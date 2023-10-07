@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../auth_ui/login.dart';
 
 class OnboardingPageModel {
   final String title;
@@ -128,8 +129,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                        onPressed: () async {
-                          await _initHive();
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Login()),
+                          );
                         },
                         child: Text(
                           "Átugrás",
@@ -138,7 +143,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     TextButton(
                       onPressed: () async {
                         if (_currentPage == widget.pages.length - 1) {
-                          await _initHive();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Login()),
+                          );
                         } else {
                           _pageController.animateToPage(_currentPage + 1,
                               curve: Curves.easeInOutCubic,
