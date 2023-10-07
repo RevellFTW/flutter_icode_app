@@ -29,13 +29,6 @@ class MainApp extends StatelessWidget {
             bgColor: const Color(0xff1eb090),
           ),
           OnboardingPageModel(
-            title: 'Bookmark your favourites',
-            description:
-                'Bookmark your favourite quotes to read at a leisure time.',
-            image: 'assets/image2.png',
-            bgColor: const Color(0xfffeae4f),
-          ),
-          OnboardingPageModel(
             title: 'Follow creators',
             description: 'Follow your favourite creators to stay in the loop.',
             image: 'assets/image3.png',

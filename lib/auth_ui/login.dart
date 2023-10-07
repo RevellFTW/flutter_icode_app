@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:icode_app/auth_ui/home.dart';
+import 'package:icode_app/pages/hero_view_page.dart';
 
-import 'home.dart';
 import 'signup.dart';
 
 class Login extends StatefulWidget {
@@ -27,7 +28,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     if (_boxLogin.get("loginStatus") ?? false) {
-      return Home();
+      return HomePage();
     }
 
     return Scaffold(
@@ -128,7 +129,7 @@ class _LoginState extends State<Login> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return Home();
+                              return HomePage();
                             },
                           ),
                         );
