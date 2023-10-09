@@ -1,6 +1,6 @@
 {
-    "name": "icode_app",
-    "short_name": "icode_app",
+    "name": "task_master",
+    "short_name": "task_master",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

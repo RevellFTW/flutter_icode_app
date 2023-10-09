@@ -1,4 +1,4 @@
-package com.example.icode_app
+package com.example.task_master
 
 import io.flutter.embedding.android.FlutterActivity
 

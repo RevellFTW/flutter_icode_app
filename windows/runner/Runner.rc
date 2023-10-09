@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "icode_app" "\0"
+            VALUE "FileDescription", "task_master" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "icode_app" "\0"
+            VALUE "InternalName", "task_master" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "icode_app.exe" "\0"
-            VALUE "ProductName", "icode_app" "\0"
+            VALUE "OriginalFilename", "task_master.exe" "\0"
+            VALUE "ProductName", "task_master" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
