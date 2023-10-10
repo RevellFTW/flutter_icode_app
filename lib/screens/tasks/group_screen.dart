@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:task_master/widget/task_builder.dart';
+import '../../models/patient.dart';
+import '../../providers/spreadsheet.dart';
 
 class GroupScreen extends StatelessWidget {
   final String groupName;
+  //fill patients with data
+  final List<Patient> patients = List<Patient>.generate(
+    20,
+    (index) => Patient(
+      name: 'Patient $index',
+      startDate: DateTime.now(),
+      caretakerName: 'Caretaker $index',
+    ),
+  );
 
-  const GroupScreen(this.groupName, {super.key});
-
+  GroupScreen(this.groupName, {Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,9 +38,9 @@ class GroupScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: TaskBuilder(
-                filter: groupName.toLowerCase(),
-              ),
+              child: groupName.toLowerCase() == 'patients'
+                  ? PatientTable(patients: patients)
+                  : PatientTable(patients: patients),
             ),
           ),
         ],

@@ -20,7 +20,7 @@ class UserTaskScreen extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            TaskBuilder(filter: 'NoGroup'),
+            // TaskBuilder(filter: 'NoGroup'),
           ],
         ),
       ),
