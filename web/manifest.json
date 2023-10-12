@@ -1,6 +1,6 @@
 {
-    "name": "task_master",
-    "short_name": "task_master",
+    "name": "todoapp",
+    "short_name": "todoapp",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
