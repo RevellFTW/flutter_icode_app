@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/patient.dart';
+import '../screens/patient_form_screen.dart';
 
 class PatientTable extends StatelessWidget {
   final List<Patient> patients;
@@ -36,7 +37,17 @@ class PatientTable extends StatelessWidget {
         rows: patients
             .map((Patient patient) => DataRow(
                   onSelectChanged: (bool? selected) {
-                    // Handle the tap event here.
+                    if (selected == true) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Edit Patient'),
+                            content: PatientFormScreen(patient: patient),
+                          );
+                        },
+                      );
+                    }
                   },
                   cells: <DataCell>[
                     DataCell(Text(patient.name)),

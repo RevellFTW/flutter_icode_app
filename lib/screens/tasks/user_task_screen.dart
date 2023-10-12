@@ -10,7 +10,7 @@ class UserTaskScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ápolói alkalmazás'),
+        title: const Text('Caretaker app'),
       ),
       body: const SingleChildScrollView(
         child: Column(

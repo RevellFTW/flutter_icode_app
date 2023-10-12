@@ -8,6 +8,7 @@ class GroupScreen extends StatelessWidget {
   final List<Patient> patients = List<Patient>.generate(
     20,
     (index) => Patient(
+      id: index,
       name: 'Patient $index',
       startDate: DateTime.now(),
       caretakerName: 'Caretaker $index',
