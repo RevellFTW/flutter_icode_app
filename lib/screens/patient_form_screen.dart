@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/patient.dart';
 import '../models/patient_task.dart';
 import 'tasks/patient_tasks_screen.dart';
+import '../main.dart';
 
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;
@@ -21,9 +22,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
 
   Future<List<PatientTask>> loadTasksFromFirestore() async {
     List<PatientTask> tasks = [];
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    QuerySnapshot querySnapshot =
-        await firestore.collection('patientTasks').get();
+    QuerySnapshot querySnapshot = await db.collection('patientTasks').get();
 
     for (var doc in querySnapshot.docs) {
       tasks.add(PatientTask(

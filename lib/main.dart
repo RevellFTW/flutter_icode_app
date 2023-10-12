@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -33,6 +34,8 @@ void main() async {
       deviceInfo is AndroidDeviceInfo ? deviceInfo.version.sdkInt : 0;
   runApp(MyApp(androidSdkVersion: androidSdkVersion));
 }
+
+final db = FirebaseFirestore.instance;
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key, required this.androidSdkVersion}) : super(key: key);
