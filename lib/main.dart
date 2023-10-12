@@ -7,17 +7,15 @@ import 'package:device_info_plus/device_info_plus.dart';
 import '../widget/app_theme.dart';
 import '../providers/tasks_provider.dart';
 import '../screens/tasks/add_task_screen.dart';
-import '../screens/tasks/user_task_screen.dart';
-import '../screens/splash_screen.dart';
 import '../providers/auth.dart';
-import '../screens/user_add_screen.dart';
 import '../providers/user_provider.dart';
-import '../screens/user_detail_screen.dart';
 import '../screens/tabs_screen.dart';
 import '../helper/scroll_behaviour.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
 import 'firebase_options.dart';
+import 'models/patient.dart';
+import 'screens/tasks/user_task_screen.dart';
 
 final log = Logger('MainLogger');
 
@@ -37,6 +35,16 @@ void main() async {
       deviceInfo is AndroidDeviceInfo ? deviceInfo.version.sdkInt : 0;
   runApp(const MainApp());
 }
+
+final List<Patient> patients = List<Patient>.generate(
+  20,
+  (index) => Patient(
+    id: index,
+    name: 'Patient $index',
+    startDate: DateTime.now(),
+    caretakerName: 'Caretaker $index',
+  ),
+);
 
 final db = FirebaseFirestore.instance;
 int androidSdkVersion = 0;
@@ -79,25 +87,10 @@ class _MyAppState extends State<MyApp> {
             theme: Provider.of<UserProvider>(context).isDark
                 ? DarkTheme.darkThemeData
                 : LightTheme.lightThemeData,
-            home: auth.isAuth
-                ? const Tabs()
-                : FutureBuilder(
-                    future: auth.tryLogin(),
-                    builder: (context, snapshot) =>
-                        snapshot.connectionState == ConnectionState.waiting
-                            ? Container(
-                                color: Colors.white,
-                                child: const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              )
-                            : const SplashScreen(),
-                  ),
+            home: const Tabs(),
             routes: {
               AddTask.routeName: (ctx) => const AddTask(),
               UserTaskScreen.routeName: (ctx) => const UserTaskScreen(),
-              UserAddScreen.routeName: (ctx) => const UserAddScreen(),
-              UserDetailScreen.routeName: (ctx) => const UserDetailScreen(),
               Tabs.routeName: (ctx) => const Tabs(),
             },
           );

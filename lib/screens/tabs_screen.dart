@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../screens/user_detail_screen.dart';
-import '../screens/tasks/user_task_screen.dart';
-import '../screens/tasks/all_task_screen.dart';
-import '../screens/tasks/add_task_screen.dart';
+import '../main.dart';
+import '../providers/spreadsheet.dart';
 import '../providers/user_provider.dart';
 
 class Tabs extends StatefulWidget {
@@ -18,16 +16,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
 
   final List tabs = [
-    const UserTaskScreen(),
-    const AllTask(),
-    const UserDetailScreen(),
+    PatientTable(patients: patients),
+    PatientTable(patients: patients),
   ];
 
   late AnimationController _animationController;
-  late Animation<double> _buttonAnimation;
-  late Animation<double> _translateButton;
-
-  bool _isExpanded = false;
 
   bool isInit = false;
 
@@ -38,13 +31,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       ..addListener(() {
         setState(() {});
       });
-
-    _buttonAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
-
-    _translateButton = Tween<double>(begin: 100, end: -5).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
 
     isInit = true;
 
@@ -64,16 +50,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   void dispose() {
     _animationController.dispose();
     super.dispose();
-  }
-
-  _toogle() {
-    if (_isExpanded) {
-      _animationController.reverse();
-    } else {
-      _animationController.forward();
-    }
-
-    _isExpanded = !_isExpanded;
   }
 
   @override
@@ -97,23 +73,16 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             : MediaQuery.sizeOf(context).width * 0.07,
         items: [
           BottomNavigationBarItem(
-            label: 'Home',
+            label: 'Patients',
             icon: const Icon(
               Icons.home,
             ),
             backgroundColor: color,
           ),
           BottomNavigationBarItem(
-            label: 'Tasks',
+            label: 'Caretakers',
             icon: const Icon(
               Icons.task,
-            ),
-            backgroundColor: color,
-          ),
-          BottomNavigationBarItem(
-            label: 'Account',
-            icon: const Icon(
-              Icons.account_circle,
             ),
             backgroundColor: color,
           ),
@@ -124,44 +93,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           });
         },
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 70),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Transform(
-              key: UniqueKey(),
-              transform: Matrix4.translationValues(
-                  0.0, _translateButton.value * 3, 0.0),
-              child: FloatingActionButton(
-                heroTag: 'task-btn',
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    AddTask.routeName,
-                  );
-                  _toogle();
-                },
-                child: const Icon(
-                  Icons.task,
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            FloatingActionButton(
-              elevation: 5,
-              onPressed: _toogle,
-              child: AnimatedIcon(
-                  icon: AnimatedIcons.add_event, progress: _buttonAnimation),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      // extendBody: true,
       resizeToAvoidBottomInset: false,
     );
   }
