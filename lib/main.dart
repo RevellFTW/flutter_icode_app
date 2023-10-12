@@ -12,9 +12,22 @@ import '../providers/user_provider.dart';
 import '../screens/user_detail_screen.dart';
 import '../screens/tabs_screen.dart';
 import '../helper/scroll_behaviour.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:logging/logging.dart';
+import 'firebase_options.dart';
+
+final log = Logger('MainLogger');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    log.severe('Could not initialize app: $e');
+  }
+
   final deviceInfo = await DeviceInfoPlugin().deviceInfo;
   final androidSdkVersion =
       deviceInfo is AndroidDeviceInfo ? deviceInfo.version.sdkInt : 0;
