@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '/widget/task_groups.dart';
+import 'package:todoapp/providers/spreadsheet.dart';
+import '../../main.dart';
 
 class UserTaskScreen extends StatelessWidget {
   static const routeName = '/user-task';
@@ -11,12 +12,12 @@ class UserTaskScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Caretaker app'),
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            TaskGroups(),
-            SizedBox(
+            PatientTable(patients: patients),
+            const SizedBox(
               height: 10,
             ),
             // TaskBuilder(filter: 'NoGroup'),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todoapp/screens/tasks/user_task_screen.dart';
 import '../main.dart';
 import '../providers/spreadsheet.dart';
 import '../providers/user_provider.dart';
@@ -16,8 +17,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
 
   final List tabs = [
-    PatientTable(patients: patients),
-    PatientTable(patients: patients),
+    const UserTaskScreen(),
+    const UserTaskScreen(),
   ];
 
   late AnimationController _animationController;
