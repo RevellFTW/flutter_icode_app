@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'main_app.dart';
 import 'package:provider/provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import '../widget/app_theme.dart';
@@ -20,7 +18,6 @@ import 'screens/tasks/user_task_screen.dart';
 final log = Logger('MainLogger');
 
 void main() async {
-  await _initHive();
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
@@ -33,7 +30,7 @@ void main() async {
   final deviceInfo = await DeviceInfoPlugin().deviceInfo;
   androidSdkVersion =
       deviceInfo is AndroidDeviceInfo ? deviceInfo.version.sdkInt : 0;
-  runApp(const MainApp());
+  runApp(MyApp(androidSdkVersion: androidSdkVersion));
 }
 
 final List<Patient> patients = List<Patient>.generate(
@@ -48,11 +45,6 @@ final List<Patient> patients = List<Patient>.generate(
 
 final db = FirebaseFirestore.instance;
 int androidSdkVersion = 0;
-Future<void> _initHive() async {
-  await Hive.initFlutter();
-  await Hive.openBox("login");
-  await Hive.openBox("accounts");
-}
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key, required this.androidSdkVersion}) : super(key: key);
