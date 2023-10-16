@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todoapp/screens/tasks/user_task_screen.dart';
+import 'package:todoapp/screens/tasks/patient_screen.dart';
 import '../main.dart';
-import '../providers/spreadsheet.dart';
+import '../providers/patients_table_screen.dart';
 import '../providers/user_provider.dart';
+import 'tasks/caretaker_screen.dart';
 
 class Tabs extends StatefulWidget {
   static const routeName = '/tabs-page';
@@ -17,8 +18,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
 
   final List tabs = [
-    const UserTaskScreen(),
-    const UserTaskScreen(),
+    const PatientScreen(),
+    const CaretakerScreen(),
   ];
 
   late AnimationController _animationController;

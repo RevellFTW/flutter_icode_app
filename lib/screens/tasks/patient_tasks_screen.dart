@@ -10,7 +10,7 @@ class TasksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tasks Screen')),
+      appBar: AppBar(title: const Text('Event Logs')),
       body: ListView.builder(
         itemCount: tasks.length,
         itemBuilder: (context, index) {

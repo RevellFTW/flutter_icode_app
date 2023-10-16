@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
+import '../main.dart';
 import '../models/patient.dart';
 import '../screens/patient_form_screen.dart';
 
-class PatientTable extends StatelessWidget {
+class PatientTable extends StatefulWidget {
   final List<Patient> patients;
 
-  const PatientTable({super.key, required this.patients});
+  const PatientTable({Key? key, required this.patients}) : super(key: key);
+
+  @override
+  _PatientTableState createState() => _PatientTableState();
+}
+
+class _PatientTableState extends State<PatientTable> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    var index;
+    var _selected;
     return SingleChildScrollView(
       child: SizedBox(
         width: MediaQuery.of(context).size.width,

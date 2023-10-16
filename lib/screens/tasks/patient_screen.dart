@@ -1,30 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/providers/spreadsheet.dart';
+import 'package:todoapp/providers/patients_table_screen.dart';
+import '../../main.dart';
 import '../../main.dart';
 
-class UserTaskScreen extends StatelessWidget {
-  static const routeName = '/user-task';
-  const UserTaskScreen({super.key});
+class PatientScreen extends StatefulWidget {
+  static const routeName = '/patient';
+  const PatientScreen({super.key});
+
+  @override
+  _PatientScreenState createState() => _PatientScreenState();
+}
+
+class _PatientScreenState extends State<PatientScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Caretaker app'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            PatientTable(patients: patients),
-            const SizedBox(
-              height: 10,
-            ),
-            // TaskBuilder(filter: 'NoGroup'),
-          ],
+        appBar: AppBar(
+          title: const Text('Caretaker app'),
         ),
-      ),
-    );
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              PatientTable(patients: patients),
+              const SizedBox(
+                height: 10,
+              ),
+              // TaskBuilder(filter: 'NoGroup'),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              //todo
+            });
+          },
+          child: Icon(Icons.delete),
+        ));
   }
 
   Widget textDecoration(String text, BuildContext context) {

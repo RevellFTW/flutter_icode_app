@@ -12,8 +12,10 @@ import '../helper/scroll_behaviour.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
 import 'firebase_options.dart';
+import 'models/caretaker.dart';
 import 'models/patient.dart';
-import 'screens/tasks/user_task_screen.dart';
+import 'screens/tasks/caretaker_screen.dart';
+import 'screens/tasks/patient_screen.dart';
 
 final log = Logger('MainLogger');
 
@@ -40,6 +42,15 @@ final List<Patient> patients = List<Patient>.generate(
     name: 'Patient $index',
     startDate: DateTime.now(),
     caretakerName: 'Caretaker $index',
+  ),
+);
+
+final List<Caretaker> caretakers = List<Caretaker>.generate(
+  20,
+  (index) => Caretaker(
+    id: index,
+    name: 'Caretaker $index',
+    startDate: DateTime.now(),
   ),
 );
 
@@ -82,7 +93,8 @@ class _MyAppState extends State<MyApp> {
             home: const Tabs(),
             routes: {
               AddTask.routeName: (ctx) => const AddTask(),
-              UserTaskScreen.routeName: (ctx) => const UserTaskScreen(),
+              PatientScreen.routeName: (ctx) => const PatientScreen(),
+              CaretakerScreen.routeName: (ctx) => const CaretakerScreen(),
               Tabs.routeName: (ctx) => const Tabs(),
             },
           );

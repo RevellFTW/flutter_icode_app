@@ -34,7 +34,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
                             controller: _taskController,
                             onSubmitted: (newValue) {
                               setState(() {
-                                widget.careTasks[index] = newValue;
+                                if (newValue.isNotEmpty)
+                                  widget.careTasks[index] = newValue;
                                 _editIndex = -1;
                                 _taskController.clear();
                               });
