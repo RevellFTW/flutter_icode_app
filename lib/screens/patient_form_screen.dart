@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/patient.dart';
 import '../models/patient_task.dart';
+import 'patient_care_tasks_screen.dart';
 import 'tasks/patient_tasks_screen.dart';
 import '../main.dart';
 
@@ -70,6 +71,22 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
           ElevatedButton(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
+                List<String> careTasks = List<String>.empty(growable: true);
+                careTasks.addAll(['Take medicine', 'Eat breakfast']);
+                // ignore: use_build_context_synchronously
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          CareTasksPage(careTasks: careTasks)),
+                );
+              }
+            },
+            child: const Text('Care Tasks'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
                 List<PatientTask> tasks = await loadTasksFromFirestore();
                 // ignore: use_build_context_synchronously
                 Navigator.push(
@@ -79,7 +96,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                 );
               }
             },
-            child: const Text('View Tasks'),
+            child: const Text('Event Logs'),
           ),
         ],
       ),
