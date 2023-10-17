@@ -1,11 +1,34 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../main.dart';
 import '../models/caretaker.dart';
 import '../screens/caretaker_form_screen.dart';
 
-class CaretakerTable extends StatelessWidget {
-  final List<Caretaker> caretakers;
+class CaretakerTable extends StatefulWidget {
+  const CaretakerTable({Key? key}) : super(key: key);
 
-  const CaretakerTable({super.key, required this.caretakers});
+  @override
+  _CaretakerTableState createState() => _CaretakerTableState();
+}
+
+class _CaretakerTableState extends State<CaretakerTable> {
+  List<Caretaker> caretakers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData().then((value) {
+      setState(() {
+        caretakers = value;
+      });
+    });
+  }
+
+  Future<List<Caretaker>> _loadData() async {
+    // Load the data asynchronously
+    final data = await loadCaretakersFromFirestore();
+    return data;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,5 +77,20 @@ class CaretakerTable extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<List<Caretaker>> loadCaretakersFromFirestore() async {
+    List<Caretaker> caretakers = [];
+    QuerySnapshot querySnapshot = await db.collection('caretakers').get();
+
+    for (var doc in querySnapshot.docs) {
+      caretakers.add(Caretaker(
+        id: doc['id'],
+        name: doc['name'],
+        startDate: doc['startDate'].toDate(),
+      ));
+    }
+
+    return caretakers;
   }
 }

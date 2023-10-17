@@ -12,12 +12,12 @@ class CaretakerScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Caretaker app'),
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            CaretakerTable(caretakers: caretakers),
-            const SizedBox(
+            CaretakerTable(),
+            SizedBox(
               height: 10,
             ),
             // TaskBuilder(filter: 'NoGroup'),

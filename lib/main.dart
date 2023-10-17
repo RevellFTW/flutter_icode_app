@@ -35,25 +35,6 @@ void main() async {
   runApp(MyApp(androidSdkVersion: androidSdkVersion));
 }
 
-final List<Patient> patients = List<Patient>.generate(
-  20,
-  (index) => Patient(
-    id: index,
-    name: 'Patient $index',
-    startDate: DateTime.now(),
-    caretakerName: 'Caretaker $index',
-  ),
-);
-
-final List<Caretaker> caretakers = List<Caretaker>.generate(
-  20,
-  (index) => Caretaker(
-    id: index,
-    name: 'Caretaker $index',
-    startDate: DateTime.now(),
-  ),
-);
-
 final db = FirebaseFirestore.instance;
 int androidSdkVersion = 0;
 

@@ -19,7 +19,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
-  late TextEditingController _caretakerNameController;
 
   Future<List<PatientTask>> loadTasksFromFirestore() async {
     List<PatientTask> tasks = [];
@@ -43,8 +42,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     _nameController = TextEditingController(text: widget.patient.name);
     _startDateController =
         TextEditingController(text: widget.patient.startDate.toString());
-    _caretakerNameController =
-        TextEditingController(text: widget.patient.caretakerName);
   }
 
   @override
@@ -60,13 +57,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
           TextFormField(
             controller: _startDateController,
             decoration: const InputDecoration(labelText: 'Start Date'),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 30.0),
-            child: TextFormField(
-              controller: _caretakerNameController,
-              decoration: const InputDecoration(labelText: 'Caretaker'),
-            ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 30.0),

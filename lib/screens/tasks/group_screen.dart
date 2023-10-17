@@ -11,7 +11,6 @@ class GroupScreen extends StatelessWidget {
       id: index,
       name: 'Patient $index',
       startDate: DateTime.now(),
-      caretakerName: 'Caretaker $index',
     ),
   );
 
@@ -40,8 +39,8 @@ class GroupScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(top: 10),
               child: groupName.toLowerCase() == 'patients'
-                  ? PatientTable(patients: patients)
-                  : PatientTable(patients: patients),
+                  ? const PatientTable()
+                  : const PatientTable(),
             ),
           ),
         ],

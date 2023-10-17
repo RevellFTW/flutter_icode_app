@@ -1,27 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../main.dart';
 import '../models/patient.dart';
 import '../screens/patient_form_screen.dart';
 
 class PatientTable extends StatefulWidget {
-  final List<Patient> patients;
-
-  const PatientTable({Key? key, required this.patients}) : super(key: key);
+  const PatientTable({Key? key}) : super(key: key);
 
   @override
   _PatientTableState createState() => _PatientTableState();
 }
 
 class _PatientTableState extends State<PatientTable> {
+  List<Patient> patients = [];
+
   @override
   void initState() {
     super.initState();
+    _loadData().then((value) {
+      setState(() {
+        patients = value;
+      });
+    });
+  }
+
+  Future<List<Patient>> _loadData() async {
+    // Load the data asynchronously
+    final data = await loadPatientsFromFirestore();
+
+    // Return the loaded data
+    return data;
   }
 
   @override
   Widget build(BuildContext context) {
-    var index;
-    var _selected;
     return SingleChildScrollView(
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -37,13 +49,6 @@ class _PatientTableState extends State<PatientTable> {
             DataColumn(
               label: Text(
                 'Start Date',
-                style: TextStyle(
-                    fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Caretaker',
                 style: TextStyle(
                     fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
               ),
@@ -67,12 +72,25 @@ class _PatientTableState extends State<PatientTable> {
                     cells: <DataCell>[
                       DataCell(Text(patient.name)),
                       DataCell(Text(patient.startDate.toString())),
-                      DataCell(Text(patient.caretakerName)),
                     ],
                   ))
               .toList(),
         ),
       ),
     );
+  }
+
+  Future<List<Patient>> loadPatientsFromFirestore() async {
+    List<Patient> patients = [];
+    QuerySnapshot querySnapshot = await db.collection('patients').get();
+
+    for (var doc in querySnapshot.docs) {
+      patients.add(Patient(
+          id: doc['id'],
+          name: doc['name'],
+          startDate: doc['startDate'].toDate()));
+    }
+
+    return patients;
   }
 }

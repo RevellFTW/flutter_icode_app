@@ -23,12 +23,12 @@ class _PatientScreenState extends State<PatientScreen> {
         appBar: AppBar(
           title: const Text('Caretaker app'),
         ),
-        body: SingleChildScrollView(
+        body: const SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              PatientTable(patients: patients),
-              const SizedBox(
+              PatientTable(),
+              SizedBox(
                 height: 10,
               ),
               // TaskBuilder(filter: 'NoGroup'),
