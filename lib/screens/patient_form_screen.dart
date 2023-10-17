@@ -19,8 +19,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
-
-  Future<List<PatientTask>> loadTasksFromFirestore() async {
+  List<String> careTasks = [];
+  Future<List<PatientTask>> loadEventLogsFromFirestore() async {
     List<PatientTask> tasks = [];
     QuerySnapshot querySnapshot = await db.collection('patientTasks').get();
 
@@ -36,12 +36,37 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     return tasks;
   }
 
+  Future<List<String>> loadCareTasksFromFirestore() async {
+    List<String> tasks = [];
+    QuerySnapshot querySnapshot = await db
+        .collection('patients')
+        .where('id', isEqualTo: widget.patient.id)
+        .get();
+
+    for (var task in querySnapshot.docs[0]['careTasks']) {
+      tasks.add(task.toString());
+    }
+    return tasks;
+  }
+
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.patient.name);
     _startDateController =
         TextEditingController(text: widget.patient.startDate.toString());
+    _loadData().then((value) {
+      setState(() {
+        careTasks = value;
+      });
+    });
+  }
+
+  Future<List<String>> _loadData() async {
+    // Load the data asynchronously
+    final data = await loadCareTasksFromFirestore();
+    // Return the loaded data
+    return data;
   }
 
   @override
@@ -63,8 +88,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
             child: ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
-                  List<String> careTasks = List<String>.empty(growable: true);
-                  careTasks.addAll(['Take medicine', 'Eat breakfast']);
                   // ignore: use_build_context_synchronously
                   Navigator.push(
                     context,
@@ -82,7 +105,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
             child: ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
-                  List<PatientTask> tasks = await loadTasksFromFirestore();
+                  List<PatientTask> tasks = await loadEventLogsFromFirestore();
                   // ignore: use_build_context_synchronously
                   Navigator.push(
                     context,
