@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../main.dart';
 import '../models/caretaker.dart';
 import '../screens/caretaker_form_screen.dart';
@@ -8,6 +9,7 @@ class CaretakerTable extends StatefulWidget {
   const CaretakerTable({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _CaretakerTableState createState() => _CaretakerTableState();
 }
 
@@ -70,7 +72,8 @@ class _CaretakerTableState extends State<CaretakerTable> {
                     },
                     cells: <DataCell>[
                       DataCell(Text(caretaker.name)),
-                      DataCell(Text(caretaker.startDate.toString())),
+                      DataCell(
+                          Text(DateFormat.yMMMd().format(caretaker.startDate))),
                     ],
                   ))
               .toList(),

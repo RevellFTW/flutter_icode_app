@@ -12,8 +12,6 @@ import '../helper/scroll_behaviour.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
 import 'firebase_options.dart';
-import 'models/caretaker.dart';
-import 'models/patient.dart';
 import 'screens/tasks/caretaker_screen.dart';
 import 'screens/tasks/patient_screen.dart';
 
@@ -37,6 +35,16 @@ void main() async {
 
 final db = FirebaseFirestore.instance;
 int androidSdkVersion = 0;
+final currentUser = User(name: 'John Doe', role: 'back-office');
+String appName = "Caretaker App";
+
+//todo make user in firebase, and load this with auth and more properties
+class User {
+  final String name;
+  final String role;
+
+  User({required this.name, required this.role});
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key, required this.androidSdkVersion}) : super(key: key);
@@ -47,6 +55,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    appName = 'Caretaker App';
+    if (currentUser.role == 'back-office') {
+      appName = 'Back-Office Caretaker App';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(

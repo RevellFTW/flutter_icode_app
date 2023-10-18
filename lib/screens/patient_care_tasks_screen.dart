@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../models/patient.dart';
 
 class CareTasksPage extends StatefulWidget {
   final List<String> careTasks;
-
-  const CareTasksPage({super.key, required this.careTasks});
+  final Patient patient;
+  const CareTasksPage(
+      {super.key, required this.careTasks, required this.patient});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CareTasksPageState createState() => _CareTasksPageState();
 }
 
@@ -18,7 +21,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Care Tasks'),
+        title: Text("${widget.patient.name}'s Care Tasks"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -34,8 +37,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
                             controller: _taskController,
                             onSubmitted: (newValue) {
                               setState(() {
-                                if (newValue.isNotEmpty)
+                                if (newValue.isNotEmpty) {
                                   widget.careTasks[index] = newValue;
+                                }
                                 _editIndex = -1;
                                 _taskController.clear();
                               });
@@ -85,7 +89,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                     },
                   ),
                   TextButton(
-                    child: Text('Add'),
+                    child: const Text('Add'),
                     onPressed: () {
                       if (_taskController.text.isNotEmpty) {
                         setState(() {

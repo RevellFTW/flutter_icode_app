@@ -2,15 +2,26 @@ import 'package:flutter/material.dart';
 import '../../main.dart';
 import '../../providers/caretaker_table_screen.dart';
 
-class CaretakerScreen extends StatelessWidget {
+class CaretakerScreen extends StatefulWidget {
   static const routeName = '/caretaker';
   const CaretakerScreen({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _CaretakerScreenState createState() => _CaretakerScreenState();
+}
+
+class _CaretakerScreenState extends State<CaretakerScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Caretaker app'),
+        title: Text(appName),
       ),
       body: const SingleChildScrollView(
         child: Column(
@@ -22,37 +33,6 @@ class CaretakerScreen extends StatelessWidget {
             ),
             // TaskBuilder(filter: 'NoGroup'),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget textDecoration(String text, BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-    return Container(
-      margin: const EdgeInsets.only(left: 10, bottom: 10),
-      width: isLandscape
-          ? mediaQuery.size.width * 0.2
-          : mediaQuery.size.width * 0.4,
-      height: isLandscape
-          ? mediaQuery.size.width * 0.06
-          : mediaQuery.size.height * 0.06,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(15),
-        ),
-        color: Theme.of(context).colorScheme.primary,
-      ),
-      child: Align(
-        alignment: Alignment.center,
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: mediaQuery.textScaleFactor * 20,
-            color: Colors.white,
-          ),
         ),
       ),
     );

@@ -71,7 +71,11 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => TasksScreen(tasks: tasks)),
+                        builder: (context) => TasksScreen(
+                              tasks: tasks,
+                              eventLogName:
+                                  "${widget.caretaker.name} Caretaker's Log",
+                            )),
                   );
                 }
               },

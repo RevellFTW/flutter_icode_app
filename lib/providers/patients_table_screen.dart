@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../main.dart';
 import '../models/patient.dart';
 import '../screens/patient_form_screen.dart';
@@ -48,7 +49,7 @@ class _PatientTableState extends State<PatientTable> {
             ),
             DataColumn(
               label: Text(
-                'Start Date',
+                'Entry Date',
                 style: TextStyle(
                     fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
               ),
@@ -71,7 +72,8 @@ class _PatientTableState extends State<PatientTable> {
                     },
                     cells: <DataCell>[
                       DataCell(Text(patient.name)),
-                      DataCell(Text(patient.startDate.toString())),
+                      DataCell(
+                          Text(DateFormat.yMMMd().format(patient.startDate))),
                     ],
                   ))
               .toList(),

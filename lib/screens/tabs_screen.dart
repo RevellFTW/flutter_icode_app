@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todoapp/screens/tasks/patient_screen.dart';
-import '../main.dart';
-import '../providers/patients_table_screen.dart';
 import '../providers/user_provider.dart';
 import 'tasks/caretaker_screen.dart';
 

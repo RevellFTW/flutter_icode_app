@@ -22,7 +22,10 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   List<String> careTasks = [];
   Future<List<PatientTask>> loadEventLogsFromFirestore() async {
     List<PatientTask> tasks = [];
-    QuerySnapshot querySnapshot = await db.collection('patientTasks').get();
+    QuerySnapshot querySnapshot = await db
+        .collection('patientTasks')
+        .where('name', isEqualTo: widget.patient.name)
+        .get();
 
     for (var doc in querySnapshot.docs) {
       tasks.add(PatientTask(
@@ -92,8 +95,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            CareTasksPage(careTasks: careTasks)),
+                        builder: (context) => CareTasksPage(
+                            careTasks: careTasks, patient: widget.patient)),
                   );
                 }
               },
@@ -110,7 +113,11 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => TasksScreen(tasks: tasks)),
+                        builder: (context) => TasksScreen(
+                              tasks: tasks,
+                              eventLogName:
+                                  "${widget.patient.name} Patient's Log",
+                            )),
                   );
                 }
               },

@@ -4,13 +4,14 @@ import '../../models/patient_task.dart';
 
 class TasksScreen extends StatelessWidget {
   final List<PatientTask> tasks;
-
-  const TasksScreen({super.key, required this.tasks});
+  final String eventLogName;
+  const TasksScreen(
+      {super.key, required this.tasks, required this.eventLogName});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Event Logs')),
+      appBar: AppBar(title: Text(eventLogName)),
       body: ListView.builder(
         itemCount: tasks.length,
         itemBuilder: (context, index) {
