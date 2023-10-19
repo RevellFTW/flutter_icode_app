@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/main.dart';
 import '../helper/firestore_helper.dart';
 import '../models/patient.dart';
 
@@ -19,11 +18,47 @@ class _CareTasksPageState extends State<CareTasksPage> {
   int _editIndex = -1;
   String _editKey = '';
   String? dropdownValue = 'weekly';
+  final FocusNode _focusNode = FocusNode();
 
   saveToDb() {
     getDocumentID(widget.patient.id).then((docID) {
       addDocumentToCareTasks(widget.careTasks, docID);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus) {
+      setState(() {
+        if (_editIndex != -1) {
+          if (_taskController.text.isNotEmpty) {
+            widget.careTasks.remove(_editKey);
+            widget.careTasks[_taskController.text] = dropdownValue!;
+            _editIndex = -1;
+            _editKey = '';
+            _taskController.clear();
+          } else {
+            _taskController.text = _editKey;
+          }
+          _editIndex = -1;
+          _editKey = '';
+          _taskController.clear();
+        }
+      });
+      saveToDb();
+    }
   }
 
   @override
@@ -46,6 +81,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                         child: ListTile(
                           title: _editIndex == index
                               ? TextField(
+                                  focusNode: _focusNode,
                                   controller: _taskController,
                                   onSubmitted: (newValue) {
                                     setState(() {
