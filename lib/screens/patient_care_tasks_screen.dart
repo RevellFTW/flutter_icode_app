@@ -25,6 +25,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
   final FocusNode _focusNode = FocusNode();
 
   saveToDb() {
+    widget.careTasks.addAll(_editedCareTasks);
+    _editedCareTasks.clear();
     getDocumentID(widget.patient.id).then((docID) {
       addDocumentToCareTasks(widget.careTasks, docID);
     });
@@ -71,6 +73,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
       onTap: () {
         FocusScope.of(context)
             .unfocus(); // Unfocus the TextField and DropdownButtonFormField
+        saveToDb();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -95,8 +98,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     onSubmitted: (newValue) {
                                       setState(() {
                                         if (newValue.isNotEmpty) {
-                                          widget.careTasks.remove(_editKey);
-                                          widget.careTasks[newValue] =
+                                          _editedCareTasks.remove(_editKey);
+                                          _editedCareTasks[newValue] =
                                               dropdownValue!;
                                         }
                                         _editIndex = -1;
@@ -140,7 +143,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                       onChanged: (String? newValue) {
                                         setState(() {
                                           dropdownValue = newValue!;
-                                          widget.careTasks[widget.careTasks.keys
+                                          _editedCareTasks[widget.careTasks.keys
                                                   .elementAt(index)] =
                                               dropdownValue!;
                                           _editFrequency = -1;
