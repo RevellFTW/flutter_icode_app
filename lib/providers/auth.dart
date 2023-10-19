@@ -1,46 +1,44 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+//todo add firebase here
 class Auth extends ChangeNotifier {
-  String? _token;
+  User? _user;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool get isAuth {
-    if (_token == null) return false;
+    if (_user == null) return false;
     return true;
   }
 
-  Future<void> authenticate(String token) async {
-    _token = token;
-
-    notifyListeners();
-
+  Future<void> authenticate(String email, String password) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final data = jsonEncode({'token': _token});
-      prefs.setString('data', data);
-    } catch (e) {
-      rethrow;
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      _user = userCredential.user;
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      // Handle exceptions
     }
   }
 
   Future<bool> tryLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('data')) {
+    User? user = _auth.currentUser;
+    if (user == null) {
       return false;
     }
-
-    final extractedData =
-        jsonDecode(prefs.getString('data')!) as Map<String, dynamic>;
-    _token = extractedData['token'];
+    _user = user;
     notifyListeners();
     return true;
   }
 
-  void logout() async {
-    _token = null;
+  Future<void> logout() async {
+    await _auth.signOut();
+    _user = null;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    prefs.clear();
   }
 }

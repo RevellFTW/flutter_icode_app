@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/patient.dart';
@@ -19,7 +21,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
-  List<String> careTasks = [];
+  Map<String, String> careTasks = {};
   Future<List<PatientTask>> loadEventLogsFromFirestore() async {
     List<PatientTask> tasks = [];
     QuerySnapshot querySnapshot = await db
@@ -39,16 +41,16 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     return tasks;
   }
 
-  Future<List<String>> loadCareTasksFromFirestore() async {
-    List<String> tasks = [];
+  Future<Map<String, String>> loadCareTasksFromFirestore() async {
+    Map<String, String> tasks = {};
     QuerySnapshot querySnapshot = await db
         .collection('patients')
         .where('id', isEqualTo: widget.patient.id)
         .get();
-
-    for (var task in querySnapshot.docs[0]['careTasks']) {
-      tasks.add(task.toString());
-    }
+    var data = querySnapshot.docs[0]['careTasks'];
+    data.forEach((key, value) {
+      tasks[key] = value;
+    });
     return tasks;
   }
 
@@ -65,7 +67,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     });
   }
 
-  Future<List<String>> _loadData() async {
+  Future<Map<String, String>> _loadData() async {
     // Load the data asynchronously
     final data = await loadCareTasksFromFirestore();
     // Return the loaded data

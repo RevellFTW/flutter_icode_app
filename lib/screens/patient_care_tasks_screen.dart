@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'package:todoapp/main.dart';
+import '../helper/firestore_helper.dart';
 import '../models/patient.dart';
 
 class CareTasksPage extends StatefulWidget {
-  final List<String> careTasks;
+  final Map<String, String> careTasks;
   final Patient patient;
   const CareTasksPage(
       {super.key, required this.careTasks, required this.patient});
@@ -16,6 +17,14 @@ class CareTasksPage extends StatefulWidget {
 class _CareTasksPageState extends State<CareTasksPage> {
   final TextEditingController _taskController = TextEditingController();
   int _editIndex = -1;
+  String _editKey = '';
+  String? dropdownValue = 'weekly';
+
+  saveToDb() {
+    getDocumentID(widget.patient.id).then((docID) {
+      addDocumentToCareTasks(widget.careTasks, docID);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,37 +40,57 @@ class _CareTasksPageState extends State<CareTasksPage> {
               child: ListView.builder(
                 itemCount: widget.careTasks.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: _editIndex == index
-                        ? TextField(
-                            controller: _taskController,
-                            onSubmitted: (newValue) {
-                              setState(() {
-                                if (newValue.isNotEmpty) {
-                                  widget.careTasks[index] = newValue;
-                                }
+                  return Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: ListTile(
+                          title: _editIndex == index
+                              ? TextField(
+                                  controller: _taskController,
+                                  onSubmitted: (newValue) {
+                                    setState(() {
+                                      if (newValue.isNotEmpty) {
+                                        widget.careTasks.remove(_editKey);
+                                        widget.careTasks[newValue] =
+                                            dropdownValue!;
+                                      }
+                                      _editIndex = -1;
+                                      _editKey = '';
+                                      _taskController.clear();
+                                    });
+                                    saveToDb();
+                                  },
+                                )
+                              : Text(
+                                  '${widget.careTasks.keys.elementAt(index)}: ${widget.careTasks.values.elementAt(index)}'),
+                          onTap: () {
+                            setState(() {
+                              if (_editIndex == -1) {
+                                _editIndex = index;
+                                _editKey =
+                                    widget.careTasks.keys.elementAt(index);
+                                _taskController.text = _editKey;
+                                dropdownValue = widget.careTasks[_editKey];
+                              } else {
                                 _editIndex = -1;
+                                _editKey = '';
                                 _taskController.clear();
-                              });
-                            },
-                          )
-                        : Text(widget.careTasks[index]),
-                    onTap: () {
-                      setState(() {
-                        if (_editIndex == -1) {
-                          _editIndex = index;
-                          _taskController.text = widget.careTasks[index];
-                        } else {
-                          _editIndex = -1;
-                          _taskController.clear();
-                        }
-                      });
-                    },
-                    onLongPress: () {
-                      setState(() {
-                        widget.careTasks.removeAt(index);
-                      });
-                    },
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          setState(() {
+                            widget.careTasks
+                                .remove(widget.careTasks.keys.elementAt(index));
+                          });
+                          saveToDb();
+                        },
+                      ),
+                    ],
                   );
                 },
               ),
@@ -77,10 +106,35 @@ class _CareTasksPageState extends State<CareTasksPage> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Add New Care Task'),
-                content: TextField(
-                  controller: _taskController,
-                  decoration: const InputDecoration(labelText: 'Care Task'),
-                ),
+                content: Column(children: <Widget>[
+                  TextField(
+                    controller: _taskController,
+                    decoration: const InputDecoration(labelText: 'Care Task'),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30.0),
+                    child: DropdownButtonFormField<String>(
+                      value: dropdownValue,
+                      decoration: const InputDecoration(
+                        labelText: 'Frequency of Care Task',
+                        hintText: 'weekly, monthly, daily',
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownValue = newValue!;
+                        });
+                      },
+                      items: <String>['weekly', 'monthly', 'daily']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ]),
+                //insert here
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Cancel'),
@@ -93,8 +147,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
                     onPressed: () {
                       if (_taskController.text.isNotEmpty) {
                         setState(() {
-                          widget.careTasks.add(_taskController.text);
+                          widget.careTasks[_taskController.text] =
+                              dropdownValue!;
                         });
+                        saveToDb();
                       }
                       Navigator.of(context).pop();
                     },

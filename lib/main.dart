@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import '../widget/app_theme.dart';
-import '../providers/tasks_provider.dart';
-import '../screens/tasks/add_task_screen.dart';
 import '../providers/auth.dart';
 import '../providers/user_provider.dart';
 import '../screens/tabs_screen.dart';
@@ -12,6 +10,7 @@ import '../helper/scroll_behaviour.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
 import 'firebase_options.dart';
+import 'models/patient.dart';
 import 'screens/tasks/caretaker_screen.dart';
 import 'screens/tasks/patient_screen.dart';
 
@@ -26,6 +25,21 @@ void main() async {
   } catch (e) {
     log.severe('Could not initialize app: $e');
   }
+
+  // DocumentReference documentReference = FirebaseFirestore.instance
+  //     .collection('patients')
+  //     .doc('XJLq6N47U33SN7ITYVOB');
+
+  // // Add a new collection which has the caretask name, and the frequency
+  // Map<String, String> careTasks = {
+  //   'Take medicine': 'daily',
+  //   'Make breakfast': 'daily',
+  //   'Do laundry': 'weekly'
+  // };
+
+  // // Update the document with the new data
+  // await documentReference
+  //     .set({'careTasks': careTasks}, SetOptions(merge: true));
 
   final deviceInfo = await DeviceInfoPlugin().deviceInfo;
   androidSdkVersion =
@@ -69,9 +83,6 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(
-          value: TasksProvider(),
-        ),
-        ChangeNotifierProvider.value(
           value: Auth(),
         ),
         ChangeNotifierProvider.value(
@@ -90,7 +101,6 @@ class _MyAppState extends State<MyApp> {
                 : LightTheme.lightThemeData,
             home: const Tabs(),
             routes: {
-              AddTask.routeName: (ctx) => const AddTask(),
               PatientScreen.routeName: (ctx) => const PatientScreen(),
               CaretakerScreen.routeName: (ctx) => const CaretakerScreen(),
               Tabs.routeName: (ctx) => const Tabs(),
