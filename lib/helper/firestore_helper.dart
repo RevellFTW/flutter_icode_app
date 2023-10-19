@@ -14,8 +14,6 @@ void addDocumentToCareTasks(Map<String, String> data, String documentID) {
 
   // Add the new collection to the document data
   documentReference.update({'careTasks': data});
-
-  addDocumentToCollection('careTasks', data);
 }
 
 Future<String> getDocumentID(int id) async {

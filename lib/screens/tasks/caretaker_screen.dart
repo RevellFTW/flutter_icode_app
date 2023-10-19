@@ -20,21 +20,28 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(appName),
-      ),
-      body: const SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            CaretakerTable(),
-            SizedBox(
-              height: 10,
-            ),
-            // TaskBuilder(filter: 'NoGroup'),
-          ],
+        appBar: AppBar(
+          title: Text(appName),
         ),
-      ),
-    );
+        body: const SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              CaretakerTable(),
+              SizedBox(
+                height: 10,
+              ),
+              // TaskBuilder(filter: 'NoGroup'),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              //todo
+            });
+          },
+          child: const Icon(Icons.delete),
+        ));
   }
 }

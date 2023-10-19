@@ -11,6 +11,7 @@ class CaretakerFormScreen extends StatefulWidget {
   const CaretakerFormScreen({super.key, required this.caretaker});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CaretakerFormScreenState createState() => _CaretakerFormScreenState();
 }
 
@@ -48,41 +49,43 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Name'),
-          ),
-          TextFormField(
-            controller: _startDateController,
-            decoration: const InputDecoration(labelText: 'Start Date'),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  List<PatientTask> tasks =
-                      await loadTasksFromFirestore(widget.caretaker.name);
-                  // ignore: use_build_context_synchronously
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TasksScreen(
+    return Scaffold(
+      appBar: AppBar(title: Text(appName)),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 30.0, right: 30, top: 10),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextFormField(
+                controller: _startDateController,
+                decoration: const InputDecoration(labelText: 'Start Date'),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      List<PatientTask> tasks =
+                          await loadTasksFromFirestore(widget.caretaker.name);
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => TasksScreen(
                               tasks: tasks,
                               eventLogName:
-                                  "${widget.caretaker.name} Caretaker's Log",
-                            )),
-                  );
-                }
-              },
-              child: const Text('Event Logs'),
-            ),
+                                  "${widget.caretaker.name} Caretaker's Log")));
+                    }
+                  },
+                  child: const Text('Event Logs'),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

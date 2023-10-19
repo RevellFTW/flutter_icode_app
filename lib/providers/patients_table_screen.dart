@@ -59,15 +59,9 @@ class _PatientTableState extends State<PatientTable> {
               .map((Patient patient) => DataRow(
                     onSelectChanged: (bool? selected) {
                       if (selected == true) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Edit Patient'),
-                              content: PatientFormScreen(patient: patient),
-                            );
-                          },
-                        );
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                PatientFormScreen(patient: patient)));
                       }
                     },
                     cells: <DataCell>[

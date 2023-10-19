@@ -58,16 +58,9 @@ class _CaretakerTableState extends State<CaretakerTable> {
               .map((Caretaker caretaker) => DataRow(
                     onSelectChanged: (bool? selected) {
                       if (selected == true) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Edit Caretaker'),
-                              content:
-                                  CaretakerFormScreen(caretaker: caretaker),
-                            );
-                          },
-                        );
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                CaretakerFormScreen(caretaker: caretaker)));
                       }
                     },
                     cells: <DataCell>[

@@ -11,6 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
 import 'firebase_options.dart';
 import 'models/patient.dart';
+import 'screens/home_page.dart';
 import 'screens/tasks/caretaker_screen.dart';
 import 'screens/tasks/patient_screen.dart';
 
@@ -80,34 +81,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(
-          value: Auth(),
-        ),
-        ChangeNotifierProvider.value(
-          value: UserProvider(),
-        ),
-      ],
-      child: Consumer<Auth>(
-        builder: (context, auth, _) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            scrollBehavior: CustomScrollBehavior(
-              androidSdkVersion: widget.androidSdkVersion,
-            ),
-            theme: Provider.of<UserProvider>(context).isDark
-                ? DarkTheme.darkThemeData
-                : LightTheme.lightThemeData,
-            home: const Tabs(),
-            routes: {
-              PatientScreen.routeName: (ctx) => const PatientScreen(),
-              CaretakerScreen.routeName: (ctx) => const CaretakerScreen(),
-              Tabs.routeName: (ctx) => const Tabs(),
-            },
-          );
-        },
-      ),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
     );
   }
 }

@@ -76,57 +76,57 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Name'),
-          ),
-          TextFormField(
-            controller: _startDateController,
-            decoration: const InputDecoration(labelText: 'Start Date'),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  // ignore: use_build_context_synchronously
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CareTasksPage(
-                            careTasks: careTasks, patient: widget.patient)),
-                  );
-                }
-              },
-              child: const Text('Care Tasks'),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  List<PatientTask> tasks = await loadEventLogsFromFirestore();
-                  // ignore: use_build_context_synchronously
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TasksScreen(
+    return Scaffold(
+      appBar: AppBar(title: Text(appName)),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 30.0, right: 30, top: 10),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextFormField(
+                controller: _startDateController,
+                decoration: const InputDecoration(labelText: 'Start Date'),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => CareTasksPage(
+                              careTasks: careTasks, patient: widget.patient)));
+                    }
+                  },
+                  child: const Text('Care Tasks'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      List<PatientTask> tasks =
+                          await loadEventLogsFromFirestore();
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => TasksScreen(
                               tasks: tasks,
                               eventLogName:
-                                  "${widget.patient.name} Patient's Log",
-                            )),
-                  );
-                }
-              },
-              child: const Text('Event Logs'),
-            ),
+                                  "${widget.patient.name} Patient's Log")));
+                    }
+                  },
+                  child: const Text('Event Logs'),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
