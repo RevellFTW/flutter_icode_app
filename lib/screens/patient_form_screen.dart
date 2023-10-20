@@ -100,7 +100,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => CareTasksPage(
-                              careTasks: careTasks, patient: widget.patient)));
+                              careTasks: HashMap.of(careTasks),
+                              patient: widget.patient)));
                     }
                   },
                   child: const Text('Care Tasks'),

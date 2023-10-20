@@ -1,9 +1,11 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import '../helper/firestore_helper.dart';
 import '../models/patient.dart';
 
 class CareTasksPage extends StatefulWidget {
-  final Map<String, String> careTasks;
+  final HashMap<String, String> careTasks;
 
   final Patient patient;
   const CareTasksPage(
@@ -15,18 +17,15 @@ class CareTasksPage extends StatefulWidget {
 }
 
 class _CareTasksPageState extends State<CareTasksPage> {
-  final Map<String, String> _editedCareTasks = {};
-
   final TextEditingController _taskController = TextEditingController();
   int _editIndex = -1;
   int _editFrequency = -1;
   String _editKey = '';
   String? dropdownValue = 'weekly';
   final FocusNode _focusNode = FocusNode();
+  Map<int, String> orderedCareTasks = {};
 
   saveToDb() {
-    widget.careTasks.addAll(_editedCareTasks);
-    _editedCareTasks.clear();
     getDocumentID(widget.patient.id).then((docID) {
       addDocumentToCareTasks(widget.careTasks, docID);
     });
@@ -52,6 +51,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
           if (_taskController.text.isNotEmpty) {
             widget.careTasks.remove(_editKey);
             widget.careTasks[_taskController.text] = dropdownValue!;
+            orderedCareTasks[_editIndex] = _taskController.text;
             _editIndex = -1;
             _editKey = '';
             _taskController.clear();
@@ -71,9 +71,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        saveToDb();
         FocusScope.of(context)
             .unfocus(); // Unfocus the TextField and DropdownButtonFormField
-        saveToDb();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -98,9 +98,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     onSubmitted: (newValue) {
                                       setState(() {
                                         if (newValue.isNotEmpty) {
-                                          _editedCareTasks.remove(_editKey);
-                                          _editedCareTasks[newValue] =
+                                          widget.careTasks.remove(_editKey);
+                                          widget.careTasks[newValue] =
                                               dropdownValue!;
+                                          orderedCareTasks[_editIndex] =
+                                              _taskController.text;
                                         }
                                         _editIndex = -1;
                                         _editKey = '';
@@ -143,7 +145,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                       onChanged: (String? newValue) {
                                         setState(() {
                                           dropdownValue = newValue!;
-                                          _editedCareTasks[widget.careTasks.keys
+                                          widget.careTasks[widget.careTasks.keys
                                                   .elementAt(index)] =
                                               dropdownValue!;
                                           _editFrequency = -1;
