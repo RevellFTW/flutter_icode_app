@@ -8,7 +8,8 @@ Future<void> addDocumentToCollection(
   await db.collection(collectionName).add(data);
 }
 
-void addDocumentToCareTasks(Map<String, String> data, String documentID) {
+void addDocumentToCareTasks(
+    Map<String, Map<String, String>> data, String documentID) {
   DocumentReference documentReference =
       FirebaseFirestore.instance.collection('patients').doc(documentID);
 

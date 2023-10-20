@@ -1,11 +1,12 @@
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../helper/firestore_helper.dart';
 import '../models/patient.dart';
 
 class CareTasksPage extends StatefulWidget {
-  final HashMap<String, String> careTasks;
+  final Map<String, Map<String, String>> careTasks;
 
   final Patient patient;
   const CareTasksPage(
@@ -23,7 +24,6 @@ class _CareTasksPageState extends State<CareTasksPage> {
   String _editKey = '';
   String? dropdownValue = 'weekly';
   final FocusNode _focusNode = FocusNode();
-  Map<int, String> orderedCareTasks = {};
 
   saveToDb() {
     getDocumentID(widget.patient.id).then((docID) {
@@ -49,9 +49,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
       setState(() {
         if (_editIndex != -1) {
           if (_taskController.text.isNotEmpty) {
-            widget.careTasks.remove(_editKey);
-            widget.careTasks[_taskController.text] = dropdownValue!;
-            orderedCareTasks[_editIndex] = _taskController.text;
+            //widget.careTasks.remove(_editKey);
+            widget.careTasks[_editKey]!['task'] = _taskController.text;
+            widget.careTasks[_editKey]!['frequency'] = dropdownValue!;
             _editIndex = -1;
             _editKey = '';
             _taskController.clear();
@@ -88,6 +88,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                   itemCount: widget.careTasks.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Row(
+                      key: ValueKey(widget.careTasks.keys.elementAt(index)),
                       children: <Widget>[
                         Expanded(
                           child: ListTile(
@@ -98,11 +99,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     onSubmitted: (newValue) {
                                       setState(() {
                                         if (newValue.isNotEmpty) {
-                                          widget.careTasks.remove(_editKey);
-                                          widget.careTasks[newValue] =
-                                              dropdownValue!;
-                                          orderedCareTasks[_editIndex] =
-                                              _taskController.text;
+                                          //widget.careTasks.remove(_editKey);
+                                          widget.careTasks[_editKey]!['task'] =
+                                              newValue;
                                         }
                                         _editIndex = -1;
                                         _editKey = '';
@@ -119,9 +118,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                           _editIndex = index;
                                           _editKey = widget.careTasks.keys
                                               .elementAt(index);
-                                          _taskController.text = _editKey;
-                                          dropdownValue =
-                                              widget.careTasks[_editKey];
+                                          _taskController.text = widget
+                                              .careTasks[_editKey]!['task']!;
+                                          dropdownValue = widget.careTasks[
+                                              _editKey]!['frequency'];
                                         } else {
                                           _editIndex = -1;
                                           _editKey = '';
@@ -129,9 +129,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                         }
                                       });
                                     },
-                                    child: Text(
-                                      widget.careTasks.keys.elementAt(index),
-                                    ),
+                                    child: Text(widget.careTasks[widget
+                                        .careTasks.keys
+                                        .elementAt(index)]!['task']!),
                                   ),
                             trailing: _editFrequency == index
                                 ? SizedBox(
@@ -144,11 +144,14 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                       ),
                                       onChanged: (String? newValue) {
                                         setState(() {
+                                          String index = widget.careTasks.keys
+                                              .elementAt(_editFrequency);
                                           dropdownValue = newValue!;
-                                          widget.careTasks[widget.careTasks.keys
-                                                  .elementAt(index)] =
-                                              dropdownValue!;
+                                          widget.careTasks[index]![
+                                              'frequency'] = dropdownValue!;
+
                                           _editFrequency = -1;
+                                          _editKey = '';
                                           _focusNode.unfocus();
                                         });
                                         saveToDb();
@@ -172,7 +175,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                       });
                                     },
                                     child: Text(
-                                      widget.careTasks.values.elementAt(index),
+                                      widget.careTasks[widget.careTasks.keys
+                                          .elementAt(index)]!['frequency']!,
                                     ),
                                   ),
                           ),
@@ -181,8 +185,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
                           icon: const Icon(Icons.delete),
                           onPressed: () {
                             setState(() {
-                              widget.careTasks.remove(
-                                  widget.careTasks.keys.elementAt(index));
+                              String keyToRemove =
+                                  widget.careTasks.keys.elementAt(index);
+                              widget.careTasks.remove(keyToRemove);
                             });
                             saveToDb();
                           },
@@ -244,8 +249,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                       onPressed: () {
                         if (_taskController.text.isNotEmpty) {
                           setState(() {
-                            widget.careTasks[_taskController.text] =
-                                dropdownValue!;
+                            int index = widget.careTasks.length;
+                            widget.careTasks[index.toString()] = {
+                              'task': _taskController.text,
+                              'frequency': dropdownValue!,
+                            };
                           });
                           saveToDb();
                         }

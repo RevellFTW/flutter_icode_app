@@ -21,7 +21,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
-  Map<String, String> careTasks = {};
+  Map<String, Map<String, String>> careTasks = {};
   Future<List<PatientTask>> loadEventLogsFromFirestore() async {
     List<PatientTask> tasks = [];
     QuerySnapshot querySnapshot = await db
@@ -41,16 +41,24 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     return tasks;
   }
 
-  Future<Map<String, String>> loadCareTasksFromFirestore() async {
-    Map<String, String> tasks = {};
+  Future<Map<String, Map<String, String>>> loadCareTasksFromFirestore() async {
+    Map<String, Map<String, String>> tasks = {};
     QuerySnapshot querySnapshot = await db
         .collection('patients')
         .where('id', isEqualTo: widget.patient.id)
         .get();
     var data = querySnapshot.docs[0]['careTasks'];
+
     data.forEach((key, value) {
-      tasks[key] = value;
+      String taskName = value['task'];
+      String frequencyName = value['frequency'];
+
+      tasks[key] = {
+        'task': taskName,
+        'frequency': frequencyName,
+      };
     });
+
     return tasks;
   }
 
@@ -67,7 +75,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     });
   }
 
-  Future<Map<String, String>> _loadData() async {
+  Future<Map<String, Map<String, String>>> _loadData() async {
     // Load the data asynchronously
     final data = await loadCareTasksFromFirestore();
     // Return the loaded data
@@ -100,8 +108,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => CareTasksPage(
-                              careTasks: HashMap.of(careTasks),
-                              patient: widget.patient)));
+                              careTasks: careTasks, patient: widget.patient)));
                     }
                   },
                   child: const Text('Care Tasks'),
