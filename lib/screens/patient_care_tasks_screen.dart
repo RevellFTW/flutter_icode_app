@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../helper/firestore_helper.dart';
+import '../main.dart';
 import '../models/patient.dart';
 
 class CareTasksPage extends StatefulWidget {
@@ -78,6 +79,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text("${widget.patient.name}'s Care Tasks"),
+          backgroundColor: appBackgroundColor,
+          foregroundColor: appForegroundColor,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),

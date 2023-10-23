@@ -50,7 +50,10 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(appName)),
+      appBar: AppBar(
+          title: Text(appName),
+          backgroundColor: appBackgroundColor,
+          foregroundColor: appForegroundColor),
       body: Padding(
         padding: const EdgeInsets.only(left: 30.0, right: 30, top: 10),
         child: Form(

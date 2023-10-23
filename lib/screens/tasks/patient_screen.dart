@@ -22,6 +22,8 @@ class _PatientScreenState extends State<PatientScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text(appName),
+          backgroundColor: appBackgroundColor,
+          foregroundColor: appForegroundColor,
         ),
         body: const SingleChildScrollView(
           child: Column(

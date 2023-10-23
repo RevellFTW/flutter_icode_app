@@ -62,6 +62,8 @@ final db = FirebaseFirestore.instance;
 int androidSdkVersion = 0;
 final currentUser = User(name: 'John Doe', role: 'back-office');
 String appName = "Caretaker App";
+Color appForegroundColor = Colors.white;
+Color appBackgroundColor = Colors.indigo.shade200;
 
 //todo make user in firebase, and load this with auth and more properties
 class User {
@@ -86,6 +88,8 @@ class _MyAppState extends State<MyApp> {
     appName = 'Caretaker App';
     if (currentUser.role == 'back-office') {
       appName = 'Back-Office Caretaker App';
+      appForegroundColor = appForegroundColor;
+      appBackgroundColor = appBackgroundColor;
     }
   }
 
@@ -93,8 +97,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true),
+      debugShowCheckedModeBanner: true,
       home: HomePage(),
     );
   }

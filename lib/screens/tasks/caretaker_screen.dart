@@ -22,6 +22,8 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text(appName),
+          backgroundColor: appBackgroundColor,
+          foregroundColor: appForegroundColor,
         ),
         body: const SingleChildScrollView(
           child: Column(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
 import '../../models/patient_task.dart';
 
 class TasksScreen extends StatelessWidget {
@@ -11,7 +12,10 @@ class TasksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(eventLogName)),
+      appBar: AppBar(
+          title: Text(eventLogName),
+          backgroundColor: appBackgroundColor,
+          foregroundColor: appForegroundColor),
       body: ListView.builder(
         itemCount: tasks.length,
         itemBuilder: (context, index) {

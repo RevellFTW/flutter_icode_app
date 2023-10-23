@@ -7,7 +7,7 @@ class LightTheme {
       elevation: 1,
     ),
     colorScheme: ColorScheme.fromSwatch().copyWith(
-      primary: Color.fromARGB(255, 0, 102, 255),
+      primary: Color.fromARGB(255, 168, 191, 226),
       secondary: Color.fromARGB(255, 112, 164, 231),
     ),
     textTheme: ThemeData.light().textTheme.copyWith(
