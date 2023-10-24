@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../helper/firestore_helper.dart';
 import '../main.dart';
 import '../models/patient.dart';
+import '../helper/datetime_helper.dart';
 
 class CareTasksPage extends StatefulWidget {
   final Map<String, Map<String, String>> careTasks;
@@ -238,6 +239,20 @@ class _CareTasksPageState extends State<CareTasksPage> {
                             child: Text(value),
                           );
                         }).toList(),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30.0),
+                      child: ElevatedButton(
+                        onPressed: () => pickDate(context),
+                        child: const Text('Pick Date'),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30.0),
+                      child: ElevatedButton(
+                        onPressed: () => pickTime(context),
+                        child: const Text('Pick Time'),
                       ),
                     ),
                   ]),
