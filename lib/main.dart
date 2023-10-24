@@ -62,6 +62,7 @@ final db = FirebaseFirestore.instance;
 int androidSdkVersion = 0;
 final currentUser = User(name: 'John Doe', role: 'back-office');
 String appName = "Caretaker App";
+DateTime selectedDateTime = DateTime.now();
 Color appForegroundColor = Colors.white;
 Color appBackgroundColor = Colors.indigo.shade200;
 

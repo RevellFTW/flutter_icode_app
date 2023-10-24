@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../helper/firestore_helper.dart';
 import '../main.dart';
 import '../models/patient.dart';
@@ -71,6 +72,45 @@ class _CareTasksPageState extends State<CareTasksPage> {
     }
   }
 
+  Future<void> pickDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDateTime,
+      firstDate: DateTime(DateTime.now().year - 100),
+      lastDate: DateTime(DateTime.now().year + 100),
+    );
+    if (pickedDate != null && pickedDate != selectedDateTime) {
+      setState(() {
+        selectedDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          selectedDateTime.hour,
+          selectedDateTime.minute,
+        );
+      });
+      pickTime(context);
+    }
+  }
+
+  Future<void> pickTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(selectedDateTime),
+    );
+    if (pickedTime != null) {
+      setState(() {
+        selectedDateTime = DateTime(
+          selectedDateTime.year,
+          selectedDateTime.month,
+          selectedDateTime.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -87,123 +127,146 @@ class _CareTasksPageState extends State<CareTasksPage> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: widget.careTasks.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Row(
-                      key: ValueKey(widget.careTasks.keys.elementAt(index)),
-                      children: <Widget>[
-                        Expanded(
-                          child: ListTile(
-                            title: _editIndex == index
-                                ? TextFormField(
-                                    focusNode: _focusNode,
-                                    controller: _taskController,
-                                    onChanged: (String newValue) {
+          child: ListView.builder(
+            itemCount: widget.careTasks.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Row(
+                key: ValueKey(widget.careTasks.keys.elementAt(index)),
+                children: [
+                  Expanded(
+                    child: ListTile(
+                      focusNode: _focusNode,
+                      title: _editIndex == index
+                          ? TextFormField(
+                              controller: _taskController,
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  currentTextFormFieldValue = newValue;
+                                });
+                              },
+                              onTapOutside: (newValue) {
+                                setState(() {
+                                  if (currentTextFormFieldValue.isNotEmpty) {
+                                    widget.careTasks[_editKey]!['task'] =
+                                        currentTextFormFieldValue;
+                                  }
+                                  _editIndex = -1;
+                                  _editKey = '';
+                                  _taskController.clear();
+                                  _focusNode.unfocus();
+                                  saveToDb();
+                                });
+                              },
+                            )
+                          : GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (_editIndex == -1) {
+                                    _editIndex = index;
+                                    _editKey =
+                                        widget.careTasks.keys.elementAt(index);
+                                    _taskController.text =
+                                        widget.careTasks[_editKey]!['task']!;
+                                    dropdownValue = widget
+                                        .careTasks[_editKey]!['frequency'];
+                                  } else {
+                                    _editIndex = -1;
+                                    _editKey = '';
+                                    _taskController.clear();
+                                  }
+                                });
+                              },
+                              child: Text(widget.careTasks[widget.careTasks.keys
+                                  .elementAt(index)]!['task']!),
+                            ),
+                      subtitle: _editIndex == index
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 20, bottom: 20),
+                              child: SizedBox(
+                                  width: 130,
+                                  child: DropdownMenu<String>(
+                                    initialSelection: dropdownValue,
+                                    label: const Text('Frequency'),
+                                    onSelected: (String? newValue) {
                                       setState(() {
-                                        currentTextFormFieldValue = newValue;
-                                      });
-                                    },
-                                    onTapOutside: (newValue) {
-                                      setState(() {
-                                        if (currentTextFormFieldValue
-                                            .isNotEmpty) {
-                                          //widget.careTasks.remove(_editKey);
-                                          widget.careTasks[_editKey]!['task'] =
-                                              currentTextFormFieldValue;
-                                        }
-                                        _editIndex = -1;
+                                        String index = widget.careTasks.keys
+                                            .elementAt(_editFrequency);
+                                        dropdownValue = newValue!;
+                                        widget.careTasks[index]!['frequency'] =
+                                            dropdownValue!;
+                                        saveToDb();
+                                        _editFrequency = -1;
                                         _editKey = '';
-                                        _taskController.clear();
                                         _focusNode.unfocus();
-                                        saveToDb();
                                       });
                                     },
-                                  )
-                                : GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        if (_editIndex == -1) {
-                                          _editIndex = index;
-                                          _editKey = widget.careTasks.keys
-                                              .elementAt(index);
-                                          _taskController.text = widget
-                                              .careTasks[_editKey]!['task']!;
-                                          dropdownValue = widget.careTasks[
-                                              _editKey]!['frequency'];
-                                        } else {
-                                          _editIndex = -1;
-                                          _editKey = '';
-                                          _taskController.clear();
-                                        }
-                                      });
-                                    },
-                                    child: Text(widget.careTasks[widget
-                                        .careTasks.keys
-                                        .elementAt(index)]!['task']!),
-                                  ),
-                            trailing: _editFrequency == index
-                                ? SizedBox(
-                                    width: 130,
-                                    child: DropdownMenu<String>(
-                                      initialSelection: dropdownValue,
-                                      label:
-                                          const Text('Frequency of Care Task'),
-                                      hintText: 'weekly, monthly, daily',
-                                      onSelected: (String? newValue) {
-                                        setState(() {
-                                          String index = widget.careTasks.keys
-                                              .elementAt(_editFrequency);
-                                          dropdownValue = newValue!;
-                                          widget.careTasks[index]![
-                                              'frequency'] = dropdownValue!;
-
-                                          _editFrequency = -1;
-                                          _editKey = '';
-                                          _focusNode.unfocus();
-                                        });
-                                        saveToDb();
-                                      },
-                                      dropdownMenuEntries: list
-                                          .map<DropdownMenuEntry<String>>(
-                                              (String value) {
-                                        return DropdownMenuEntry<String>(
-                                            value: value, label: value);
-                                      }).toList(),
-                                    ))
-                                : GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _editFrequency = index;
-                                      });
-                                    },
-                                    child: Text(
-                                      widget.careTasks[widget.careTasks.keys
-                                          .elementAt(index)]!['frequency']!,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            setState(() {
-                              String keyToRemove =
-                                  widget.careTasks.keys.elementAt(index);
-                              widget.careTasks.remove(keyToRemove);
-                            });
-                            saveToDb();
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
+                                    dropdownMenuEntries: list
+                                        .map<DropdownMenuEntry<String>>(
+                                            (String value) {
+                                      return DropdownMenuEntry<String>(
+                                          value: value, label: value);
+                                    }).toList(),
+                                  )),
+                            )
+                          : GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _editFrequency = index;
+                                });
+                              },
+                              child: Text(
+                                widget.careTasks[widget.careTasks.keys
+                                    .elementAt(index)]!['frequency']!,
+                              ),
+                            ),
+                      trailing: _editIndex == index
+                          ? IconButton(
+                              icon: const Icon(Icons.check),
+                              onPressed: () {
+                                setState(() {
+                                  _editIndex = -1;
+                                  _editKey = '';
+                                  _taskController.clear();
+                                });
+                              },
+                            )
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    setState(() {
+                                      _editIndex = index;
+                                      _editKey = widget.careTasks.keys
+                                          .elementAt(index);
+                                      _taskController.text =
+                                          widget.careTasks[_editKey]!['task']!;
+                                      dropdownValue = widget
+                                          .careTasks[_editKey]!['frequency'];
+                                    });
+                                    _focusNode.requestFocus();
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    setState(() {
+                                      widget.careTasks.remove(widget
+                                          .careTasks.keys
+                                          .elementAt(index));
+                                      saveToDb();
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
         floatingActionButton: FloatingActionButton(
@@ -245,16 +308,17 @@ class _CareTasksPageState extends State<CareTasksPage> {
                       padding: const EdgeInsets.only(top: 30.0),
                       child: ElevatedButton(
                         onPressed: () => pickDate(context),
-                        child: const Text('Pick Date'),
+                        child: Text(
+                            '${DateFormat.MMMd().format(selectedDateTime)} ${DateFormat.Hm().format(selectedDateTime)}'),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 30.0),
-                      child: ElevatedButton(
-                        onPressed: () => pickTime(context),
-                        child: const Text('Pick Time'),
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 30.0),
+                    //   child: ElevatedButton(
+                    //     onPressed: () => pickTime(context),
+                    //     child: const Text('Pick Time'),
+                    //   ),
+                    // ),
                   ]),
                   //insert here
                   actions: <Widget>[
