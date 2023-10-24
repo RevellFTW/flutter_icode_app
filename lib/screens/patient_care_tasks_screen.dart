@@ -19,12 +19,14 @@ class CareTasksPage extends StatefulWidget {
 }
 
 class _CareTasksPageState extends State<CareTasksPage> {
+  final List<String> list = <String>['weekly', 'monthly', 'daily', 'once'];
   final TextEditingController _taskController = TextEditingController();
   int _editIndex = -1;
   int _editFrequency = -1;
   String _editKey = '';
   String? dropdownValue = 'weekly';
   final FocusNode _focusNode = FocusNode();
+  String currentTextFormFieldValue = '';
 
   saveToDb() {
     getDocumentID(widget.patient.id).then((docID) {
@@ -96,22 +98,28 @@ class _CareTasksPageState extends State<CareTasksPage> {
                         Expanded(
                           child: ListTile(
                             title: _editIndex == index
-                                ? TextField(
+                                ? TextFormField(
                                     focusNode: _focusNode,
                                     controller: _taskController,
-                                    onSubmitted: (newValue) {
+                                    onChanged: (String newValue) {
                                       setState(() {
-                                        if (newValue.isNotEmpty) {
+                                        currentTextFormFieldValue = newValue;
+                                      });
+                                    },
+                                    onTapOutside: (newValue) {
+                                      setState(() {
+                                        if (currentTextFormFieldValue
+                                            .isNotEmpty) {
                                           //widget.careTasks.remove(_editKey);
                                           widget.careTasks[_editKey]!['task'] =
-                                              newValue;
+                                              currentTextFormFieldValue;
                                         }
                                         _editIndex = -1;
                                         _editKey = '';
                                         _taskController.clear();
                                         _focusNode.unfocus();
+                                        saveToDb();
                                       });
-                                      saveToDb();
                                     },
                                   )
                                 : GestureDetector(
@@ -138,14 +146,13 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                   ),
                             trailing: _editFrequency == index
                                 ? SizedBox(
-                                    width: 100,
-                                    child: DropdownButtonFormField<String>(
-                                      value: dropdownValue,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Frequency of Care Task',
-                                        hintText: 'weekly, monthly, daily',
-                                      ),
-                                      onChanged: (String? newValue) {
+                                    width: 130,
+                                    child: DropdownMenu<String>(
+                                      initialSelection: dropdownValue,
+                                      label:
+                                          const Text('Frequency of Care Task'),
+                                      hintText: 'weekly, monthly, daily',
+                                      onSelected: (String? newValue) {
                                         setState(() {
                                           String index = widget.careTasks.keys
                                               .elementAt(_editFrequency);
@@ -159,16 +166,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                         });
                                         saveToDb();
                                       },
-                                      items: <String>[
-                                        'weekly',
-                                        'monthly',
-                                        'daily'
-                                      ].map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(value),
-                                        );
+                                      dropdownMenuEntries: list
+                                          .map<DropdownMenuEntry<String>>(
+                                              (String value) {
+                                        return DropdownMenuEntry<String>(
+                                            value: value, label: value);
                                       }).toList(),
                                     ))
                                 : GestureDetector(
