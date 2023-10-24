@@ -195,7 +195,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
                               ),
                         subtitle: _editIndex == index
                             ? Padding(
-                                padding: EdgeInsets.only(top: 20, bottom: 20),
+                                padding:
+                                    const EdgeInsets.only(top: 20, bottom: 20),
                                 child: SizedBox(
                                     width: 130,
                                     child: DropdownMenu<String>(
@@ -254,6 +255,13 @@ class _CareTasksPageState extends State<CareTasksPage> {
                             : Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
+                                  ElevatedButton(
+                                    child: Text(
+                                      DateFormat('yyyy-MM-dd h:mm a')
+                                          .format(selectedDateTime),
+                                    ),
+                                    onPressed: () => pickDate(context),
+                                  ),
                                   IconButton(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () {
@@ -313,9 +321,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 30.0),
                       child: ElevatedButton(
-                        onPressed: () => pickDate(context),
                         child: Text(
-                            '${DateFormat.MMMd().format(selectedDateTime)} ${DateFormat.Hm().format(selectedDateTime)}'),
+                          DateFormat('yyyy-MM-dd h:mm a')
+                              .format(selectedDateTime),
+                        ),
+                        onPressed: () => pickDate(context),
                       ),
                     ),
                     // Padding(
