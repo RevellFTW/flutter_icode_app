@@ -125,7 +125,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
           foregroundColor: appForegroundColor,
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(left: 15),
           child: ListView.builder(
             itemCount: widget.careTasks.length,
             itemBuilder: (BuildContext context, int index) {
@@ -255,11 +255,12 @@ class _CareTasksPageState extends State<CareTasksPage> {
                             : Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  ElevatedButton(
-                                    child: Text(
-                                      DateFormat('yyyy-MM-dd h:mm a')
+                                  FloatingActionButton.extended(
+                                    label: Text(
+                                      DateFormat('MM-dd h:mm a')
                                           .format(selectedDateTime),
                                     ),
+                                    icon: const Icon(Icons.calendar_today),
                                     onPressed: () => pickDate(context),
                                   ),
                                   IconButton(
@@ -291,50 +292,47 @@ class _CareTasksPageState extends State<CareTasksPage> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('Add New Care Task'),
-                  content: Column(children: <Widget>[
-                    TextField(
+                  content:
+                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                    TextFormField(
                       controller: _taskController,
                       decoration: const InputDecoration(labelText: 'Care Task'),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 30.0),
-                      child: DropdownButtonFormField<String>(
-                        value: dropdownValue,
-                        decoration: const InputDecoration(
-                          labelText: 'Frequency of Care Task',
-                          hintText: 'weekly, monthly, daily',
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 30.0),
+                        child: DropdownMenu<String>(
+                          width: 202,
+                          initialSelection: dropdownValue,
+                          label: const Text('Frequency'),
+                          onSelected: (String? newValue) {
+                            setState(() {
+                              dropdownValue = newValue!;
+                            });
+                          },
+                          dropdownMenuEntries: list
+                              .map<DropdownMenuEntry<String>>((String value) {
+                            return DropdownMenuEntry<String>(
+                                value: value, label: value);
+                          }).toList(),
                         ),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownValue = newValue!;
-                          });
-                        },
-                        items: <String>['weekly', 'monthly', 'daily']
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 30.0),
-                      child: ElevatedButton(
-                        child: Text(
-                          DateFormat('yyyy-MM-dd h:mm a')
-                              .format(selectedDateTime),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 30.0),
+                        child: FloatingActionButton.extended(
+                          label: Text(
+                            DateFormat('yyyy-MM-dd h:mm a')
+                                .format(selectedDateTime),
+                          ),
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: () => pickDate(context),
                         ),
-                        onPressed: () => pickDate(context),
                       ),
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 30.0),
-                    //   child: ElevatedButton(
-                    //     onPressed: () => pickTime(context),
-                    //     child: const Text('Pick Time'),
-                    //   ),
-                    // ),
                   ]),
                   //insert here
                   actions: <Widget>[
