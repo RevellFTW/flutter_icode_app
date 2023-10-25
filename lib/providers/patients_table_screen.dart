@@ -85,7 +85,7 @@ class _PatientTableState extends State<PatientTable> {
       var careTasksCollection = doc['careTasks'];
       List<CareTask> careTasks = [];
       for (var map in careTasksCollection) {
-        DateTime date = DateTime.now();
+        String date = DateTime.now().toString();
         Frequency frequency = Frequency.weekly;
         String taskName = 'default';
         map.forEach((key, value) {
@@ -93,7 +93,8 @@ class _PatientTableState extends State<PatientTable> {
             case 'date':
               {
                 date = DateTime.fromMicrosecondsSinceEpoch(
-                    value.microsecondsSinceEpoch);
+                        value.microsecondsSinceEpoch)
+                    .toString();
               }
               break;
             case 'frequency':
