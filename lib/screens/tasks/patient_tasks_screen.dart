@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
-import '../../models/patient_task.dart';
+import '../../models/event_log.dart';
 
 class TasksScreen extends StatelessWidget {
-  final List<PatientTask> tasks;
+  final List<EventLog> tasks;
   final String eventLogName;
   const TasksScreen(
       {super.key, required this.tasks, required this.eventLogName});

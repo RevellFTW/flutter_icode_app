@@ -1,5 +1,5 @@
-class PatientTask {
-  PatientTask(
+class EventLog {
+  EventLog(
       {required this.name,
       required this.description,
       required this.date,

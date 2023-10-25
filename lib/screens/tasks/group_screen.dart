@@ -5,14 +5,6 @@ import '../../providers/patients_table_screen.dart';
 class GroupScreen extends StatelessWidget {
   final String groupName;
   //fill patients with data
-  final List<Patient> patients = List<Patient>.generate(
-    20,
-    (index) => Patient(
-      id: index,
-      name: 'Patient $index',
-      startDate: DateTime.now(),
-    ),
-  );
 
   GroupScreen(this.groupName, {Key? key}) : super(key: key);
   @override

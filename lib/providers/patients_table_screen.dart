@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../main.dart';
+import '../models/care_task.dart';
 import '../models/patient.dart';
 import '../screens/patient_form_screen.dart';
 
@@ -81,10 +82,23 @@ class _PatientTableState extends State<PatientTable> {
     QuerySnapshot querySnapshot = await db.collection('patients').get();
 
     for (var doc in querySnapshot.docs) {
+      var rawCareTasks = doc['careTasks'];
+      List<CareTask> careTasks = [];
+
+      rawCareTasks.forEach((key, value) {
+        DateTime date = value['date']?.toDate() ?? DateTime.now();
+        careTasks.add(CareTask(
+          taskName: value['task'],
+          taskFrequency: value['frequency'],
+          date: date,
+        ));
+      });
+
       patients.add(Patient(
           id: doc['id'],
           name: doc['name'],
-          startDate: doc['startDate'].toDate()));
+          startDate: doc['startDate'].toDate(),
+          careTasks: careTasks));
     }
 
     return patients;

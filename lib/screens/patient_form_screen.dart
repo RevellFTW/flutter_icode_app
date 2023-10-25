@@ -2,8 +2,9 @@ import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../models/care_task.dart';
 import '../models/patient.dart';
-import '../models/patient_task.dart';
+import '../models/event_log.dart';
 import 'patient_care_tasks_screen.dart';
 import 'tasks/patient_tasks_screen.dart';
 import '../main.dart';
@@ -22,15 +23,15 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
   Map<String, Map<String, String>> careTasks = {};
-  Future<List<PatientTask>> loadEventLogsFromFirestore() async {
-    List<PatientTask> tasks = [];
+  Future<List<EventLog>> loadEventLogsFromFirestore() async {
+    List<EventLog> tasks = [];
     QuerySnapshot querySnapshot = await db
         .collection('patientTasks')
         .where('name', isEqualTo: widget.patient.name)
         .get();
 
     for (var doc in querySnapshot.docs) {
-      tasks.add(PatientTask(
+      tasks.add(EventLog(
         name: doc['name'],
         description: doc['description'],
         date: doc['date'].toDate(),
@@ -43,22 +44,16 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
 
   Future<Map<String, Map<String, String>>> loadCareTasksFromFirestore() async {
     Map<String, Map<String, String>> tasks = {};
-    QuerySnapshot querySnapshot = await db
-        .collection('patients')
-        .where('id', isEqualTo: widget.patient.id)
-        .get();
-    var data = querySnapshot.docs[0]['careTasks'];
+    List<CareTask> careTasks = widget.patient.careTasks;
 
-    data.forEach((key, value) {
-      String taskName = value['task'];
-      String frequencyName = value['frequency'];
-
-      tasks[key] = {
+    for (int i = 0; i < careTasks.length; i++) {
+      String taskName = careTasks[i].taskName;
+      String frequencyName = careTasks[i].taskFrequency;
+      tasks[i.toString()] = {
         'task': taskName,
         'frequency': frequencyName,
       };
-    });
-
+    }
     return tasks;
   }
 
@@ -122,8 +117,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      List<PatientTask> tasks =
-                          await loadEventLogsFromFirestore();
+                      List<EventLog> tasks = await loadEventLogsFromFirestore();
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => TasksScreen(

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/models/caretaker.dart';
-import '../models/patient_task.dart';
+import '../models/event_log.dart';
 import 'tasks/patient_tasks_screen.dart';
 import '../main.dart';
 
@@ -20,12 +20,12 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
 
-  Future<List<PatientTask>> loadTasksFromFirestore(String caretakerName) async {
-    List<PatientTask> tasks = [];
+  Future<List<EventLog>> loadTasksFromFirestore(String caretakerName) async {
+    List<EventLog> tasks = [];
     QuerySnapshot querySnapshot = await db.collection('patientTasks').get();
 
     for (var doc in querySnapshot.docs) {
-      tasks.add(PatientTask(
+      tasks.add(EventLog(
         name: doc['name'],
         description: doc['description'],
         date: doc['date'].toDate(),
@@ -73,7 +73,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      List<PatientTask> tasks =
+                      List<EventLog> tasks =
                           await loadTasksFromFirestore(widget.caretaker.name);
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
