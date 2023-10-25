@@ -88,9 +88,6 @@ class _CareTasksPageState extends State<CareTasksPage> {
           selectedDateTime.hour,
           selectedDateTime.minute,
         );
-        if (index != -1) {
-          widget.patient.careTasks[index].date = selectedDateTime;
-        }
       });
       if (index != -1) {
         pickTime(context, index: index);
@@ -116,6 +113,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
         );
         if (index != -1) {
           widget.patient.careTasks[index].date = selectedDateTime;
+          saveToDb();
         }
       });
     }

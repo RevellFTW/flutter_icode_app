@@ -8,7 +8,7 @@ class CareTask {
 
   late String taskName;
   late String taskFrequency;
-  late final DateTime date;
+  late DateTime date;
 
   factory CareTask.fromJson(Map<String, dynamic> json) {
     return CareTask(
