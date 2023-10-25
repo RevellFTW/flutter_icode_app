@@ -7,7 +7,7 @@ class CareTask {
       required this.date});
 
   late String taskName;
-  late String taskFrequency;
+  late Frequency taskFrequency;
   late DateTime date;
 
   factory CareTask.fromJson(Map<String, dynamic> json) {
@@ -21,8 +21,10 @@ class CareTask {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['task'] = taskName;
-    data['frequency'] = taskFrequency;
+    data['frequency'] = taskFrequency.name.toString();
     data['date'] = date;
     return data;
   }
 }
+
+enum Frequency { daily, weekly, monthly, once }

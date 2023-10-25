@@ -55,7 +55,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
             widget.patient.careTasks[int.parse(_editKey)].taskName =
                 _taskController.text;
             widget.patient.careTasks[int.parse(_editKey)].taskFrequency =
-                dropdownValue!;
+                Frequency.values.byName(dropdownValue!);
             _editIndex = -1;
             _editKey = '';
             _taskController.clear();
@@ -150,8 +150,12 @@ class _CareTasksPageState extends State<CareTasksPage> {
                             _editKey = index.toString();
                             _taskController.text = widget.patient
                                 .careTasks[int.parse(_editKey)].taskName!;
-                            dropdownValue = widget.patient
-                                .careTasks[int.parse(_editKey)].taskFrequency;
+                            dropdownValue = widget
+                                .patient
+                                .careTasks[int.parse(_editKey)]
+                                .taskFrequency
+                                .name
+                                .toString();
                           }
                         });
                       },
@@ -162,8 +166,12 @@ class _CareTasksPageState extends State<CareTasksPage> {
                             _editKey = index.toString();
                             _taskController.text = widget.patient
                                 .careTasks[int.parse(_editKey)].taskName;
-                            dropdownValue = widget.patient
-                                .careTasks[int.parse(_editKey)].taskFrequency;
+                            dropdownValue = widget
+                                .patient
+                                .careTasks[int.parse(_editKey)]
+                                .taskFrequency
+                                .name
+                                .toString();
                           });
                           _focusNode.requestFocus();
                         },
@@ -180,7 +188,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     dropdownValue = widget
                                         .patient
                                         .careTasks[int.parse(_editKey)]
-                                        .taskFrequency;
+                                        .taskFrequency
+                                        .name
+                                        .toString();
                                   });
                                   _focusNode.requestFocus();
                                 },
@@ -222,9 +232,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                           String index = _editIndex.toString();
                                           dropdownValue = newValue!;
                                           widget
-                                              .patient
-                                              .careTasks[int.parse(index)]
-                                              .taskFrequency = dropdownValue!;
+                                                  .patient
+                                                  .careTasks[int.parse(index)]
+                                                  .taskFrequency =
+                                              Frequency.values
+                                                  .byName(dropdownValue!);
                                           _editIndex = -1;
                                           _editKey = '';
                                           _focusNode.unfocus();
@@ -252,7 +264,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                   });
                                 },
                                 child: Text(
-                                  widget.patient.careTasks[index].taskFrequency,
+                                  widget.patient.careTasks[index].taskFrequency
+                                      .name
+                                      .toString(),
                                 ),
                               ),
                         trailing: _editIndex == index
@@ -364,7 +378,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
                           setState(() {
                             widget.patient.careTasks.add(CareTask(
                                 taskName: _taskController.text,
-                                taskFrequency: dropdownValue!,
+                                taskFrequency:
+                                    Frequency.values.byName(dropdownValue!),
                                 date: selectedDateTime));
                           });
                           saveToDb();

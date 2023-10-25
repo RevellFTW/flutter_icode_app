@@ -86,7 +86,7 @@ class _PatientTableState extends State<PatientTable> {
       List<CareTask> careTasks = [];
       for (var map in careTasksCollection) {
         DateTime date = DateTime.now();
-        String frequency = 'weekly';
+        Frequency frequency = Frequency.weekly;
         String taskName = 'default';
         map.forEach((key, value) {
           switch (key) {
@@ -98,7 +98,7 @@ class _PatientTableState extends State<PatientTable> {
               break;
             case 'frequency':
               {
-                frequency = value;
+                frequency = Frequency.values.byName(value);
               }
             case 'task':
               {
