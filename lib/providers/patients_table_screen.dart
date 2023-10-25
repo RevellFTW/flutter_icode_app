@@ -92,7 +92,7 @@ class _PatientTableState extends State<PatientTable> {
           switch (key) {
             case 'date':
               {
-                date = DateTime.fromMillisecondsSinceEpoch(
+                date = DateTime.fromMicrosecondsSinceEpoch(
                     value.microsecondsSinceEpoch);
               }
               break;
