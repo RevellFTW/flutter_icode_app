@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/models/care_task.dart';
 import '../helper/firestore_helper.dart';
+import '../helper/monthly_picker.dart';
 import '../main.dart';
 import '../models/patient.dart';
 import '../helper/datetime_helper.dart';
@@ -98,20 +99,149 @@ class _CareTasksPageState extends State<CareTasksPage> {
               pickedDate.day,
               pickedTime.hour,
               pickedTime.minute,
-            );
+            ).toString();
           });
           if (index != -1) {
-            widget.patient.careTasks[index].date = selectedDateTime.toString();
+            widget.patient.careTasks[index].date = selectedDateTime;
             saveToDb();
           }
         }
       }
     } else if (selectedModifier == Frequency.weekly) {
       // For weekly, pick day of the week and time
-      // Implement logic to pick day of the week and time here
+      String selectedDay = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Select Day of the Week'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // Here you can create buttons for each day of the week
+                Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop('Monday'),
+                    child: Text('Monday'),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop('Tuesday'),
+                    child: Text('Tuesday'),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop('Wednesday'),
+                    child: Text('Wednesday'),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop('Thursday'),
+                    child: Text('Thursday'),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop('Friday'),
+                    child: Text('Friday'),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop('Saturday'),
+                    child: Text('Saturday'),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop('Sunday'),
+                    child: Text('Sunday'),
+                  ),
+                )
+                // Add buttons for other days of the week
+              ],
+            ),
+          );
+        },
+      );
+
+      // Once the user selects a day, proceed to pick time
+      if (selectedDay != null) {
+        DateTime selectedDate = initialDateTime;
+        while (selectedDate.weekday != _getWeekdayFromString(selectedDay)) {
+          selectedDate = selectedDate.add(Duration(days: 1));
+        }
+        final TimeOfDay? pickedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        );
+
+        if (pickedTime != null) {
+          setState(() {
+            selectedDateTime =
+                '$selectedDay $pickedTime.hour:$pickedTime.minute';
+          });
+          if (index != -1) {
+            widget.patient.careTasks[index].date = selectedDateTime;
+            saveToDb();
+          }
+        }
+      }
     } else if (selectedModifier == Frequency.monthly) {
       // For monthly, pick month, day, and time
-      // Implement logic to pick month, day, and time here
+      DateTime? pickedDate = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return MonthlyPicker(initialDate: initialDateTime);
+        },
+      );
+      if (pickedDate != null) {
+        final TimeOfDay? pickedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.fromDateTime(pickedDate),
+        );
+        if (pickedTime != null) {
+          setState(() {
+            selectedDateTime =
+                '${pickedDate.month}-${pickedDate.day} ${pickedTime.hour}:${pickedTime.minute}';
+          });
+          if (index != -1) {
+            widget.patient.careTasks[index].date = selectedDateTime;
+            saveToDb();
+          }
+        }
+      }
+    }
+  }
+
+// Helper function to get weekday from string
+  int _getWeekdayFromString(String day) {
+    switch (day) {
+      case 'Monday':
+        return DateTime.monday;
+      case 'Tuesday':
+        return DateTime.tuesday;
+      case 'Wednesday':
+        return DateTime.wednesday;
+      case 'Thursday':
+        return DateTime.thursday;
+      case 'Friday':
+        return DateTime.friday;
+      case 'Saturday':
+        return DateTime.saturday;
+      case 'Sunday':
+        return DateTime.sunday;
+      default:
+        return DateTime.monday;
     }
   }
 
@@ -144,19 +274,13 @@ class _CareTasksPageState extends State<CareTasksPage> {
   Future<void> pickTime(BuildContext context, {int index = -1}) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(selectedDateTime),
+      initialTime: TimeOfDay.now(),
     );
     if (pickedTime != null) {
       setState(() {
-        selectedDateTime = DateTime(
-          selectedDateTime.year,
-          selectedDateTime.month,
-          selectedDateTime.day,
-          pickedTime.hour,
-          pickedTime.minute,
-        );
+        selectedDateTime = '${pickedTime.hour} : ${pickedTime.minute}';
         if (index != -1) {
-          widget.patient.careTasks[index].date = selectedDateTime.toString();
+          widget.patient.careTasks[index].date = selectedDateTime;
           saveToDb();
         }
       });
@@ -166,7 +290,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
   Future<void> pickTimeOnly(BuildContext context, {int index = -1}) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(selectedDateTime),
+      initialTime: TimeOfDay.now(),
     );
     if (pickedTime != null) {
       setState(() {
@@ -348,15 +472,12 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                 children: [
                                   FloatingActionButton.extended(
                                     label: Text(
-                                      DateFormat('MM-dd h:mm a').format(
-                                          DateTime.parse(widget
-                                              .patient.careTasks[index].date)),
+                                      widget.patient.careTasks[index].date,
                                     ),
                                     icon: const Icon(Icons.calendar_today),
                                     onPressed: () => pickDate(
                                         context,
-                                        DateTime.parse(widget
-                                            .patient.careTasks[index].date),
+                                        DateTime.now(),
                                         widget.patient.careTasks[index]
                                             .taskFrequency,
                                         index: index),
@@ -421,12 +542,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 30.0),
                         child: FloatingActionButton.extended(
-                          label: Text(
-                            DateFormat('yyyy-MM-dd h:mm a')
-                                .format(selectedDateTime),
-                          ),
+                          label: Text(selectedDateTime),
                           icon: const Icon(Icons.calendar_today),
-                          onPressed: () => pickDate(context, selectedDateTime,
+                          onPressed: () => pickDate(context, DateTime.now(),
                               Frequency.values.byName(dropdownValue!)),
                         ),
                       ),
