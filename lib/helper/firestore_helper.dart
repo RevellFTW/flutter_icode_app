@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../main.dart';
+import '../models/care_task.dart';
+import '../models/patient.dart';
 
 Future<void> addDocumentToCollection(
     String collectionName, Map<String, dynamic> data) async {
@@ -8,13 +9,17 @@ Future<void> addDocumentToCollection(
   await db.collection(collectionName).add(data);
 }
 
-void addDocumentToCareTasks(
-    Map<String, Map<String, String>> data, String documentID) {
+void updatePatient(Patient patient, String documentID) {
   DocumentReference documentReference =
       FirebaseFirestore.instance.collection('patients').doc(documentID);
-
-  // Add the new collection to the document data
-  documentReference.update({'careTasks': data});
+  Map<String, dynamic> patientData = {
+    'id': patient.id,
+    'name': patient.name,
+    'startDate': patient.startDate,
+    'careTasks':
+        patient.careTasks.map((careTask) => careTask.toJson()).toList(),
+  };
+  documentReference.set(patientData, SetOptions(merge: true));
 }
 
 Future<String> getDocumentID(int id) async {

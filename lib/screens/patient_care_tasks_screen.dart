@@ -1,19 +1,18 @@
 import 'dart:collection';
 
+import 'package:cloud_firestore_platform_interface/src/timestamp.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:todoapp/models/care_task.dart';
 import '../helper/firestore_helper.dart';
 import '../main.dart';
 import '../models/patient.dart';
 import '../helper/datetime_helper.dart';
 
 class CareTasksPage extends StatefulWidget {
-  final Map<String, Map<String, String>> careTasks;
-
   final Patient patient;
-  const CareTasksPage(
-      {super.key, required this.careTasks, required this.patient});
+  const CareTasksPage({super.key, required this.patient});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -31,7 +30,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
 
   saveToDb() {
     getDocumentID(widget.patient.id).then((docID) {
-      addDocumentToCareTasks(widget.careTasks, docID);
+      updatePatient(widget.patient, docID);
     });
   }
 
@@ -53,8 +52,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
       setState(() {
         if (_editIndex != -1) {
           if (_taskController.text.isNotEmpty) {
-            widget.careTasks[_editKey]!['task'] = _taskController.text;
-            widget.careTasks[_editKey]!['frequency'] = dropdownValue!;
+            widget.patient.careTasks[int.parse(_editKey)].taskName =
+                _taskController.text;
+            widget.patient.careTasks[int.parse(_editKey)].taskFrequency =
+                dropdownValue!;
             _editIndex = -1;
             _editKey = '';
             _taskController.clear();
@@ -70,10 +71,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
     }
   }
 
-  Future<void> pickDate(BuildContext context) async {
+  Future<void> pickDate(BuildContext context, DateTime initialDateTime,
+      {int index = -1}) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDateTime,
+      initialDate: initialDateTime,
       firstDate: DateTime(DateTime.now().year - 100),
       lastDate: DateTime(DateTime.now().year + 100),
     );
@@ -86,12 +88,19 @@ class _CareTasksPageState extends State<CareTasksPage> {
           selectedDateTime.hour,
           selectedDateTime.minute,
         );
+        if (index != -1) {
+          widget.patient.careTasks[index].date = selectedDateTime;
+        }
       });
-      pickTime(context);
+      if (index != -1) {
+        pickTime(context, index: index);
+      } else {
+        pickTime(context);
+      }
     }
   }
 
-  Future<void> pickTime(BuildContext context) async {
+  Future<void> pickTime(BuildContext context, {int index = -1}) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(selectedDateTime),
@@ -105,6 +114,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
           pickedTime.hour,
           pickedTime.minute,
         );
+        if (index != -1) {
+          widget.patient.careTasks[index].date = selectedDateTime;
+        }
       });
     }
   }
@@ -127,7 +139,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
         body: Padding(
           padding: const EdgeInsets.only(left: 15),
           child: ListView.builder(
-            itemCount: widget.careTasks.length,
+            itemCount: widget.patient.careTasks.length,
             itemBuilder: (BuildContext context, int index) {
               return Row(
                 children: [
@@ -137,11 +149,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                         setState(() {
                           if (_editIndex == -1) {
                             _editIndex = index;
-                            _editKey = widget.careTasks.keys.elementAt(index);
-                            _taskController.text =
-                                widget.careTasks[_editKey]!['task']!;
-                            dropdownValue =
-                                widget.careTasks[_editKey]!['frequency'];
+                            _editKey = index.toString();
+                            _taskController.text = widget.patient
+                                .careTasks[int.parse(_editKey)].taskName!;
+                            dropdownValue = widget.patient
+                                .careTasks[int.parse(_editKey)].taskFrequency;
                           }
                         });
                       },
@@ -149,11 +161,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                         onTap: () {
                           setState(() {
                             _editIndex = index;
-                            _editKey = widget.careTasks.keys.elementAt(index);
-                            _taskController.text =
-                                widget.careTasks[_editKey]!['task']!;
-                            dropdownValue =
-                                widget.careTasks[_editKey]!['frequency'];
+                            _editKey = index.toString();
+                            _taskController.text = widget.patient
+                                .careTasks[int.parse(_editKey)].taskName;
+                            dropdownValue = widget.patient
+                                .careTasks[int.parse(_editKey)].taskFrequency;
                           });
                           _focusNode.requestFocus();
                         },
@@ -162,12 +174,15 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                 onTap: () {
                                   setState(() {
                                     _editIndex = index;
-                                    _editKey =
-                                        widget.careTasks.keys.elementAt(index);
-                                    _taskController.text =
-                                        widget.careTasks[_editKey]!['task']!;
+                                    _editKey = index.toString();
+                                    _taskController.text = widget
+                                        .patient
+                                        .careTasks[int.parse(_editKey)]
+                                        .taskName;
                                     dropdownValue = widget
-                                        .careTasks[_editKey]!['frequency'];
+                                        .patient
+                                        .careTasks[int.parse(_editKey)]
+                                        .taskFrequency;
                                   });
                                   _focusNode.requestFocus();
                                 },
@@ -181,17 +196,18 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                   },
                                   onTapOutside: (newValue) {
                                     if (currentTextFormFieldValue.isNotEmpty) {
-                                      widget.careTasks[_editKey]!['task'] =
-                                          currentTextFormFieldValue;
+                                      widget
+                                          .patient
+                                          .careTasks[int.parse(_editKey)]
+                                          .taskName = currentTextFormFieldValue;
                                     }
                                     saveToDb();
                                   },
                                 ),
                               )
                             : GestureDetector(
-                                child: Text(widget.careTasks[widget
-                                    .careTasks.keys
-                                    .elementAt(index)]!['task']!),
+                                child: Text(
+                                    widget.patient.careTasks[index].taskName),
                               ),
                         subtitle: _editIndex == index
                             ? Padding(
@@ -205,12 +221,12 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                       requestFocusOnTap: false,
                                       onSelected: (String? newValue) {
                                         setState(() {
-                                          String index = widget.careTasks.keys
-                                              .elementAt(_editIndex);
+                                          String index = _editIndex.toString();
                                           dropdownValue = newValue!;
-                                          widget.careTasks[index]![
-                                              'frequency'] = dropdownValue!;
-
+                                          widget
+                                              .patient
+                                              .careTasks[int.parse(index)]
+                                              .taskFrequency = dropdownValue!;
                                           _editIndex = -1;
                                           _editKey = '';
                                           _focusNode.unfocus();
@@ -229,16 +245,16 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                 onTap: () {
                                   setState(() {
                                     _editIndex = index;
-                                    _editKey =
-                                        widget.careTasks.keys.elementAt(index);
-                                    _taskController.text =
-                                        widget.careTasks[_editKey]!['task']!;
+                                    _editKey = index.toString();
+                                    _taskController.text = widget
+                                        .patient
+                                        .careTasks[int.parse(_editKey)]
+                                        .taskName;
                                     _focusNode.requestFocus();
                                   });
                                 },
                                 child: Text(
-                                  widget.careTasks[widget.careTasks.keys
-                                      .elementAt(index)]!['frequency']!,
+                                  widget.patient.careTasks[index].taskFrequency,
                                 ),
                               ),
                         trailing: _editIndex == index
@@ -257,19 +273,20 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                 children: [
                                   FloatingActionButton.extended(
                                     label: Text(
-                                      DateFormat('MM-dd h:mm a')
-                                          .format(selectedDateTime),
+                                      DateFormat('MM-dd h:mm a').format(
+                                          widget.patient.careTasks[index].date),
                                     ),
                                     icon: const Icon(Icons.calendar_today),
-                                    onPressed: () => pickDate(context),
+                                    onPressed: () => pickDate(context,
+                                        widget.patient.careTasks[index].date,
+                                        index: index),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () {
                                       setState(() {
-                                        widget.careTasks.remove(widget
-                                            .careTasks.keys
-                                            .elementAt(index));
+                                        widget.patient.careTasks
+                                            .removeAt(index);
                                         saveToDb();
                                       });
                                     },
@@ -329,7 +346,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                 .format(selectedDateTime),
                           ),
                           icon: const Icon(Icons.calendar_today),
-                          onPressed: () => pickDate(context),
+                          onPressed: () => pickDate(context, selectedDateTime),
                         ),
                       ),
                     ),
@@ -347,11 +364,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
                       onPressed: () {
                         if (_taskController.text.isNotEmpty) {
                           setState(() {
-                            int index = widget.careTasks.length;
-                            widget.careTasks[index.toString()] = {
-                              'task': _taskController.text,
-                              'frequency': dropdownValue!,
-                            };
+                            widget.patient.careTasks.add(CareTask(
+                                taskName: _taskController.text,
+                                taskFrequency: dropdownValue!,
+                                date: selectedDateTime));
                           });
                           saveToDb();
                         }

@@ -42,39 +42,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     return tasks;
   }
 
-  Future<Map<String, Map<String, String>>> loadCareTasksFromFirestore() async {
-    Map<String, Map<String, String>> tasks = {};
-    List<CareTask> careTasks = widget.patient.careTasks;
-
-    for (int i = 0; i < careTasks.length; i++) {
-      String taskName = careTasks[i].taskName;
-      String frequencyName = careTasks[i].taskFrequency;
-      tasks[i.toString()] = {
-        'task': taskName,
-        'frequency': frequencyName,
-      };
-    }
-    return tasks;
-  }
-
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.patient.name);
     _startDateController =
         TextEditingController(text: widget.patient.startDate.toString());
-    _loadData().then((value) {
-      setState(() {
-        careTasks = value;
-      });
-    });
-  }
-
-  Future<Map<String, Map<String, String>>> _loadData() async {
-    // Load the data asynchronously
-    final data = await loadCareTasksFromFirestore();
-    // Return the loaded data
-    return data;
   }
 
   @override
@@ -105,8 +78,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                     if (_formKey.currentState!.validate()) {
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => CareTasksPage(
-                              careTasks: careTasks, patient: widget.patient)));
+                          builder: (context) =>
+                              CareTasksPage(patient: widget.patient)));
                     }
                   },
                   child: const Text('Care Tasks'),

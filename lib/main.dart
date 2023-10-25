@@ -27,30 +27,30 @@ void main() async {
     log.severe('Could not initialize app: $e');
   }
 
-  DocumentReference documentReference = FirebaseFirestore.instance
-      .collection('patients')
-      .doc('XJLq6N47U33SN7ITYVOB');
+//   DocumentReference documentReference = FirebaseFirestore.instance
+//       .collection('patients')
+//       .doc('XJLq6N47U33SN7ITYVOB');
 
-  // Add a new collection which has the caretask name, and the frequency
-  Map<String, Map<String, String>> careTasks = {};
-  careTasks['0'] = {
-    'task': 'Go for a wak',
-    'frequency': 'weekly',
-  };
-  careTasks['1'] = {
-    'task': 'Make breakfast',
-    'frequency': 'daily',
-  };
-  careTasks['2'] = {
-    'task': 'Do laundry',
-    'frequency': 'weekly',
-  };
-//print typeof caretask
-  print(careTasks.runtimeType);
+//   // Add a new collection which has the caretask name, and the frequency
+//   Map<String, Map<String, String>> careTasks = {};
+//   careTasks['0'] = {
+//     'task': 'Go for a wak',
+//     'frequency': 'weekly',
+//   };
+//   careTasks['1'] = {
+//     'task': 'Make breakfast',
+//     'frequency': 'daily',
+//   };
+//   careTasks['2'] = {
+//     'task': 'Do laundry',
+//     'frequency': 'weekly',
+//   };
+// //print typeof caretask
+//   print(careTasks.runtimeType);
 
-  // Update the document with the new data
-  await documentReference
-      .set({'careTasks': careTasks}, SetOptions(merge: true));
+//   // Update the document with the new data
+//   await documentReference
+//       .set({'careTasks': careTasks}, SetOptions(merge: true));
 
   final deviceInfo = await DeviceInfoPlugin().deviceInfo;
   androidSdkVersion =

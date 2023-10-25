@@ -82,17 +82,33 @@ class _PatientTableState extends State<PatientTable> {
     QuerySnapshot querySnapshot = await db.collection('patients').get();
 
     for (var doc in querySnapshot.docs) {
-      var rawCareTasks = doc['careTasks'];
+      var careTasksCollection = doc['careTasks'];
       List<CareTask> careTasks = [];
-
-      rawCareTasks.forEach((key, value) {
-        DateTime date = value['date']?.toDate() ?? DateTime.now();
-        careTasks.add(CareTask(
-          taskName: value['task'],
-          taskFrequency: value['frequency'],
-          date: date,
-        ));
-      });
+      for (var map in careTasksCollection) {
+        DateTime date = DateTime.now();
+        String frequency = 'weekly';
+        String taskName = 'default';
+        map.forEach((key, value) {
+          switch (key) {
+            case 'date':
+              {
+                date = DateTime.fromMillisecondsSinceEpoch(
+                    value.microsecondsSinceEpoch);
+              }
+              break;
+            case 'frequency':
+              {
+                frequency = value;
+              }
+            case 'task':
+              {
+                taskName = value;
+              }
+          }
+        });
+        careTasks.add(
+            CareTask(taskName: taskName, taskFrequency: frequency, date: date));
+      }
 
       patients.add(Patient(
           id: doc['id'],
