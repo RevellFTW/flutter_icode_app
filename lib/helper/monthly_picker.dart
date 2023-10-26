@@ -11,8 +11,9 @@ class MonthlyPicker extends StatefulWidget {
 
 class _MonthlyPickerState extends State<MonthlyPicker> {
   late DateTime _selectedDate;
-  late int _selectedMonth;
-  late int _selectedYear = DateTime.now().year;
+  late int _selectedMonth = DateTime.now().month;
+  late int _selectedYear;
+  late int _selectedDay = DateTime.now().day;
 
   @override
   void initState() {
@@ -25,7 +26,7 @@ class _MonthlyPickerState extends State<MonthlyPicker> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Select Month and Day'),
+      title: const Text('Select Month and Day'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -53,6 +54,8 @@ class _MonthlyPickerState extends State<MonthlyPicker> {
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
+              _selectedDate =
+                  DateTime(_selectedYear, _selectedMonth, _selectedDay);
               Navigator.of(context).pop(_selectedDate);
             },
             child: Text('OK'),
@@ -74,7 +77,7 @@ class _MonthlyPickerState extends State<MonthlyPicker> {
       }),
       onChanged: (value) {
         setState(() {
-          _selectedDate = DateTime(_selectedYear, _selectedMonth, value!);
+          _selectedDay = value!;
         });
       },
     );

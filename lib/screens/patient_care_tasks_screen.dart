@@ -72,12 +72,30 @@ class _CareTasksPageState extends State<CareTasksPage> {
     }
   }
 
-  Future<void> pickDate(BuildContext context, DateTime initialDateTime,
-      Frequency selectedModifier,
+  Future<bool> isDatePicked(BuildContext context, DateTime initialDateTime,
+      Frequency selectedModifier, bool adding,
       {int index = -1}) async {
     if (selectedModifier == Frequency.daily) {
       // For daily, only pick time
-      pickTime(context, index: index);
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+      if (pickedTime != null) {
+        setState(() {
+          TimeOfDay time =
+              TimeOfDay(hour: pickedTime.hour, minute: pickedTime.minute);
+          selectedDateTime = time.format(context);
+          if (index != -1) {
+            widget.patient.careTasks[index].date = selectedDateTime;
+
+            saveToDb();
+          }
+          if (adding) selectedDateTimeWhenAdding = selectedDateTime;
+        });
+        return true;
+      }
+      return false;
     } else if (selectedModifier == Frequency.once) {
       // For once, pick date and time
       final DateTime? pickedDate = await showDatePicker(
@@ -93,19 +111,28 @@ class _CareTasksPageState extends State<CareTasksPage> {
         );
         if (pickedTime != null) {
           setState(() {
-            selectedDateTime = DateTime(
+            selectedDateTime = DateFormat('yyyy-MM-dd h:mm a').format(DateTime(
               pickedDate.year,
               pickedDate.month,
               pickedDate.day,
               pickedTime.hour,
               pickedTime.minute,
-            ).toString();
+            ));
+
+            if (index != -1) {
+              widget.patient.careTasks[index].date = selectedDateTime;
+              saveToDb();
+            }
+            if (adding) {
+              selectedDateTimeWhenAdding = selectedDateTime;
+            }
           });
-          if (index != -1) {
-            widget.patient.careTasks[index].date = selectedDateTime;
-            saveToDb();
-          }
+          return true;
+        } else {
+          return false;
         }
+      } else {
+        return false;
       }
     } else if (selectedModifier == Frequency.weekly) {
       // For weekly, pick day of the week and time
@@ -186,15 +213,24 @@ class _CareTasksPageState extends State<CareTasksPage> {
         );
 
         if (pickedTime != null) {
+          TimeOfDay time =
+              TimeOfDay(hour: pickedTime.hour, minute: pickedTime.minute);
+          String formattedTime = '$selectedDay ${time.format(context)}';
           setState(() {
-            selectedDateTime =
-                '$selectedDay $pickedTime.hour:$pickedTime.minute';
+            selectedDateTime = formattedTime;
+
+            if (index != -1) {
+              widget.patient.careTasks[index].date = selectedDateTime;
+              saveToDb();
+            }
+            if (adding) selectedDateTimeWhenAdding = selectedDateTime;
           });
-          if (index != -1) {
-            widget.patient.careTasks[index].date = selectedDateTime;
-            saveToDb();
-          }
+          return true;
+        } else {
+          return false;
         }
+      } else {
+        return false;
       }
     } else if (selectedModifier == Frequency.monthly) {
       // For monthly, pick month, day, and time
@@ -211,16 +247,26 @@ class _CareTasksPageState extends State<CareTasksPage> {
         );
         if (pickedTime != null) {
           setState(() {
+            TimeOfDay time =
+                TimeOfDay(hour: pickedTime.hour, minute: pickedTime.minute);
             selectedDateTime =
-                '${pickedDate.month}-${pickedDate.day} ${pickedTime.hour}:${pickedTime.minute}';
+                '${pickedDate.month}-${pickedDate.day} ${time.format(context)}';
+
+            if (index != -1) {
+              widget.patient.careTasks[index].date = selectedDateTime;
+              saveToDb();
+            }
+            if (adding) selectedDateTimeWhenAdding = selectedDateTime;
           });
-          if (index != -1) {
-            widget.patient.careTasks[index].date = selectedDateTime;
-            saveToDb();
-          }
+          return true;
+        } else {
+          return false;
         }
+      } else {
+        return false;
       }
     }
+    return false;
   }
 
 // Helper function to get weekday from string
@@ -242,67 +288,6 @@ class _CareTasksPageState extends State<CareTasksPage> {
         return DateTime.sunday;
       default:
         return DateTime.monday;
-    }
-  }
-
-  // Future<void> pickDate(BuildContext context, DateTime initialDateTime,
-  //     {int index = -1}) async {
-  //   final DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: initialDateTime,
-  //     firstDate: DateTime(DateTime.now().year - 100),
-  //     lastDate: DateTime(DateTime.now().year + 100),
-  //   );
-  //   if (pickedDate != null && pickedDate != selectedDateTime) {
-  //     setState(() {
-  //       selectedDateTime = DateTime(
-  //         pickedDate.year,
-  //         pickedDate.month,
-  //         pickedDate.day,
-  //         selectedDateTime.hour,
-  //         selectedDateTime.minute,
-  //       );
-  //     });
-  //     if (index != -1) {
-  //       pickTime(context, index: index);
-  //     } else {
-  //       pickTime(context);
-  //     }
-  //   }
-  // }
-
-  Future<void> pickTime(BuildContext context, {int index = -1}) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (pickedTime != null) {
-      setState(() {
-        selectedDateTime = '${pickedTime.hour} : ${pickedTime.minute}';
-        if (index != -1) {
-          widget.patient.careTasks[index].date = selectedDateTime;
-          saveToDb();
-        }
-      });
-    }
-  }
-
-  Future<void> pickTimeOnly(BuildContext context, {int index = -1}) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (pickedTime != null) {
-      setState(() {
-        selectedTime = TimeOfDay(
-          hour: pickedTime.hour,
-          minute: pickedTime.minute,
-        );
-        if (index != -1) {
-          widget.patient.careTasks[index].date = selectedDateTime.toString();
-          saveToDb();
-        }
-      });
     }
   }
 
@@ -411,19 +396,33 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                 child: SizedBox(
                                     width: 130,
                                     child: DropdownMenu<String>(
-                                      initialSelection: dropdownValue,
+                                      initialSelection: widget.patient
+                                          .careTasks[index].taskFrequency.name
+                                          .toString(),
                                       label: const Text('Frequency'),
                                       requestFocusOnTap: false,
                                       onSelected: (String? newValue) {
-                                        setState(() {
+                                        setState(() async {
                                           String index = _editIndex.toString();
-                                          dropdownValue = newValue!;
-                                          widget
-                                                  .patient
-                                                  .careTasks[int.parse(index)]
-                                                  .taskFrequency =
-                                              Frequency.values
-                                                  .byName(dropdownValue!);
+                                          bool result = false;
+                                          if (newValue != dropdownValue) {
+                                            result = await isDatePicked(
+                                                context,
+                                                DateTime.now(),
+                                                Frequency.values
+                                                    .byName(newValue!),
+                                                false,
+                                                index: _editIndex);
+                                          }
+                                          if (result == true) {
+                                            dropdownValue = newValue!;
+                                            widget
+                                                    .patient
+                                                    .careTasks[int.parse(index)]
+                                                    .taskFrequency =
+                                                Frequency.values
+                                                    .byName(dropdownValue!);
+                                          }
                                           _editIndex = -1;
                                           _editKey = '';
                                           _focusNode.unfocus();
@@ -475,11 +474,12 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                       widget.patient.careTasks[index].date,
                                     ),
                                     icon: const Icon(Icons.calendar_today),
-                                    onPressed: () => pickDate(
+                                    onPressed: () => isDatePicked(
                                         context,
                                         DateTime.now(),
                                         widget.patient.careTasks[index]
                                             .taskFrequency,
+                                        false,
                                         index: index),
                                   ),
                                   IconButton(
@@ -508,73 +508,117 @@ class _CareTasksPageState extends State<CareTasksPage> {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Add New Care Task'),
-                  content:
-                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    TextFormField(
-                      controller: _taskController,
-                      decoration: const InputDecoration(labelText: 'Care Task'),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: DropdownMenu<String>(
-                          width: 202,
-                          initialSelection: dropdownValue,
-                          label: const Text('Frequency'),
-                          onSelected: (String? newValue) {
-                            setState(() {
-                              dropdownValue = newValue!;
-                            });
+                return StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return AlertDialog(
+                      title: const Text('Add New Care Task'),
+                      content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _taskController,
+                              decoration:
+                                  const InputDecoration(labelText: 'Care Task'),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 30.0),
+                                child: DropdownMenu<String>(
+                                  width: 202,
+                                  initialSelection: dropdownValue,
+                                  label: const Text('Frequency'),
+                                  onSelected: (String? newValue) async {
+                                    bool result = false;
+                                    if (newValue != dropdownValue) {
+                                      result = await isDatePicked(
+                                          context,
+                                          DateTime.now(),
+                                          Frequency.values.byName(newValue!),
+                                          true);
+                                    }
+                                    if (result == true) {
+                                      setState(() {
+                                        dropdownValue = newValue!;
+                                      });
+                                    }
+                                  },
+                                  dropdownMenuEntries: list
+                                      .map<DropdownMenuEntry<String>>(
+                                          (String value) {
+                                    return DropdownMenuEntry<String>(
+                                        value: value, label: value);
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 30.0),
+                                child: FloatingActionButton.extended(
+                                  label: Text(selectedDateTimeWhenAdding),
+                                  icon: const Icon(Icons.calendar_today),
+                                  onPressed: () {
+                                    setState(() {
+                                      isDatePicked(
+                                          context,
+                                          DateTime.now(),
+                                          Frequency.values
+                                              .byName(dropdownValue!),
+                                          true);
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ]),
+                      //insert here
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
                           },
-                          dropdownMenuEntries: list
-                              .map<DropdownMenuEntry<String>>((String value) {
-                            return DropdownMenuEntry<String>(
-                                value: value, label: value);
-                          }).toList(),
                         ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: FloatingActionButton.extended(
-                          label: Text(selectedDateTime),
-                          icon: const Icon(Icons.calendar_today),
-                          onPressed: () => pickDate(context, DateTime.now(),
-                              Frequency.values.byName(dropdownValue!)),
+                        TextButton(
+                          child: const Text('Add'),
+                          onPressed: () {
+                            if (_taskController.text.isNotEmpty) {
+                              setState(() {
+                                widget.patient.careTasks.add(CareTask(
+                                    taskName: _taskController.text,
+                                    taskFrequency:
+                                        Frequency.values.byName(dropdownValue!),
+                                    date: selectedDateTime.toString()));
+                              });
+                              saveToDb();
+                              Navigator.of(context).pop();
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Error'),
+                                    content: const Text(
+                                        'Please enter a name for the care task.'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('OK'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          },
                         ),
-                      ),
-                    ),
-                  ]),
-                  //insert here
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: const Text('Add'),
-                      onPressed: () {
-                        if (_taskController.text.isNotEmpty) {
-                          setState(() {
-                            widget.patient.careTasks.add(CareTask(
-                                taskName: _taskController.text,
-                                taskFrequency:
-                                    Frequency.values.byName(dropdownValue!),
-                                date: selectedDateTime.toString()));
-                          });
-                          saveToDb();
-                        }
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
+                      ],
+                    );
+                  },
                 );
               },
             );

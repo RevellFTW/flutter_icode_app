@@ -85,24 +85,27 @@ class _PatientTableState extends State<PatientTable> {
       var careTasksCollection = doc['careTasks'];
       List<CareTask> careTasks = [];
       for (var map in careTasksCollection) {
-        String date = DateTime.now().toString();
+        String date = '';
         Frequency frequency = Frequency.weekly;
         String taskName = 'default';
         map.forEach((key, value) {
           switch (key) {
             case 'date':
               {
-                date = date;
+                date = value;
               }
               break;
             case 'frequency':
               {
                 frequency = Frequency.values.byName(value);
               }
+              break;
+
             case 'task':
               {
                 taskName = value;
               }
+              break;
           }
         });
         careTasks.add(
