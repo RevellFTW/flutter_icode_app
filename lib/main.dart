@@ -1,19 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import '../widget/app_theme.dart';
-import '../providers/auth.dart';
-import '../providers/user_provider.dart';
-import '../screens/tabs_screen.dart';
-import '../helper/scroll_behaviour.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
 import 'firebase_options.dart';
-import 'models/patient.dart';
 import 'screens/home_page.dart';
-import 'screens/tasks/caretaker_screen.dart';
-import 'screens/tasks/patient_screen.dart';
 
 final log = Logger('MainLogger');
 

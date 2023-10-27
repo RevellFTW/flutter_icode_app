@@ -186,58 +186,58 @@ class _CareTasksPageState extends State<CareTasksPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Select Day of the Week'),
+            title: const Text('Select Day of the Week'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 // Here you can create buttons for each day of the week
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Monday'),
                     child: Text('Monday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Tuesday'),
                     child: Text('Tuesday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Wednesday'),
                     child: Text('Wednesday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Thursday'),
                     child: Text('Thursday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Friday'),
                     child: Text('Friday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Saturday'),
                     child: Text('Saturday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Sunday'),
-                    child: Text('Sunday'),
+                    child: const Text('Sunday'),
                   ),
                 )
                 // Add buttons for other days of the week
