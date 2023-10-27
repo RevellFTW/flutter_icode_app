@@ -35,6 +35,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
     });
   }
 
+  stateSetter() {
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -72,14 +76,54 @@ class _CareTasksPageState extends State<CareTasksPage> {
     }
   }
 
-  Future<bool> isDatePicked(BuildContext context, DateTime initialDateTime,
-      Frequency selectedModifier, bool adding,
+  DateTime yMHTAStringToDateTime(String date) {
+    DateTime dateTime = DateFormat("yyyy-MM-dd hh:mm a").parse(date);
+    return dateTime;
+  }
+
+  TimeOfDay extractTimeFromInput(String input) {
+    // Extracts time portion (e.g., "Wednesday 12:00 PM") from the input
+    List<String> parts = input.split(' ');
+    String timeString = '${parts[1]} ${parts[2]}';
+    return stringToTimeOfDay(timeString);
+  }
+
+  TimeOfDay stringToTimeOfDay(String time) {
+    // Split the input string into hours, minutes, and AM/PM parts
+    List<String> parts = time.split(' ');
+    List<String> timeParts = parts[0].split(':');
+    int hours = int.parse(timeParts[0]);
+    int minutes = int.parse(timeParts[1]);
+
+    // Determine whether it's AM or PM and adjust hours accordingly
+    if (parts[1] == 'PM' && hours != 12) {
+      hours += 12;
+    } else if (parts[1] == 'AM' && hours == 12) {
+      hours = 0;
+    }
+
+    // Create and return the TimeOfDay object
+    return TimeOfDay(hour: hours, minute: minutes);
+  }
+
+//input is ike 12.10 12:00
+  DateTime mHTAStringToDateTime(String date) {
+    // Parse the string to DateTime
+    DateTime dateTime = DateFormat("MM-dd hh:mm a").parse(date);
+
+    return dateTime;
+  }
+
+  Future<bool> isDatePicked(BuildContext context, String initialDateString,
+      Frequency selectedModifier, bool isModifying, bool isClickedDirectly,
       {int index = -1}) async {
     if (selectedModifier == Frequency.daily) {
       // For daily, only pick time
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.now(),
+        initialTime: isClickedDirectly
+            ? stringToTimeOfDay(initialDateString)
+            : TimeOfDay.now(),
       );
       if (pickedTime != null) {
         setState(() {
@@ -91,7 +135,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
 
             saveToDb();
           }
-          if (adding) selectedDateTimeWhenAdding = selectedDateTime;
+          if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
         });
         return true;
       }
@@ -100,7 +144,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
       // For once, pick date and time
       final DateTime? pickedDate = await showDatePicker(
         context: context,
-        initialDate: initialDateTime,
+        initialDate: isClickedDirectly
+            ? yMHTAStringToDateTime(initialDateString)
+            : DateTime.now(),
         firstDate: DateTime(DateTime.now().year - 100),
         lastDate: DateTime(DateTime.now().year + 100),
       );
@@ -123,7 +169,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
               widget.patient.careTasks[index].date = selectedDateTime;
               saveToDb();
             }
-            if (adding) {
+            if (!isModifying) {
               selectedDateTimeWhenAdding = selectedDateTime;
             }
           });
@@ -203,13 +249,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
 
       // Once the user selects a day, proceed to pick time
       if (selectedDay != null) {
-        DateTime selectedDate = initialDateTime;
-        while (selectedDate.weekday != _getWeekdayFromString(selectedDay)) {
-          selectedDate = selectedDate.add(Duration(days: 1));
-        }
         final TimeOfDay? pickedTime = await showTimePicker(
           context: context,
-          initialTime: TimeOfDay.now(),
+          initialTime: isClickedDirectly
+              ? extractTimeFromInput(initialDateString)
+              : TimeOfDay.now(),
         );
 
         if (pickedTime != null) {
@@ -223,7 +267,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
               widget.patient.careTasks[index].date = selectedDateTime;
               saveToDb();
             }
-            if (adding) selectedDateTimeWhenAdding = selectedDateTime;
+            if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
           });
           return true;
         } else {
@@ -237,7 +281,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
       DateTime? pickedDate = await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return MonthlyPicker(initialDate: initialDateTime);
+          return MonthlyPicker(
+              initialDate: isClickedDirectly
+                  ? mHTAStringToDateTime(initialDateString)
+                  : DateTime.now());
         },
       );
       if (pickedDate != null) {
@@ -256,7 +303,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
               widget.patient.careTasks[index].date = selectedDateTime;
               saveToDb();
             }
-            if (adding) selectedDateTimeWhenAdding = selectedDateTime;
+            if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
           });
           return true;
         } else {
@@ -401,32 +448,33 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                           .toString(),
                                       label: const Text('Frequency'),
                                       requestFocusOnTap: false,
-                                      onSelected: (String? newValue) {
-                                        setState(() async {
+                                      onSelected: (String? newValue) async {
+                                        if (newValue != dropdownValue) {
                                           String index = _editIndex.toString();
-                                          bool result = false;
-                                          if (newValue != dropdownValue) {
-                                            result = await isDatePicked(
-                                                context,
-                                                DateTime.now(),
-                                                Frequency.values
-                                                    .byName(newValue!),
-                                                false,
-                                                index: _editIndex);
-                                          }
+                                          bool result = await isDatePicked(
+                                            context,
+                                            widget.patient.careTasks[_editIndex]
+                                                .date,
+                                            Frequency.values.byName(newValue!),
+                                            true,
+                                            false,
+                                            index: _editIndex,
+                                          );
                                           if (result == true) {
-                                            dropdownValue = newValue!;
-                                            widget
-                                                    .patient
-                                                    .careTasks[int.parse(index)]
-                                                    .taskFrequency =
-                                                Frequency.values
-                                                    .byName(dropdownValue!);
+                                            setState(() {
+                                              dropdownValue = newValue!;
+                                              widget
+                                                      .patient
+                                                      .careTasks[int.parse(index)]
+                                                      .taskFrequency =
+                                                  Frequency.values
+                                                      .byName(dropdownValue!);
+                                            });
                                           }
                                           _editIndex = -1;
                                           _editKey = '';
                                           _focusNode.unfocus();
-                                        });
+                                        }
                                         saveToDb();
                                       },
                                       dropdownMenuEntries: list
@@ -476,10 +524,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     icon: const Icon(Icons.calendar_today),
                                     onPressed: () => isDatePicked(
                                         context,
-                                        DateTime.now(),
+                                        widget.patient.careTasks[index].date,
                                         widget.patient.careTasks[index]
                                             .taskFrequency,
-                                        false,
+                                        true,
+                                        true,
                                         index: index),
                                   ),
                                   IconButton(
@@ -533,9 +582,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     if (newValue != dropdownValue) {
                                       result = await isDatePicked(
                                           context,
-                                          DateTime.now(),
+                                          DateTime.now().toString(),
                                           Frequency.values.byName(newValue!),
-                                          true);
+                                          false,
+                                          false);
                                     }
                                     if (result == true) {
                                       setState(() {
@@ -559,15 +609,17 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                 child: FloatingActionButton.extended(
                                   label: Text(selectedDateTimeWhenAdding),
                                   icon: const Icon(Icons.calendar_today),
-                                  onPressed: () {
-                                    setState(() {
-                                      isDatePicked(
-                                          context,
-                                          DateTime.now(),
-                                          Frequency.values
-                                              .byName(dropdownValue!),
-                                          true);
-                                    });
+                                  onPressed: () async {
+                                    bool result = false;
+                                    result = await isDatePicked(
+                                        context,
+                                        DateTime.now().toString(),
+                                        Frequency.values.byName(dropdownValue!),
+                                        false,
+                                        false);
+                                    if (result == true) {
+                                      setState(() {});
+                                    }
                                   },
                                 ),
                               ),
@@ -583,7 +635,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                         ),
                         TextButton(
                           child: const Text('Add'),
-                          onPressed: () {
+                          onPressed: () async {
                             if (_taskController.text.isNotEmpty) {
                               setState(() {
                                 widget.patient.careTasks.add(CareTask(
@@ -591,9 +643,11 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     taskFrequency:
                                         Frequency.values.byName(dropdownValue!),
                                     date: selectedDateTime.toString()));
+
+                                saveToDb();
+                                stateSetter();
+                                Navigator.of(context).pop();
                               });
-                              saveToDb();
-                              Navigator.of(context).pop();
                             } else {
                               showDialog(
                                 context: context,
