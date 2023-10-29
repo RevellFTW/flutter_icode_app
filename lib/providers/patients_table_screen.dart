@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../main.dart';
+import '../global/variables.dart';
 import '../models/care_task.dart';
 import '../models/patient.dart';
 import '../screens/patient_form_screen.dart';
@@ -19,9 +19,13 @@ class _PatientTableState extends State<PatientTable> {
   @override
   void initState() {
     super.initState();
+
     _loadData().then((value) {
       setState(() {
         patients = value;
+        for (var patient in patients) {
+          checkboxState[patient.id] = false;
+        }
       });
     });
   }
@@ -40,7 +44,15 @@ class _PatientTableState extends State<PatientTable> {
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: DataTable(
+          showCheckboxColumn: false,
           columns: const <DataColumn>[
+            DataColumn(
+              label: Text(
+                'Select',
+                style: TextStyle(
+                    fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+              ),
+            ),
             DataColumn(
               label: Text(
                 'Name',
@@ -66,6 +78,16 @@ class _PatientTableState extends State<PatientTable> {
                       }
                     },
                     cells: <DataCell>[
+                      DataCell(
+                        Checkbox(
+                          value: checkboxState[patient.id],
+                          onChanged: (bool? value) {
+                            setState(() {
+                              checkboxState[patient.id] = value!;
+                            });
+                          },
+                        ),
+                      ),
                       DataCell(Text(patient.name)),
                       DataCell(
                           Text(DateFormat.yMMMd().format(patient.startDate))),

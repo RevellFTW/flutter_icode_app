@@ -1,13 +1,10 @@
-import 'dart:collection';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../models/care_task.dart';
+import '../global/variables.dart';
 import '../models/patient.dart';
 import '../models/event_log.dart';
 import 'patient_care_tasks_screen.dart';
 import 'tasks/patient_tasks_screen.dart';
-import '../main.dart';
 
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;

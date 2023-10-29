@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../global/variables.dart';
 import '../main.dart';
 import '../models/care_task.dart';
 import '../models/patient.dart';

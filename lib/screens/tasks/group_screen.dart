@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../models/patient.dart';
 import '../../providers/patients_table_screen.dart';
 
 class GroupScreen extends StatelessWidget {

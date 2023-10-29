@@ -1,15 +1,9 @@
-import 'dart:collection';
-
-import 'package:cloud_firestore_platform_interface/src/timestamp.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:todoapp/models/care_task.dart';
+import '../global/variables.dart';
 import '../helper/firestore_helper.dart';
 import '../helper/monthly_picker.dart';
-import '../main.dart';
 import '../models/patient.dart';
-import '../helper/datetime_helper.dart';
 
 class CareTasksPage extends StatefulWidget {
   final Patient patient;

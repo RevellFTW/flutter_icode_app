@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class CareTask {
   CareTask(
       {required this.taskName,

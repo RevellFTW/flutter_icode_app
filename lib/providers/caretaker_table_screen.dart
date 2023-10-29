@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../main.dart';
+import '../global/variables.dart';
 import '../models/caretaker.dart';
 import '../screens/caretaker_form_screen.dart';
 
@@ -22,6 +22,9 @@ class _CaretakerTableState extends State<CaretakerTable> {
     _loadData().then((value) {
       setState(() {
         caretakers = value;
+        for (var caretaker in caretakers) {
+          checkboxState[caretaker.id] = false;
+        }
       });
     });
   }
@@ -38,7 +41,15 @@ class _CaretakerTableState extends State<CaretakerTable> {
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: DataTable(
+          showCheckboxColumn: false,
           columns: const <DataColumn>[
+            DataColumn(
+              label: Text(
+                'Select',
+                style: TextStyle(
+                    fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+              ),
+            ),
             DataColumn(
               label: Text(
                 'Name',
@@ -64,6 +75,16 @@ class _CaretakerTableState extends State<CaretakerTable> {
                       }
                     },
                     cells: <DataCell>[
+                      DataCell(
+                        Checkbox(
+                          value: checkboxState[caretaker.id],
+                          onChanged: (bool? value) {
+                            setState(() {
+                              checkboxState[caretaker.id] = value!;
+                            });
+                          },
+                        ),
+                      ),
                       DataCell(Text(caretaker.name)),
                       DataCell(
                           Text(DateFormat.yMMMd().format(caretaker.startDate))),

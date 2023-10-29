@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/models/caretaker.dart';
+import '../global/variables.dart';
 import '../models/event_log.dart';
 import 'tasks/patient_tasks_screen.dart';
-import '../main.dart';
 
 class CaretakerFormScreen extends StatefulWidget {
   final Caretaker caretaker;

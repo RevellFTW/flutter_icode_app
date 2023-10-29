@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../main.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import '../../global/variables.dart';
 import '../../providers/caretaker_table_screen.dart';
 
 class CaretakerScreen extends StatefulWidget {
@@ -20,30 +21,35 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(appName),
-          backgroundColor: appBackgroundColor,
-          foregroundColor: appForegroundColor,
+      appBar: AppBar(
+        title: Text(appName),
+        backgroundColor: appBackgroundColor,
+        foregroundColor: appForegroundColor,
+      ),
+      body: const SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            CaretakerTable(),
+            SizedBox(
+              height: 10,
+            ),
+            // TaskBuilder(filter: 'NoGroup'),
+          ],
         ),
-        body: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              CaretakerTable(),
-              SizedBox(
-                height: 10,
-              ),
-              // TaskBuilder(filter: 'NoGroup'),
-            ],
-          ),
+      ),
+      floatingActionButton: SpeedDial(icon: Icons.create, children: [
+        SpeedDialChild(
+          child: const Icon(Icons.add),
+          label: 'Add Caretaker',
+          onTap: () {/* Do someting */},
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              //todo
-            });
-          },
+        SpeedDialChild(
           child: const Icon(Icons.delete),
-        ));
+          label: 'Delete Caretaker(s)',
+          onTap: () {/* Do something */},
+        ),
+      ]),
+    );
   }
 }
