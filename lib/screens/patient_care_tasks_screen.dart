@@ -24,7 +24,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
   final FocusNode _focusNode = FocusNode();
   String currentTextFormFieldValue = '';
   saveToDb() {
-    getDocumentID(widget.patient.id).then((docID) {
+    getDocumentID(widget.patient.id, 'patients').then((docID) {
       updatePatient(widget.patient, docID);
     });
   }
@@ -238,32 +238,6 @@ class _CareTasksPageState extends State<CareTasksPage> {
         return DateTime.monday;
     }
   }
-
-  // Future<void> pickDate(BuildContext context, DateTime initialDateTime,
-  //     {int index = -1}) async {
-  //   final DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: initialDateTime,
-  //     firstDate: DateTime(DateTime.now().year - 100),
-  //     lastDate: DateTime(DateTime.now().year + 100),
-  //   );
-  //   if (pickedDate != null && pickedDate != selectedDateTime) {
-  //     setState(() {
-  //       selectedDateTime = DateTime(
-  //         pickedDate.year,
-  //         pickedDate.month,
-  //         pickedDate.day,
-  //         selectedDateTime.hour,
-  //         selectedDateTime.minute,
-  //       );
-  //     });
-  //     if (index != -1) {
-  //       pickTime(context, index: index);
-  //     } else {
-  //       pickTime(context);
-  //     }
-  //   }
-  // }
 
   Future<void> pickTime(BuildContext context, {int index = -1}) async {
     final TimeOfDay? pickedTime = await showTimePicker(

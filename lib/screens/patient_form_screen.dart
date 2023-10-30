@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../global/variables.dart';
+import '../helper/firestore_helper.dart';
 import '../models/patient.dart';
 import '../models/event_log.dart';
 import 'patient_care_tasks_screen.dart';
@@ -19,7 +20,10 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
+  String currentTextFormFieldValue = '';
   Map<String, Map<String, String>> careTasks = {};
+  final FocusNode _focusNode = FocusNode();
+
   Future<List<EventLog>> loadEventLogsFromFirestore() async {
     List<EventLog> tasks = [];
     QuerySnapshot querySnapshot = await db
@@ -63,6 +67,34 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Name'),
+                onChanged: (String newValue) {
+                  setState(() {
+                    currentTextFormFieldValue = newValue;
+                  });
+                },
+                onFieldSubmitted: (String newValue) {
+                  setState(() {
+                    if (currentTextFormFieldValue.isNotEmpty) {
+                      widget.patient.name = currentTextFormFieldValue;
+                      modifyPatientInDb(widget.patient);
+                    } else {
+                      _nameController.text = widget.patient.name;
+                    }
+                  });
+                },
+                onTapOutside: (newValue) {
+                  if (currentTextFormFieldValue.isNotEmpty) {
+                    setState(() {
+                      widget.patient.name = currentTextFormFieldValue;
+                      modifyPatientInDb(widget.patient);
+                    });
+                  } else {
+                    setState(() {
+                      _nameController.text = widget.patient.name;
+                    });
+                  }
+                  FocusScope.of(context).unfocus();
+                },
               ),
               TextFormField(
                 controller: _startDateController,

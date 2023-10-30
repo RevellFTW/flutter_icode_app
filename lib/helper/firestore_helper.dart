@@ -24,6 +24,28 @@ void updatePatient(Patient patient, String documentID) {
   documentReference.set(patientData, SetOptions(merge: true));
 }
 
+void updateCaretaker(Caretaker caretaker, String documentID) {
+  DocumentReference documentReference =
+      FirebaseFirestore.instance.collection('caretakers').doc(documentID);
+  Map<String, dynamic> caretakerData = {
+    'id': caretaker.id,
+    'name': caretaker.name,
+    'startDate': caretaker.startDate,
+    'patients': '',
+  };
+  documentReference.set(caretakerData, SetOptions(merge: true));
+}
+
+void modifyPatientInDb(Patient patient) async {
+  String docID = await getDocumentID(patient.id, 'patients');
+  updatePatient(patient, docID);
+}
+
+void modifyCaretakerInDb(Caretaker caretaker) async {
+  String docID = await getDocumentID(caretaker.id, 'caretakers');
+  updateCaretaker(caretaker, docID);
+}
+
 void addPatientToDb(Patient patient) {
   Map<String, dynamic> patientData = {
     'id': patient.id,
@@ -46,18 +68,18 @@ void addCaretakerToDb(Caretaker caretaker) {
 }
 
 void removePatientFromDb(int id) async {
-  String docID = await getDocumentID(id);
+  String docID = await getDocumentID(id, 'patients');
   await db.collection('patients').doc(docID).delete();
 }
 
 void removeCaretakerFromDb(int id) async {
-  String docID = await getDocumentID(id);
+  String docID = await getDocumentID(id, 'caretakers');
   await db.collection('caretakers').doc(docID).delete();
 }
 
-Future<String> getDocumentID(int id) async {
+Future<String> getDocumentID(int id, String collection) async {
   var snapshot =
-      await db.collection('patients').where('id', isEqualTo: id).get();
+      await db.collection(collection).where('id', isEqualTo: id).get();
 
   String docID = snapshot.docs[0].id;
   return docID;

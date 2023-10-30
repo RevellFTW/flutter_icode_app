@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/models/caretaker.dart';
 import '../global/variables.dart';
+import '../helper/firestore_helper.dart';
 import '../models/event_log.dart';
 import 'tasks/patient_tasks_screen.dart';
 
@@ -19,6 +20,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
+  String currentTextFormFieldValue = '';
 
   Future<List<EventLog>> loadTasksFromFirestore(String caretakerName) async {
     List<EventLog> tasks = [];
@@ -63,6 +65,34 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Name'),
+                onChanged: (String newValue) {
+                  setState(() {
+                    currentTextFormFieldValue = newValue;
+                  });
+                },
+                onFieldSubmitted: (String newValue) {
+                  setState(() {
+                    if (currentTextFormFieldValue.isNotEmpty) {
+                      widget.caretaker.name = currentTextFormFieldValue;
+                      modifyCaretakerInDb(widget.caretaker);
+                    } else {
+                      _nameController.text = widget.caretaker.name;
+                    }
+                  });
+                },
+                onTapOutside: (newValue) {
+                  if (currentTextFormFieldValue.isNotEmpty) {
+                    setState(() {
+                      widget.caretaker.name = currentTextFormFieldValue;
+                      modifyCaretakerInDb(widget.caretaker);
+                    });
+                  } else {
+                    setState(() {
+                      _nameController.text = widget.caretaker.name;
+                    });
+                  }
+                  FocusScope.of(context).unfocus();
+                },
               ),
               TextFormField(
                 controller: _startDateController,
