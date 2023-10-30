@@ -2,20 +2,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../global/variables.dart';
+import '../helper/firestore_helper.dart';
 import '../models/care_task.dart';
 import '../models/patient.dart';
 import '../screens/patient_form_screen.dart';
 
 class PatientTable extends StatefulWidget {
   const PatientTable({Key? key}) : super(key: key);
-
   @override
   _PatientTableState createState() => _PatientTableState();
+
+  setPatients(List<Patient> patients) {
+    patients = patients;
+  }
 }
 
-class _PatientTableState extends State<PatientTable> {
-  List<Patient> patients = [];
+List<Patient> patients = [];
 
+class _PatientTableState extends State<PatientTable> {
   @override
   void initState() {
     super.initState();
@@ -140,4 +144,15 @@ class _PatientTableState extends State<PatientTable> {
 
     return patients;
   }
+}
+
+void addPatient(String string) async {
+  Patient patient = Patient(
+    id: patients.length + 1,
+    startDate: DateTime.now(),
+    name: string,
+    careTasks: [],
+  );
+  patients.add(patient);
+  addPatientToDb(patient);
 }

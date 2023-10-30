@@ -23,6 +23,17 @@ void updatePatient(Patient patient, String documentID) {
   documentReference.set(patientData, SetOptions(merge: true));
 }
 
+void addPatientToDb(Patient patient) {
+  Map<String, dynamic> patientData = {
+    'id': patient.id,
+    'name': patient.name,
+    'startDate': patient.startDate,
+    'careTasks':
+        patient.careTasks.map((careTask) => careTask.toJson()).toList(),
+  };
+  addDocumentToCollection('patients', patientData);
+}
+
 Future<String> getDocumentID(int id) async {
   var snapshot =
       await db.collection('patients').where('id', isEqualTo: id).get();

@@ -3,6 +3,8 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:todoapp/providers/patients_table_screen.dart';
 
 import '../../global/variables.dart';
+import '../../helper/firestore_helper.dart';
+import '../../models/patient.dart';
 
 class PatientScreen extends StatefulWidget {
   static const routeName = '/patient';
@@ -14,6 +16,8 @@ class PatientScreen extends StatefulWidget {
 }
 
 class _PatientScreenState extends State<PatientScreen> {
+  final TextEditingController _patientNameController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +47,38 @@ class _PatientScreenState extends State<PatientScreen> {
         SpeedDialChild(
           child: const Icon(Icons.add),
           label: 'Add Patient',
-          onTap: () {/* Do someting */},
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                      title: Text('Add Patient'),
+                      content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _patientNameController,
+                              decoration:
+                                  InputDecoration(labelText: 'Patient Name'),
+                            ),
+                          ]),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Add'),
+                          onPressed: () {
+                            addPatient(_patientNameController.text.toString());
+                            _patientNameController.clear();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ));
+          },
         ),
         SpeedDialChild(
           child: const Icon(Icons.delete),
