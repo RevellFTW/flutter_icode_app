@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import '../../global/variables.dart';
-import '../../main.dart';
 import '../../models/event_log.dart';
 
 class TasksScreen extends StatelessWidget {
