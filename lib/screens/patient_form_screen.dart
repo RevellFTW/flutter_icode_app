@@ -4,6 +4,7 @@ import '../global/variables.dart';
 import '../helper/firestore_helper.dart';
 import '../models/patient.dart';
 import '../models/event_log.dart';
+import 'home_page.dart';
 import 'patient_care_tasks_screen.dart';
 import 'tasks/event_log_screen.dart';
 
@@ -131,9 +132,11 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => EventLogScreen(
-                              eventLogs: tasks,
-                              eventLogName:
-                                  "${widget.patient.name} Patient's Log")));
+                                eventLogs: tasks,
+                                eventLogName:
+                                    "${widget.patient.name} Patient's Log",
+                                caller: Caller.patient,
+                              )));
                     }
                   },
                   child: const Text('Event Logs'),

@@ -4,6 +4,7 @@ import 'package:todoapp/models/caretaker.dart';
 import '../global/variables.dart';
 import '../helper/firestore_helper.dart';
 import '../models/event_log.dart';
+import 'home_page.dart';
 import 'tasks/event_log_screen.dart';
 
 class CaretakerFormScreen extends StatefulWidget {
@@ -120,9 +121,11 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => EventLogScreen(
-                              eventLogs: tasks,
-                              eventLogName:
-                                  "${widget.caretaker.name} Caretaker's Log")));
+                                eventLogs: tasks,
+                                eventLogName:
+                                    "${widget.caretaker.name} Caretaker's Log",
+                                caller: Caller.caretaker,
+                              )));
                     }
                   },
                   child: const Text('Event Logs'),

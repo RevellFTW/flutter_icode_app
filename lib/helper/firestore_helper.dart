@@ -84,6 +84,18 @@ Future<String> getDocumentID(int id, String collection) async {
   return docID;
 }
 
+Future<List<String>> getCareTaskNamesFromPatientId(String id) async {
+  String docID = await getDocumentID(int.parse(id), 'patients');
+  var snapshot = await db.collection('patients').doc(docID).get();
+  List<String> careTaskNames = [];
+  if (snapshot.exists) {
+    for (var careTask in snapshot.data()!['careTasks']) {
+      careTaskNames.add(careTask['task']);
+    }
+  }
+  return careTaskNames;
+}
+
 Future<List<Patient>> loadPatientsFromFirestore() async {
   List<Patient> patients = [];
   QuerySnapshot querySnapshot = await db.collection('patients').get();

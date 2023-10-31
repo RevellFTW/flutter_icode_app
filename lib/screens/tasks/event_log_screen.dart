@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../global/variables.dart';
+import '../../helper/firestore_helper.dart';
 import '../../models/event_log.dart';
+import '../home_page.dart';
 
 class EventLogScreen extends StatefulWidget {
   final List<EventLog> eventLogs;
   final String eventLogName;
+  final Caller caller;
   const EventLogScreen(
-      {super.key, required this.eventLogs, required this.eventLogName});
+      {super.key,
+      required this.eventLogs,
+      required this.eventLogName,
+      required this.caller});
 
   @override
   _EventLogScreenState createState() => _EventLogScreenState();
@@ -23,12 +29,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
   String? _nameDropdownValue = 'Do Laundry';
 
   final FocusNode _focusNode = FocusNode();
-  List<String> list = ['test1', 'test2', 'test3', 'test4', 'test5'];
-
-  void getCareTasksFromPatientId(String patientId) {
-    // Implement the logic to get the care tasks from the database
-    print("get");
-  }
+  late List<String> list = [];
 
   void _onFocusChange() {
     if (!_focusNode.hasFocus) {
@@ -55,8 +56,26 @@ class _EventLogScreenState extends State<EventLogScreen> {
 
   @override
   void initState() {
+    if (widget.caller == Caller.patient) {
+      _loadData().then((value) {
+        setState(() {
+          list = value;
+        });
+      });
+      list.add('Other');
+    }
     super.initState();
+
     _focusNode.addListener(_onFocusChange);
+  }
+
+  Future<List<String>> _loadData() async {
+    // Load the data asynchronously
+    final data =
+        await getCareTaskNamesFromPatientId(widget.eventLogs[0].patientId);
+
+    // Return the loaded data
+    return data;
   }
 
   @override
@@ -134,7 +153,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                       width: 130,
                                       child: DropdownMenu<String>(
                                         initialSelection: _nameDropdownValue,
-                                        label: const Text('Frequency'),
+                                        label: const Text('Task Name'),
                                         requestFocusOnTap: false,
                                         onSelected: (String? newValue) {
                                           setState(() {
