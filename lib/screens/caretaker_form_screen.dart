@@ -21,28 +21,31 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
   late TextEditingController _nameController;
   late TextEditingController _startDateController;
   String currentTextFormFieldValue = '';
+  late DateTime updatedDateTime;
 
-  Future<List<EventLog>> loadTasksFromFirestore(String caretakerName) async {
+  Future<List<EventLog>> loadTasksFromFirestore(String caretakerId) async {
     List<EventLog> tasks = [];
     QuerySnapshot querySnapshot = await db.collection('patientTasks').get();
 
     for (var doc in querySnapshot.docs) {
       tasks.add(EventLog(
-        name: doc['name'],
-        description: doc['description'],
-        date: doc['date'].toDate(),
-        caretakerName: doc['caretakerName'],
-      ));
+          id: doc['id'],
+          name: doc['name'],
+          description: doc['description'],
+          date: doc['date'].toDate(),
+          caretakerId: doc['caretakerId'],
+          patientId: doc['patientId']));
     }
 
     return tasks
-        .where((element) => element.caretakerName == caretakerName)
+        .where((element) => element.caretakerId == caretakerId)
         .toList();
   }
 
   @override
   void initState() {
     super.initState();
+    updatedDateTime = widget.caretaker.startDate;
     _nameController = TextEditingController(text: widget.caretaker.name);
     _startDateController =
         TextEditingController(text: widget.caretaker.startDate.toString());
@@ -94,17 +97,26 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                   FocusScope.of(context).unfocus();
                 },
               ),
-              TextFormField(
-                controller: _startDateController,
-                decoration: const InputDecoration(labelText: 'Start Date'),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: FloatingActionButton.extended(
+                      label: Text(
+                        widget.caretaker.startDate.toString(),
+                      ),
+                      icon: const Icon(Icons.calendar_today),
+                      onPressed: () =>
+                          updateStartDate(widget.caretaker.startDate)),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 30.0),
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      List<EventLog> tasks =
-                          await loadTasksFromFirestore(widget.caretaker.name);
+                      List<EventLog> tasks = await loadTasksFromFirestore(
+                          widget.caretaker.id.toString());
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => TasksScreen(
@@ -121,5 +133,33 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> updateStartDate(DateTime time) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: time,
+      firstDate: DateTime(DateTime.now().year - 100),
+      lastDate: DateTime(DateTime.now().year + 100),
+    );
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(pickedDate),
+      );
+      if (pickedTime != null) {
+        setState(() {
+          updatedDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+        });
+        widget.caretaker.startDate = updatedDateTime;
+        modifyCaretakerInDb(widget.caretaker);
+      }
+    }
   }
 }

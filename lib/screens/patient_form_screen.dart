@@ -19,25 +19,25 @@ class PatientFormScreen extends StatefulWidget {
 class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
-  late TextEditingController _startDateController;
   String currentTextFormFieldValue = '';
   Map<String, Map<String, String>> careTasks = {};
-  final FocusNode _focusNode = FocusNode();
+  late DateTime updatedDateTime;
 
   Future<List<EventLog>> loadEventLogsFromFirestore() async {
     List<EventLog> tasks = [];
     QuerySnapshot querySnapshot = await db
         .collection('patientTasks')
-        .where('name', isEqualTo: widget.patient.name)
+        .where('patientId', isEqualTo: widget.patient.id.toString())
         .get();
 
     for (var doc in querySnapshot.docs) {
       tasks.add(EventLog(
-        name: doc['name'],
-        description: doc['description'],
-        date: doc['date'].toDate(),
-        caretakerName: doc['caretakerName'],
-      ));
+          id: doc['id'],
+          name: doc['name'],
+          description: doc['description'],
+          date: doc['date'].toDate(),
+          caretakerId: doc['caretakerId'],
+          patientId: doc['patientId']));
     }
 
     return tasks;
@@ -46,9 +46,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   @override
   void initState() {
     super.initState();
+    updatedDateTime = widget.patient.startDate;
     _nameController = TextEditingController(text: widget.patient.name);
-    _startDateController =
-        TextEditingController(text: widget.patient.startDate.toString());
   }
 
   @override
@@ -96,9 +95,18 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                   FocusScope.of(context).unfocus();
                 },
               ),
-              TextFormField(
-                controller: _startDateController,
-                decoration: const InputDecoration(labelText: 'Start Date'),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: FloatingActionButton.extended(
+                      label: Text(
+                        widget.patient.startDate.toString(),
+                      ),
+                      icon: const Icon(Icons.calendar_today),
+                      onPressed: () =>
+                          updateStartDate(widget.patient.startDate)),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 30.0),
@@ -136,5 +144,33 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> updateStartDate(DateTime time) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: time,
+      firstDate: DateTime(DateTime.now().year - 100),
+      lastDate: DateTime(DateTime.now().year + 100),
+    );
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(pickedDate),
+      );
+      if (pickedTime != null) {
+        setState(() {
+          updatedDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+        });
+        widget.patient.startDate = updatedDateTime;
+        modifyPatientInDb(widget.patient);
+      }
+    }
   }
 }

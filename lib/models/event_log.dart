@@ -1,12 +1,16 @@
 class EventLog {
   EventLog(
-      {required this.name,
+      {required this.id,
+      required this.name,
       required this.description,
       required this.date,
-      required this.caretakerName});
+      required this.caretakerId,
+      required this.patientId});
 
+  final String id;
   final String name;
   final String description;
   final DateTime date;
-  final String caretakerName;
+  final String caretakerId;
+  final String patientId;
 }

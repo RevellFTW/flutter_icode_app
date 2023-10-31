@@ -29,3 +29,5 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+
+enum Caller { patient, caretaker }
