@@ -127,57 +127,56 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                   });
                                   _focusNode.requestFocus();
                                 },
-                                child: TextFormField(
-                                  focusNode: _focusNode,
-                                  controller: _descriptionController,
-                                  onChanged: (String newValue) {
-                                    setState(() {
-                                      currentTextFormFieldValue = newValue;
-                                    });
-                                  },
-                                  onTapOutside: (newValue) {
-                                    if (currentTextFormFieldValue.isNotEmpty) {
-                                      widget.eventLogs[int.parse(_editKey)]
-                                              .description =
-                                          currentTextFormFieldValue;
-                                    }
-                                    saveToDb();
-                                  },
-                                ),
-                              )
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 20, bottom: 20),
+                                  child: SizedBox(
+                                      width: 130,
+                                      child: DropdownMenu<String>(
+                                        initialSelection: _nameDropdownValue,
+                                        label: const Text('Frequency'),
+                                        requestFocusOnTap: false,
+                                        onSelected: (String? newValue) {
+                                          setState(() {
+                                            String index =
+                                                _editIndex.toString();
+                                            _nameDropdownValue = newValue!;
+                                            widget.eventLogs[int.parse(index)]
+                                                .name = _nameDropdownValue!;
+                                            _editIndex = -1;
+                                            _editKey = '';
+                                            _focusNode.unfocus();
+                                          });
+                                          saveToDb();
+                                        },
+                                        dropdownMenuEntries: list
+                                            .map<DropdownMenuEntry<String>>(
+                                                (String value) {
+                                          return DropdownMenuEntry<String>(
+                                              value: value, label: value);
+                                        }).toList(),
+                                      )),
+                                ))
                             : GestureDetector(
-                                child:
-                                    Text(widget.eventLogs[index].description),
+                                child: Text(widget.eventLogs[index].name),
                               ),
                         subtitle: _editIndex == index
-                            ? Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 20, bottom: 20),
-                                child: SizedBox(
-                                    width: 130,
-                                    child: DropdownMenu<String>(
-                                      initialSelection: _nameDropdownValue,
-                                      label: const Text('Frequency'),
-                                      requestFocusOnTap: false,
-                                      onSelected: (String? newValue) {
-                                        setState(() {
-                                          String index = _editIndex.toString();
-                                          _nameDropdownValue = newValue!;
-                                          widget.eventLogs[int.parse(index)]
-                                              .name = _nameDropdownValue!;
-                                          _editIndex = -1;
-                                          _editKey = '';
-                                          _focusNode.unfocus();
-                                        });
-                                        saveToDb();
-                                      },
-                                      dropdownMenuEntries: list
-                                          .map<DropdownMenuEntry<String>>(
-                                              (String value) {
-                                        return DropdownMenuEntry<String>(
-                                            value: value, label: value);
-                                      }).toList(),
-                                    )),
+                            ? TextFormField(
+                                focusNode: _focusNode,
+                                controller: _descriptionController,
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    currentTextFormFieldValue = newValue;
+                                  });
+                                },
+                                onTapOutside: (newValue) {
+                                  if (currentTextFormFieldValue.isNotEmpty) {
+                                    widget.eventLogs[int.parse(_editKey)]
+                                            .description =
+                                        currentTextFormFieldValue;
+                                  }
+                                  saveToDb();
+                                },
                               )
                             : GestureDetector(
                                 onTap: () {
@@ -190,7 +189,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                     _focusNode.requestFocus();
                                   });
                                 },
-                                child: Text(widget.eventLogs[index].name),
+                                child:
+                                    Text(widget.eventLogs[index].description),
                               ),
                         trailing: _editIndex == index
                             ? IconButton(
