@@ -107,58 +107,58 @@ class _CareTasksPageState extends State<CareTasksPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Select Day of the Week'),
+            title: const Text('Select Day of the Week'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 // Here you can create buttons for each day of the week
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Monday'),
-                    child: Text('Monday'),
+                    child: const Text('Monday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Tuesday'),
-                    child: Text('Tuesday'),
+                    child: const Text('Tuesday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Wednesday'),
-                    child: Text('Wednesday'),
+                    child: const Text('Wednesday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Thursday'),
-                    child: Text('Thursday'),
+                    child: const Text('Thursday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Friday'),
-                    child: Text('Friday'),
+                    child: const Text('Friday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Saturday'),
-                    child: Text('Saturday'),
+                    child: const Text('Saturday'),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Sunday'),
-                    child: Text('Sunday'),
+                    child: const Text('Sunday'),
                   ),
                 )
                 // Add buttons for other days of the week
@@ -169,25 +169,22 @@ class _CareTasksPageState extends State<CareTasksPage> {
       );
 
       // Once the user selects a day, proceed to pick time
-      if (selectedDay != null) {
-        DateTime selectedDate = initialDateTime;
-        while (selectedDate.weekday != _getWeekdayFromString(selectedDay)) {
-          selectedDate = selectedDate.add(Duration(days: 1));
-        }
-        final TimeOfDay? pickedTime = await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay.now(),
-        );
+      DateTime selectedDate = initialDateTime;
+      while (selectedDate.weekday != _getWeekdayFromString(selectedDay)) {
+        selectedDate = selectedDate.add(const Duration(days: 1));
+      }
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
 
-        if (pickedTime != null) {
-          setState(() {
-            selectedDateTime =
-                '$selectedDay $pickedTime.hour:$pickedTime.minute';
-          });
-          if (index != -1) {
-            widget.patient.careTasks[index].date = selectedDateTime;
-            saveToDb();
-          }
+      if (pickedTime != null) {
+        setState(() {
+          selectedDateTime = '$selectedDay $pickedTime.hour:$pickedTime.minute';
+        });
+        if (index != -1) {
+          widget.patient.careTasks[index].date = selectedDateTime;
+          saveToDb();
         }
       }
     } else if (selectedModifier == Frequency.monthly) {
@@ -279,7 +276,6 @@ class _CareTasksPageState extends State<CareTasksPage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          saveToDb();
           FocusScope.of(context).unfocus();
         });
       },
@@ -304,7 +300,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                             _editIndex = index;
                             _editKey = index.toString();
                             _taskController.text = widget.patient
-                                .careTasks[int.parse(_editKey)].taskName!;
+                                .careTasks[int.parse(_editKey)].taskName;
                             dropdownValue = widget
                                 .patient
                                 .careTasks[int.parse(_editKey)]

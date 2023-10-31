@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MonthlyPicker extends StatefulWidget {
   final DateTime initialDate;
 
-  MonthlyPicker({required this.initialDate});
+  const MonthlyPicker({super.key, required this.initialDate});
 
   @override
   _MonthlyPickerState createState() => _MonthlyPickerState();
@@ -25,7 +25,7 @@ class _MonthlyPickerState extends State<MonthlyPicker> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Select Month and Day'),
+      title: const Text('Select Month and Day'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -37,7 +37,7 @@ class _MonthlyPickerState extends State<MonthlyPicker> {
                 items: List.generate(12, (index) {
                   return DropdownMenuItem<int>(
                     value: index + 1,
-                    child: Text('${_getMonthName(index + 1)}'),
+                    child: Text(_getMonthName(index + 1)),
                   );
                 }),
                 onChanged: (value) {
@@ -49,13 +49,13 @@ class _MonthlyPickerState extends State<MonthlyPicker> {
               _buildDayPicker(),
             ],
           ),
-          SizedBox(height: 20),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop(_selectedDate);
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),

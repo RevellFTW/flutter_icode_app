@@ -7,8 +7,8 @@ class LightTheme {
       elevation: 1,
     ),
     colorScheme: ColorScheme.fromSwatch().copyWith(
-      primary: Color.fromARGB(255, 168, 191, 226),
-      secondary: Color.fromARGB(255, 112, 164, 231),
+      primary: const Color.fromARGB(255, 168, 191, 226),
+      secondary: const Color.fromARGB(255, 112, 164, 231),
     ),
     textTheme: ThemeData.light().textTheme.copyWith(
           bodyMedium: GoogleFonts.robotoCondensed(

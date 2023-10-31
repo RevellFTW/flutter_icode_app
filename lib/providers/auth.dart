@@ -19,7 +19,7 @@ class Auth extends ChangeNotifier {
       );
       _user = userCredential.user;
       notifyListeners();
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       // Handle exceptions
     }
   }

@@ -44,7 +44,7 @@ void main() async {
 //       .set({'careTasks': careTasks}, SetOptions(merge: true));
 
   final deviceInfo = await DeviceInfoPlugin().deviceInfo;
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 //todo make user in firebase, and load this with auth and more properties

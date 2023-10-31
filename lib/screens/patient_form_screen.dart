@@ -5,7 +5,7 @@ import '../helper/firestore_helper.dart';
 import '../models/patient.dart';
 import '../models/event_log.dart';
 import 'patient_care_tasks_screen.dart';
-import 'tasks/patient_tasks_screen.dart';
+import 'tasks/event_log_screen.dart';
 
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;
@@ -130,8 +130,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       List<EventLog> tasks = await loadEventLogsFromFirestore();
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => TasksScreen(
-                              tasks: tasks,
+                          builder: (context) => EventLogScreen(
+                              eventLogs: tasks,
                               eventLogName:
                                   "${widget.patient.name} Patient's Log")));
                     }

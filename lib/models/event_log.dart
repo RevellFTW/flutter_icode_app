@@ -8,9 +8,9 @@ class EventLog {
       required this.patientId});
 
   final String id;
-  final String name;
-  final String description;
-  final DateTime date;
+  String name;
+  String description;
+  DateTime date;
   final String caretakerId;
   final String patientId;
 }
