@@ -35,10 +35,13 @@ class _EventLogScreenState extends State<EventLogScreen> {
   String _editKey = '';
   String? _nameDropdownValue = 'Do Laundry';
   String? selectedCaretakerId;
+  String? selectedPatientId;
 
   final FocusNode _focusNode = FocusNode();
   late List<String> list = [];
+  late List<String> individualCareTaskslist = [];
   late List<Caretaker> caretakerList = [];
+  late List<Patient> patientList = [];
 
   void _onFocusChange() {
     if (!_focusNode.hasFocus) {
@@ -66,7 +69,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
   @override
   void initState() {
     if (widget.caller == Caller.patient) {
-      _loadData().then((value) {
+      _loadData(widget.patient!.id.toString()).then((value) {
         setState(() {
           list = value;
           list.add('Other');
@@ -75,6 +78,12 @@ class _EventLogScreenState extends State<EventLogScreen> {
       _loadCaretakerData().then((value) {
         setState(() {
           caretakerList = value;
+        });
+      });
+    } else {
+      _loadPatientData().then((value) {
+        setState(() {
+          patientList = value;
         });
       });
     }
@@ -91,10 +100,17 @@ class _EventLogScreenState extends State<EventLogScreen> {
     return data;
   }
 
-  Future<List<String>> _loadData() async {
+  Future<List<Patient>> _loadPatientData() async {
     // Load the data asynchronously
-    final data =
-        await getCareTaskNamesFromPatientId(widget.eventLogs[0].patientId);
+    final data = await loadPatientsFromFirestore();
+
+    // Return the loaded data
+    return data.where((element) => element.id != widget.caretaker!.id).toList();
+  }
+
+  Future<List<String>> _loadData(String patientId) async {
+    // Load the data asynchronously
+    final data = await getCareTaskNamesFromPatientId(patientId);
 
     // Return the loaded data
     return data;
@@ -178,32 +194,46 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                         child: SizedBox(
                                             width: 130,
                                             child: DropdownMenu<String>(
-                                              initialSelection:
-                                                  _nameDropdownValue,
-                                              label: const Text('Task Name'),
-                                              requestFocusOnTap: false,
-                                              onSelected:
-                                                  (String? newValue) async {
-                                                setState(() {
-                                                  String index =
-                                                      _editIndex.toString();
-                                                  _nameDropdownValue =
-                                                      newValue!;
-                                                  widget
-                                                          .eventLogs[
-                                                              int.parse(index)]
-                                                          .name =
-                                                      _nameDropdownValue!;
-                                                });
-                                              },
-                                              dropdownMenuEntries: list.map<
-                                                  DropdownMenuEntry<
-                                                      String>>((String value) {
-                                                return DropdownMenuEntry<
-                                                        String>(
-                                                    value: value, label: value);
-                                              }).toList(),
-                                            )),
+                                                initialSelection:
+                                                    _nameDropdownValue,
+                                                label: const Text('Task Name'),
+                                                requestFocusOnTap: false,
+                                                onSelected:
+                                                    (String? newValue) async {
+                                                  setState(() {
+                                                    String index =
+                                                        _editIndex.toString();
+                                                    _nameDropdownValue =
+                                                        newValue!;
+                                                    widget
+                                                            .eventLogs[int
+                                                                .parse(index)]
+                                                            .name =
+                                                        _nameDropdownValue!;
+                                                  });
+                                                },
+                                                dropdownMenuEntries: widget
+                                                            .caller ==
+                                                        Caller.patient
+                                                    ? list.map<
+                                                            DropdownMenuEntry<
+                                                                String>>(
+                                                        (String value) {
+                                                        return DropdownMenuEntry<
+                                                                String>(
+                                                            value: value,
+                                                            label: value);
+                                                      }).toList()
+                                                    : individualCareTaskslist
+                                                        .map<
+                                                            DropdownMenuEntry<
+                                                                String>>((String
+                                                            value) {
+                                                        return DropdownMenuEntry<
+                                                                String>(
+                                                            value: value,
+                                                            label: value);
+                                                      }).toList())),
                                       ),
                                     ),
                                     Align(
@@ -214,25 +244,51 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                         child: SizedBox(
                                           width: 130,
                                           child: DropdownMenu<String>(
-                                            width: 202,
-                                            initialSelection:
-                                                caretakerList.first.name,
-                                            label: const Text('Caretaker'),
-                                            requestFocusOnTap: false,
-                                            onSelected:
-                                                (String? newValue) async {
-                                              setState(() {
-                                                selectedCaretakerId = newValue!;
-                                              });
-                                            },
-                                            dropdownMenuEntries: caretakerList
-                                                .map<DropdownMenuEntry<String>>(
-                                                    (Caretaker value) {
-                                              return DropdownMenuEntry<String>(
-                                                  value: value.id.toString(),
-                                                  label: value.name);
-                                            }).toList(),
-                                          ),
+                                              width: 202,
+                                              initialSelection: widget.caller ==
+                                                      Caller.patient
+                                                  ? caretakerList.first.name
+                                                  : patientList.first.name,
+                                              label: widget.caller ==
+                                                      Caller.patient
+                                                  ? const Text('Caretaker')
+                                                  : const Text('Patient'),
+                                              requestFocusOnTap: false,
+                                              onSelected:
+                                                  (String? newValue) async {
+                                                setState(() {
+                                                  if (widget.caller ==
+                                                      Caller.patient) {
+                                                    selectedCaretakerId =
+                                                        newValue!;
+                                                  } else {
+                                                    selectedPatientId =
+                                                        newValue!;
+                                                  }
+                                                });
+                                              },
+                                              dropdownMenuEntries: widget
+                                                          .caller ==
+                                                      Caller.patient
+                                                  ? caretakerList.map<
+                                                          DropdownMenuEntry<
+                                                              String>>(
+                                                      (Caretaker value) {
+                                                      return DropdownMenuEntry<
+                                                              String>(
+                                                          value: value.id
+                                                              .toString(),
+                                                          label: value.name);
+                                                    }).toList()
+                                                  : patientList
+                                                      .map<DropdownMenuEntry<String>>(
+                                                          (Patient value) {
+                                                      return DropdownMenuEntry<
+                                                              String>(
+                                                          value: value.id
+                                                              .toString(),
+                                                          label: value.name);
+                                                    }).toList()),
                                         ),
                                       ),
                                     ),
@@ -240,6 +296,16 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 ),
                               )
                             : GestureDetector(
+                                onTap: () {
+                                  if (widget.caller == Caller.caretaker) {
+                                    _loadData(widget.eventLogs[index].patientId)
+                                        .then((value) {
+                                      setState(() {
+                                        individualCareTaskslist = value;
+                                      });
+                                    });
+                                  }
+                                },
                                 child: Text(widget.eventLogs[index].name),
                               ),
                         subtitle: _editIndex == index
@@ -327,6 +393,13 @@ class _EventLogScreenState extends State<EventLogScreen> {
             showDialog(
               context: context,
               builder: (BuildContext context) {
+                if (widget.caller == Caller.caretaker) {
+                  _loadData(patientList.first.id.toString()).then((value) {
+                    setState(() {
+                      individualCareTaskslist = value;
+                    });
+                  });
+                }
                 return AlertDialog(
                   title: const Text('Add New Event Log'),
                   content:
@@ -337,18 +410,25 @@ class _EventLogScreenState extends State<EventLogScreen> {
                         padding: const EdgeInsets.only(top: 30.0),
                         child: DropdownMenu<String>(
                           width: 202,
-                          initialSelection: list.first,
+                          initialSelection: individualCareTaskslist.first,
                           label: const Text('Event Log Name'),
                           onSelected: (String? newValue) {
                             setState(() {
                               _nameDropdownValue = newValue!;
                             });
                           },
-                          dropdownMenuEntries: list
-                              .map<DropdownMenuEntry<String>>((String value) {
-                            return DropdownMenuEntry<String>(
-                                value: value, label: value);
-                          }).toList(),
+                          dropdownMenuEntries: widget.caller == Caller.patient
+                              ? list.map<DropdownMenuEntry<String>>(
+                                  (String value) {
+                                  return DropdownMenuEntry<String>(
+                                      value: value, label: value);
+                                }).toList()
+                              : individualCareTaskslist
+                                  .map<DropdownMenuEntry<String>>(
+                                      (String value) {
+                                  return DropdownMenuEntry<String>(
+                                      value: value, label: value);
+                                }).toList(),
                         ),
                       ),
                     ),
@@ -357,21 +437,40 @@ class _EventLogScreenState extends State<EventLogScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 30.0),
                         child: DropdownMenu<String>(
-                          width: 202,
-                          initialSelection: caretakerList.first.name,
-                          label: const Text('Caretaker'),
-                          onSelected: (String? newValue) {
-                            setState(() {
-                              selectedCaretakerId = newValue!;
-                            });
-                          },
-                          dropdownMenuEntries: caretakerList
-                              .map<DropdownMenuEntry<String>>(
-                                  (Caretaker value) {
-                            return DropdownMenuEntry<String>(
-                                value: value.id.toString(), label: value.name);
-                          }).toList(),
-                        ),
+                            width: 202,
+                            initialSelection: widget.caller == Caller.patient
+                                ? caretakerList.first.name
+                                : patientList.first.name,
+                            label: widget.caller == Caller.patient
+                                ? const Text('Caretaker')
+                                : const Text('Patient'),
+                            onSelected: (String? newValue) {
+                              setState(() {
+                                if (widget.caller == Caller.patient) {
+                                  selectedCaretakerId = newValue!;
+                                } else {
+                                  selectedPatientId = newValue!;
+                                  _loadData(newValue).then((value) {
+                                    setState(() {
+                                      individualCareTaskslist = value;
+                                    });
+                                  });
+                                }
+                              });
+                            },
+                            dropdownMenuEntries: widget.caller == Caller.patient
+                                ? caretakerList.map<DropdownMenuEntry<String>>(
+                                    (Caretaker value) {
+                                    return DropdownMenuEntry<String>(
+                                        value: value.id.toString(),
+                                        label: value.name);
+                                  }).toList()
+                                : patientList.map<DropdownMenuEntry<String>>(
+                                    (Patient value) {
+                                    return DropdownMenuEntry<String>(
+                                        value: value.id.toString(),
+                                        label: value.name);
+                                  }).toList()),
                       ),
                     ),
                     Align(
@@ -429,8 +528,9 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 description: _descriptionController.text,
                                 name: _nameDropdownValue!,
                                 date: _selectedDate,
-                                patientId: 'todo',
-                                caretakerId: 'todo',
+                                patientId: selectedPatientId!,
+                                caretakerId: widget.caretaker!.id
+                                    .toString(), //if caller is caretaker, then caretakerId cannot be null
                               ));
                             }
                           });
