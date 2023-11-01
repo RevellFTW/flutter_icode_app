@@ -125,6 +125,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                 eventLogName:
                                     "${widget.caretaker.name} Caretaker's Log",
                                 caller: Caller.caretaker,
+                                caretaker: widget.caretaker,
                               )));
                     }
                   },

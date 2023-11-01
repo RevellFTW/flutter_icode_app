@@ -4,17 +4,22 @@ import 'package:todoapp/models/caretaker.dart';
 import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/event_log.dart';
+import '../../models/patient.dart';
 import '../home_page.dart';
 
 class EventLogScreen extends StatefulWidget {
   final List<EventLog> eventLogs;
   final String eventLogName;
   final Caller caller;
+  final Patient? patient;
+  final Caretaker? caretaker;
   const EventLogScreen(
       {super.key,
       required this.eventLogs,
       required this.eventLogName,
-      required this.caller});
+      required this.caller,
+      this.patient,
+      this.caretaker});
 
   @override
   _EventLogScreenState createState() => _EventLogScreenState();
@@ -163,36 +168,77 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                   });
                                   _focusNode.requestFocus();
                                 },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 20, bottom: 20),
-                                  child: SizedBox(
-                                      width: 130,
-                                      child: DropdownMenu<String>(
-                                        initialSelection: _nameDropdownValue,
-                                        label: const Text('Task Name'),
-                                        requestFocusOnTap: false,
-                                        onSelected: (String? newValue) {
-                                          setState(() {
-                                            String index =
-                                                _editIndex.toString();
-                                            _nameDropdownValue = newValue!;
-                                            widget.eventLogs[int.parse(index)]
-                                                .name = _nameDropdownValue!;
-                                            _editIndex = -1;
-                                            _editKey = '';
-                                            _focusNode.unfocus();
-                                          });
-                                          saveToDb();
-                                        },
-                                        dropdownMenuEntries: list
-                                            .map<DropdownMenuEntry<String>>(
-                                                (String value) {
-                                          return DropdownMenuEntry<String>(
-                                              value: value, label: value);
-                                        }).toList(),
-                                      )),
-                                ))
+                                child: Column(
+                                  children: <Widget>[
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 20, bottom: 20),
+                                        child: SizedBox(
+                                            width: 130,
+                                            child: DropdownMenu<String>(
+                                              initialSelection:
+                                                  _nameDropdownValue,
+                                              label: const Text('Task Name'),
+                                              requestFocusOnTap: false,
+                                              onSelected:
+                                                  (String? newValue) async {
+                                                setState(() {
+                                                  String index =
+                                                      _editIndex.toString();
+                                                  _nameDropdownValue =
+                                                      newValue!;
+                                                  widget
+                                                          .eventLogs[
+                                                              int.parse(index)]
+                                                          .name =
+                                                      _nameDropdownValue!;
+                                                });
+                                              },
+                                              dropdownMenuEntries: list.map<
+                                                  DropdownMenuEntry<
+                                                      String>>((String value) {
+                                                return DropdownMenuEntry<
+                                                        String>(
+                                                    value: value, label: value);
+                                              }).toList(),
+                                            )),
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 20, bottom: 20),
+                                        child: SizedBox(
+                                          width: 130,
+                                          child: DropdownMenu<String>(
+                                            width: 202,
+                                            initialSelection:
+                                                caretakerList.first.name,
+                                            label: const Text('Caretaker'),
+                                            requestFocusOnTap: false,
+                                            onSelected:
+                                                (String? newValue) async {
+                                              setState(() {
+                                                selectedCaretakerId = newValue!;
+                                              });
+                                            },
+                                            dropdownMenuEntries: caretakerList
+                                                .map<DropdownMenuEntry<String>>(
+                                                    (Caretaker value) {
+                                              return DropdownMenuEntry<String>(
+                                                  value: value.id.toString(),
+                                                  label: value.name);
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
                             : GestureDetector(
                                 child: Text(widget.eventLogs[index].name),
                               ),
@@ -367,14 +413,26 @@ class _EventLogScreenState extends State<EventLogScreen> {
                       onPressed: () {
                         if (_descriptionController.text.isNotEmpty) {
                           setState(() {
-                            widget.eventLogs.add(EventLog(
-                              id: (widget.eventLogs.length + 1).toString(),
-                              description: _descriptionController.text,
-                              name: _nameDropdownValue!,
-                              date: _selectedDate,
-                              patientId: '1',
-                              caretakerId: selectedCaretakerId!,
-                            ));
+                            if (widget.caller == Caller.patient) {
+                              widget.eventLogs.add(EventLog(
+                                id: (widget.eventLogs.length + 1).toString(),
+                                description: _descriptionController.text,
+                                name: _nameDropdownValue!,
+                                date: _selectedDate,
+                                patientId: widget.patient!.id
+                                    .toString(), //if caller is patient, then patientId cannot be null
+                                caretakerId: selectedCaretakerId!,
+                              ));
+                            } else if (widget.caller == Caller.caretaker) {
+                              widget.eventLogs.add(EventLog(
+                                id: (widget.eventLogs.length + 1).toString(),
+                                description: _descriptionController.text,
+                                name: _nameDropdownValue!,
+                                date: _selectedDate,
+                                patientId: 'todo',
+                                caretakerId: 'todo',
+                              ));
+                            }
                           });
                           saveToDb();
                         }
