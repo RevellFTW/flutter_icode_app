@@ -215,19 +215,4 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
     caretakers.removeWhere((caretaker) => caretaker.id == id);
     removeCaretakerFromDb(id);
   }
-
-  Future<List<Caretaker>> loadCaretakersFromFirestore() async {
-    List<Caretaker> caretakers = [];
-    QuerySnapshot querySnapshot = await db.collection('caretakers').get();
-
-    for (var doc in querySnapshot.docs) {
-      caretakers.add(Caretaker(
-        id: doc['id'],
-        name: doc['name'],
-        startDate: doc['startDate'].toDate(),
-      ));
-    }
-
-    return caretakers;
-  }
 }

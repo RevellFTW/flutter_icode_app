@@ -96,6 +96,21 @@ Future<List<String>> getCareTaskNamesFromPatientId(String id) async {
   return careTaskNames;
 }
 
+Future<List<Caretaker>> loadCaretakersFromFirestore() async {
+  List<Caretaker> caretakers = [];
+  QuerySnapshot querySnapshot = await db.collection('caretakers').get();
+
+  for (var doc in querySnapshot.docs) {
+    caretakers.add(Caretaker(
+      id: doc['id'],
+      name: doc['name'],
+      startDate: doc['startDate'].toDate(),
+    ));
+  }
+
+  return caretakers;
+}
+
 Future<List<Patient>> loadPatientsFromFirestore() async {
   List<Patient> patients = [];
   QuerySnapshot querySnapshot = await db.collection('patients').get();

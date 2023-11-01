@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:todoapp/models/caretaker.dart';
 import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/event_log.dart';
@@ -27,9 +29,11 @@ class _EventLogScreenState extends State<EventLogScreen> {
   int _editIndex = -1;
   String _editKey = '';
   String? _nameDropdownValue = 'Do Laundry';
+  String? selectedCaretakerId;
 
   final FocusNode _focusNode = FocusNode();
   late List<String> list = [];
+  late List<Caretaker> caretakerList = [];
 
   void _onFocusChange() {
     if (!_focusNode.hasFocus) {
@@ -60,13 +64,26 @@ class _EventLogScreenState extends State<EventLogScreen> {
       _loadData().then((value) {
         setState(() {
           list = value;
+          list.add('Other');
         });
       });
-      list.add('Other');
+      _loadCaretakerData().then((value) {
+        setState(() {
+          caretakerList = value;
+        });
+      });
     }
     super.initState();
 
     _focusNode.addListener(_onFocusChange);
+  }
+
+  Future<List<Caretaker>> _loadCaretakerData() async {
+    // Load the data asynchronously
+    final data = await loadCaretakersFromFirestore();
+
+    // Return the loaded data
+    return data;
   }
 
   Future<List<String>> _loadData() async {
@@ -227,7 +244,9 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 children: [
                                   FloatingActionButton.extended(
                                     label: Text(
-                                      widget.eventLogs[index].date.toString(),
+                                      DateFormat("'yy MM dd kk-mm")
+                                          .format(widget.eventLogs[index].date)
+                                          .toString(),
                                     ),
                                     icon: const Icon(Icons.calendar_today),
                                     onPressed: () => {
@@ -263,20 +282,16 @@ class _EventLogScreenState extends State<EventLogScreen> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('Add New Care Task'),
+                  title: const Text('Add New Event Log'),
                   content:
                       Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    TextFormField(
-                      controller: _descriptionController,
-                      decoration: const InputDecoration(labelText: 'Event Log'),
-                    ),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 30.0),
                         child: DropdownMenu<String>(
                           width: 202,
-                          initialSelection: _nameDropdownValue,
+                          initialSelection: list.first,
                           label: const Text('Event Log Name'),
                           onSelected: (String? newValue) {
                             setState(() {
@@ -293,6 +308,40 @@ class _EventLogScreenState extends State<EventLogScreen> {
                     ),
                     Align(
                       alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 30.0),
+                        child: DropdownMenu<String>(
+                          width: 202,
+                          initialSelection: caretakerList.first.name,
+                          label: const Text('Caretaker'),
+                          onSelected: (String? newValue) {
+                            setState(() {
+                              selectedCaretakerId = newValue!;
+                            });
+                          },
+                          dropdownMenuEntries: caretakerList
+                              .map<DropdownMenuEntry<String>>(
+                                  (Caretaker value) {
+                            return DropdownMenuEntry<String>(
+                                value: value.id.toString(), label: value.name);
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 8.0, left: 5, right: 25, bottom: 15),
+                        child: TextFormField(
+                          controller: _descriptionController,
+                          decoration:
+                              const InputDecoration(labelText: 'Description'),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 30.0),
                         child: FloatingActionButton.extended(
@@ -324,7 +373,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                               name: _nameDropdownValue!,
                               date: _selectedDate,
                               patientId: '1',
-                              caretakerId: '1',
+                              caretakerId: selectedCaretakerId!,
                             ));
                           });
                           saveToDb();
