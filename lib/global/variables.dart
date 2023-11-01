@@ -7,6 +7,7 @@ int androidSdkVersion = 0;
 final currentUser = User(name: 'John Doe', role: 'back-office');
 String appName = "Caretaker App";
 String selectedDateTime = DateTime.now().toString();
+String selectedDateTimeWhenAdding = "Select";
 Color appForegroundColor = Colors.white;
 Color appBackgroundColor = Colors.indigo.shade200;
 Map<int, bool> checkboxState = {};

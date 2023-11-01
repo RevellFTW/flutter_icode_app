@@ -126,17 +126,19 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
         switch (key) {
           case 'date':
             {
-              date = date;
+              date = value;
             }
             break;
           case 'frequency':
             {
               frequency = Frequency.values.byName(value);
             }
+            break;
           case 'task':
             {
               taskName = value;
             }
+            break;
         }
       });
       careTasks.add(
