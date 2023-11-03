@@ -558,94 +558,120 @@ class _CareTasksPageState extends State<CareTasksPage> {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Add New Care Task'),
-                  content:
-                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    TextFormField(
-                      controller: _taskController,
-                      decoration: const InputDecoration(labelText: 'Care Task'),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: DropdownMenu<String>(
-                          width: 202,
-                          initialSelection: dropdownValue,
-                          label: const Text('Frequency'),
-                          onSelected: (String? newValue) async {
-                            bool result = false;
-                            if (newValue != dropdownValue) {
-                              result = await isDatePicked(
-                                  context,
-                                  DateTime.now().toString(),
-                                  Frequency.values.byName(newValue!),
-                                  false,
-                                  false);
-                            }
-                            if (result == true) {
+                return StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return AlertDialog(
+                      title: const Text('Add New Care Task'),
+                      content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _taskController,
+                              decoration:
+                                  const InputDecoration(labelText: 'Care Task'),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 30.0),
+                                child: DropdownMenu<String>(
+                                  width: 202,
+                                  initialSelection: dropdownValue,
+                                  label: const Text('Frequency'),
+                                  onSelected: (String? newValue) async {
+                                    bool result = false;
+                                    if (newValue != dropdownValue) {
+                                      result = await isDatePicked(
+                                          context,
+                                          DateTime.now().toString(),
+                                          Frequency.values.byName(newValue!),
+                                          false,
+                                          false);
+                                    }
+                                    if (result == true) {
+                                      setState(() {
+                                        dropdownValue = newValue!;
+                                      });
+                                    }
+                                  },
+                                  dropdownMenuEntries: list
+                                      .map<DropdownMenuEntry<String>>(
+                                          (String value) {
+                                    return DropdownMenuEntry<String>(
+                                        value: value, label: value);
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 30.0),
+                                child: FloatingActionButton.extended(
+                                  label: Text(selectedDateTime),
+                                  icon: const Icon(Icons.calendar_today),
+                                  onPressed: () {
+                                    setState(() {
+                                      isDatePicked(
+                                          context,
+                                          DateTime.now().toString(),
+                                          Frequency.values
+                                              .byName(dropdownValue!),
+                                          false,
+                                          false);
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ]),
+                      //insert here
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Add'),
+                          onPressed: () {
+                            if (_taskController.text.isNotEmpty) {
                               setState(() {
-                                dropdownValue = newValue!;
+                                widget.patient.careTasks.add(CareTask(
+                                    taskName: _taskController.text,
+                                    taskFrequency:
+                                        Frequency.values.byName(dropdownValue!),
+                                    date: selectedDateTime.toString()));
                               });
-                            }
-                          },
-                          dropdownMenuEntries: list
-                              .map<DropdownMenuEntry<String>>((String value) {
-                            return DropdownMenuEntry<String>(
-                                value: value, label: value);
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: FloatingActionButton.extended(
-                          label: Text(selectedDateTime),
-                          icon: const Icon(Icons.calendar_today),
-                          onPressed: () async {
-                            bool result = false;
-                            result = await isDatePicked(
-                                context,
-                                DateTime.now().toString(),
-                                Frequency.values.byName(dropdownValue!),
-                                false,
-                                false);
-                            if (result == true) {
-                              setState(() {});
+                              saveToDb();
+                              stateSetter();
+                              Navigator.of(context).pop();
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Error'),
+                                    content: const Text(
+                                        'Please enter a name for the care task.'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('OK'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             }
                           },
                         ),
-                      ),
-                    ),
-                  ]),
-                  //insert here
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: const Text('Add'),
-                      onPressed: () {
-                        if (_taskController.text.isNotEmpty) {
-                          setState(() {
-                            widget.patient.careTasks.add(CareTask(
-                                taskName: _taskController.text,
-                                taskFrequency:
-                                    Frequency.values.byName(dropdownValue!),
-                                date: selectedDateTime.toString()));
-                          });
-                          saveToDb();
-                        }
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
+                      ],
+                    );
+                  },
                 );
               },
             );
@@ -654,5 +680,9 @@ class _CareTasksPageState extends State<CareTasksPage> {
         ),
       ),
     );
+  }
+
+  void stateSetter() {
+    setState(() {});
   }
 }
