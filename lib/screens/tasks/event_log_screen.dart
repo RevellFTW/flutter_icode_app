@@ -199,7 +199,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                             .eventLogs[
                                                                 int.parse(
                                                                     _editKey)]
-                                                            .patientId))),
+                                                            .patientId!))),
                                       ),
                                     ),
                                     Align(
@@ -230,15 +230,20 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                         selectedCaretakerId) {
                                                   selectedCaretakerId =
                                                       newValue!;
+                                                  widget.eventLogs[index]
+                                                          .caretakerId =
+                                                      selectedCaretakerId;
                                                 } else if (newValue !=
                                                     selectedPatientId) {
                                                   selectedPatientId = newValue!;
-                                                  print('patient id:$newValue');
+
                                                   _loadData(newValue)
                                                       .then((value) {
+                                                    widget.eventLogs[index]
+                                                        .patientId = newValue;
                                                     individualCareTaskslistMap[
                                                         widget.eventLogs[index]
-                                                            .patientId] = value;
+                                                            .patientId!] = value;
                                                     _nameDropdownValue =
                                                         individualCareTaskslistMap[
                                                                 widget
@@ -246,6 +251,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                                         index]
                                                                     .patientId]!
                                                             .first;
+
                                                     stateSetter();
                                                   });
                                                 }

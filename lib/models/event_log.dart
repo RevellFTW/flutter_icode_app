@@ -11,6 +11,6 @@ class EventLog {
   String name;
   String description;
   DateTime date;
-  final String caretakerId;
-  final String patientId;
+  String? caretakerId;
+  String? patientId;
 }
