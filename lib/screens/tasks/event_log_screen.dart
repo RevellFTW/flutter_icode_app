@@ -47,29 +47,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
   late List<Caretaker> caretakerList = [];
   late List<Patient> patientList = [];
 
-  void _onFocusChange() {
-    // if (!_focusNode.hasFocus) {
-    //   setState(() {
-    //     if (_editIndex != -1) {
-    //       if (_descriptionController.text.isNotEmpty) {
-    //         widget.eventLogs[int.parse(_editKey)].description =
-    //             _descriptionController.text;
-    //         widget.eventLogs[int.parse(_editKey)].name = _nameDropdownValue!;
-    //         _editIndex = -1;
-    //         _editKey = '';
-    //         _descriptionController.clear();
-    //       } else {
-    //         _descriptionController.text = _editKey;
-    //       }
-    //       _editIndex = -1;
-    //       _editKey = '';
-    //       _descriptionController.clear();
-    //     }
-    //   });
-    //   saveToDb();
-    // }
-  }
-
   @override
   void initState() {
     if (widget.caller == Caller.patient) {
@@ -105,8 +82,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
       });
     }
     super.initState();
-
-    _focusNode.addListener(_onFocusChange);
   }
 
   Future<List<Caretaker>> _loadCaretakerData() async {
@@ -135,7 +110,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
 
   @override
   void dispose() {
-    _focusNode.removeListener(_onFocusChange);
     _focusNode.dispose();
     super.dispose();
   }
@@ -145,7 +119,9 @@ class _EventLogScreenState extends State<EventLogScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          saveToDb();
+          _editKey = '';
+          _editIndex = -1;
+          _focusNode.unfocus();
           FocusScope.of(context).unfocus();
         });
       },
@@ -167,24 +143,16 @@ class _EventLogScreenState extends State<EventLogScreen> {
                       onTap: () {
                         setState(() {
                           if (_editIndex == -1) {
-                            _editIndex = index;
-                            _editKey = index.toString();
-                            _descriptionController.text = widget
-                                .eventLogs[int.parse(_editKey)].description;
-                            _nameDropdownValue =
-                                widget.eventLogs[int.parse(_editKey)].name;
+                            setIndex(index);
+                            setFormTexts();
                           }
                         });
                       },
                       child: ListTile(
                         onTap: () {
                           setState(() {
-                            _editIndex = index;
-                            _editKey = index.toString();
-                            _descriptionController.text = widget
-                                .eventLogs[int.parse(_editKey)].description;
-                            _nameDropdownValue =
-                                widget.eventLogs[int.parse(_editKey)].name;
+                            setIndex(index);
+                            setFormTexts();
                           });
                           _focusNode.requestFocus();
                         },
@@ -200,13 +168,15 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                         child: SizedBox(
                                             width: 130,
                                             child: DropdownMenu<String>(
-                                                initialSelection: widget.caller ==
+                                                initialSelection: widget
+                                                            .caller ==
                                                         Caller.patient
                                                     ? list.first
-                                                    : individualCareTaskslistMap[widget
-                                                            .eventLogs[int.parse(
-                                                                _editKey)]
-                                                            .patientId]!
+                                                    : individualCareTaskslistMap[
+                                                            widget
+                                                                .eventLogs[
+                                                                    index]
+                                                                .patientId]!
                                                         .first,
                                                 label: const Text('Task Name'),
                                                 requestFocusOnTap: true,
@@ -223,24 +193,13 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                         _nameDropdownValue!;
                                                   });
                                                 },
-                                                dropdownMenuEntries: widget.caller ==
-                                                        Caller.patient
-                                                    ? list.map<DropdownMenuEntry<String>>(
-                                                        (String value) {
-                                                        return DropdownMenuEntry<
-                                                                String>(
-                                                            value: value,
-                                                            label: value);
-                                                      }).toList()
-                                                    : individualCareTaskslistMap[widget
-                                                            .eventLogs[int.parse(_editKey)]
-                                                            .patientId]!
-                                                        .map<DropdownMenuEntry<String>>((String value) {
-                                                        return DropdownMenuEntry<
-                                                                String>(
-                                                            value: value,
-                                                            label: value);
-                                                      }).toList())),
+                                                dropdownMenuEntries:
+                                                    getTaskNameDropdownEntries(
+                                                        widget
+                                                            .eventLogs[
+                                                                int.parse(
+                                                                    _editKey)]
+                                                            .patientId))),
                                       ),
                                     ),
                                     Align(
@@ -258,10 +217,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                       .toString()
                                                   : patientList.first.id
                                                       .toString(),
-                                              label:
-                                                  widget.caller == Caller.patient
-                                                      ? const Text('Caretaker')
-                                                      : const Text('Patient'),
+                                              label: widget.caller ==
+                                                      Caller.patient
+                                                  ? const Text('Caretaker')
+                                                  : const Text('Patient'),
                                               requestFocusOnTap: false,
                                               onSelected:
                                                   (String? newValue) async {
@@ -278,44 +237,21 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                   _loadData(newValue)
                                                       .then((value) {
                                                     individualCareTaskslistMap[
-                                                        widget
-                                                            .eventLogs[
-                                                                int.parse(
-                                                                    _editKey)]
+                                                        widget.eventLogs[index]
                                                             .patientId] = value;
                                                     _nameDropdownValue =
-                                                        individualCareTaskslistMap[widget
-                                                                .eventLogs[
-                                                                    int.parse(
-                                                                        _editKey)]
-                                                                .patientId]!
+                                                        individualCareTaskslistMap[
+                                                                widget
+                                                                    .eventLogs[
+                                                                        index]
+                                                                    .patientId]!
                                                             .first;
                                                     stateSetter();
                                                   });
                                                 }
                                               },
-                                              dropdownMenuEntries: widget
-                                                          .caller ==
-                                                      Caller.patient
-                                                  ? caretakerList.map<
-                                                          DropdownMenuEntry<
-                                                              String>>(
-                                                      (Caretaker value) {
-                                                      return DropdownMenuEntry<
-                                                              String>(
-                                                          value: value.id
-                                                              .toString(),
-                                                          label: value.name);
-                                                    }).toList()
-                                                  : patientList
-                                                      .map<DropdownMenuEntry<String>>(
-                                                          (Patient value) {
-                                                      return DropdownMenuEntry<
-                                                              String>(
-                                                          value: value.id
-                                                              .toString(),
-                                                          label: value.name);
-                                                    }).toList()),
+                                              dropdownMenuEntries:
+                                                  getPersonTypeDropdownEntries()),
                                         ),
                                       ),
                                     ),
@@ -336,11 +272,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 },
                                 onTapOutside: (newValue) {
                                   if (currentTextFormFieldValue.isNotEmpty) {
-                                    widget.eventLogs[int.parse(_editKey)]
-                                            .description =
+                                    widget.eventLogs[index].description =
                                         currentTextFormFieldValue;
                                   }
-                                  //saveToDb();
+                                  saveToDb(widget.eventLogs[index]);
                                 },
                                 onFieldSubmitted: (newValue) {
                                   if (currentTextFormFieldValue.isNotEmpty) {
@@ -348,6 +283,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                             .description =
                                         currentTextFormFieldValue;
                                   }
+                                  saveToDb(widget.eventLogs[index]);
+                                  _editKey = '';
+                                  _editIndex = -1;
+                                  _focusNode.unfocus();
                                 },
                               )
                             : GestureDetector(
@@ -369,6 +308,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 icon: const Icon(Icons.check),
                                 onPressed: () {
                                   setState(() {
+                                    saveToDb(widget.eventLogs[index]);
                                     _editIndex = -1;
                                     _editKey = '';
                                     _descriptionController.clear();
@@ -380,7 +320,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 children: [
                                   FloatingActionButton.extended(
                                     label: Text(
-                                      DateFormat("'yy MM dd kk-mm")
+                                      DateFormat('yyyy-MM-dd – kk:mm')
                                           .format(widget.eventLogs[index].date)
                                           .toString(),
                                     ),
@@ -396,8 +336,9 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                     icon: const Icon(Icons.delete),
                                     onPressed: () {
                                       setState(() {
+                                        deleteEventLogFromFireStore(
+                                            widget.eventLogs[index]);
                                         widget.eventLogs.removeAt(index);
-                                        print('todo delete from db');
                                       });
                                     },
                                   ),
@@ -414,10 +355,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             selectedPatientId = patientList.first.id.toString();
-            print('patientid: $selectedPatientId');
-            for (var x in individualCareTaskslistMap[selectedPatientId]!) {
-              print(x);
-            }
 
             _descriptionController.clear();
             showDialog(
@@ -449,19 +386,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                     });
                                   },
                                   dropdownMenuEntries:
-                                      widget.caller == Caller.patient
-                                          ? list.map<DropdownMenuEntry<String>>(
-                                              (String value) {
-                                              return DropdownMenuEntry<String>(
-                                                  value: value, label: value);
-                                            }).toList()
-                                          : individualCareTaskslistMap[
-                                                  selectedPatientId]!
-                                              .map<DropdownMenuEntry<String>>(
-                                                  (String value) {
-                                              return DropdownMenuEntry<String>(
-                                                  value: value, label: value);
-                                            }).toList(),
+                                      getTaskNameDropdownEntries(
+                                          selectedPatientId!),
                                 ),
                               ),
                             ),
@@ -499,22 +425,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                         }
                                       });
                                     },
-                                    dropdownMenuEntries: widget.caller ==
-                                            Caller.patient
-                                        ? caretakerList
-                                            .map<DropdownMenuEntry<String>>(
-                                                (Caretaker value) {
-                                            return DropdownMenuEntry<String>(
-                                                value: value.id.toString(),
-                                                label: value.name);
-                                          }).toList()
-                                        : patientList
-                                            .map<DropdownMenuEntry<String>>(
-                                                (Patient value) {
-                                            return DropdownMenuEntry<String>(
-                                                value: value.id.toString(),
-                                                label: value.name);
-                                          }).toList()),
+                                    dropdownMenuEntries:
+                                        getPersonTypeDropdownEntries()),
                               ),
                             ),
                             Align(
@@ -558,8 +470,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                               setState(() {
                                 if (widget.caller == Caller.patient) {
                                   widget.eventLogs.add(EventLog(
-                                    id: (widget.eventLogs.length + 1)
-                                        .toString(),
+                                    id: (widget.eventLogs.length + 1),
                                     description: _descriptionController.text,
                                     name: _nameDropdownValue!,
                                     date: _selectedDate,
@@ -569,8 +480,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                   ));
                                 } else if (widget.caller == Caller.caretaker) {
                                   widget.eventLogs.add(EventLog(
-                                    id: (widget.eventLogs.length + 1)
-                                        .toString(),
+                                    id: (widget.eventLogs.length + 1),
                                     description: _descriptionController.text,
                                     name: _fabNameDropdownValue!,
                                     date: _selectedDate,
@@ -580,7 +490,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                   ));
                                 }
                               });
-                              saveToDb();
+                              addEventLogInDb(widget.eventLogs.last);
                               stateSetter();
                             }
                             Navigator.of(context).pop();
@@ -623,19 +533,16 @@ class _EventLogScreenState extends State<EventLogScreen> {
         });
         if (index != -1) {
           widget.eventLogs[index].date = _selectedDate;
-          saveToDb();
         }
       }
     }
   }
 
-  void saveToDb() {
-    // Implement the logic to save the updated patient to the database
-    _editKey = '';
-    _editIndex = -1;
-    _focusNode.unfocus();
-
-    print("saveToDb function");
+  void saveToDb(EventLog eventLog) async {
+    //modifyEventLogInDb(eventLog);
+    getDocumentID(eventLog.id, 'patientTasks').then((docID) {
+      updateEventLog(eventLog, docID);
+    });
   }
 
   void stateSetter(
@@ -648,5 +555,39 @@ class _EventLogScreenState extends State<EventLogScreen> {
         individualCareTaskslistMap = newMap;
       }
     });
+  }
+
+  void setIndex(int index) {
+    _editIndex = index;
+    _editKey = index.toString();
+  }
+
+  void setFormTexts() {
+    _descriptionController.text =
+        widget.eventLogs[int.parse(_editKey)].description;
+    _nameDropdownValue = widget.eventLogs[int.parse(_editKey)].name;
+  }
+
+  List<DropdownMenuEntry<String>> getTaskNameDropdownEntries(String index) {
+    return widget.caller == Caller.patient
+        ? list.map<DropdownMenuEntry<String>>((String value) {
+            return DropdownMenuEntry<String>(value: value, label: value);
+          }).toList()
+        : individualCareTaskslistMap[index]!
+            .map<DropdownMenuEntry<String>>((String value) {
+            return DropdownMenuEntry<String>(value: value, label: value);
+          }).toList();
+  }
+
+  List<DropdownMenuEntry<String>> getPersonTypeDropdownEntries() {
+    return widget.caller == Caller.patient
+        ? caretakerList.map<DropdownMenuEntry<String>>((Caretaker value) {
+            return DropdownMenuEntry<String>(
+                value: value.id.toString(), label: value.name);
+          }).toList()
+        : patientList.map<DropdownMenuEntry<String>>((Patient value) {
+            return DropdownMenuEntry<String>(
+                value: value.id.toString(), label: value.name);
+          }).toList();
   }
 }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../global/variables.dart';
 import '../models/care_task.dart';
 import '../models/caretaker.dart';
+import '../models/event_log.dart';
 import '../models/patient.dart';
 
 Future<void> addDocumentToCollection(
@@ -35,6 +36,20 @@ void updateCaretaker(Caretaker caretaker, String documentID) {
   documentReference.set(caretakerData, SetOptions(merge: true));
 }
 
+void updateEventLog(EventLog eventLog, String documentID) {
+  DocumentReference documentReference =
+      FirebaseFirestore.instance.collection('patientTasks').doc(documentID);
+  Map<String, dynamic> eventLogData = {
+    'id': eventLog.id,
+    'patientId': eventLog.patientId,
+    'name': eventLog.name,
+    'description': eventLog.description,
+    'date': eventLog.date,
+    'caretakerId': eventLog.caretakerId,
+  };
+  documentReference.set(eventLogData, SetOptions(merge: true));
+}
+
 void modifyPatientInDb(Patient patient) async {
   String docID = await getDocumentID(patient.id, 'patients');
   updatePatient(patient, docID);
@@ -43,6 +58,18 @@ void modifyPatientInDb(Patient patient) async {
 void modifyCaretakerInDb(Caretaker caretaker) async {
   String docID = await getDocumentID(caretaker.id, 'caretakers');
   updateCaretaker(caretaker, docID);
+}
+
+void addEventLogInDb(EventLog eventLog) async {
+  Map<String, dynamic> eventLogData = {
+    'id': eventLog.id,
+    'patientId': eventLog.patientId,
+    'name': eventLog.name,
+    'description': eventLog.description,
+    'date': eventLog.date,
+    'caretakerId': eventLog.caretakerId,
+  };
+  addDocumentToCollection('patientTasks', eventLogData);
 }
 
 void addPatientToDb(Patient patient) {
@@ -80,8 +107,11 @@ Future<String> getDocumentID(int id, String collection) async {
   var snapshot =
       await db.collection(collection).where('id', isEqualTo: id).get();
 
-  String docID = snapshot.docs[0].id;
-  return docID;
+  if (snapshot.docs.isEmpty) {
+    return '';
+  } else {
+    return snapshot.docs[0].id;
+  }
 }
 
 Future<List<String>> getCareTaskNamesFromPatientId(String id) async {
@@ -121,6 +151,11 @@ Future<List<Caretaker>> loadCaretakersFromFirestore() async {
   }
 
   return caretakers;
+}
+
+void deleteEventLogFromFireStore(EventLog eventLog) async {
+  var eventLogId = await getDocumentID(eventLog.id, 'patientTasks');
+  db.collection('patientTasks').doc(eventLogId).delete();
 }
 
 Future<List<Patient>> loadPatientsFromFirestore() async {
