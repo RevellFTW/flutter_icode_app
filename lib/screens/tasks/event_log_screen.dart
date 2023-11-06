@@ -74,10 +74,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
               individualCareTaskslistMap.addAll({patient.id.toString(): value});
             });
           });
-          if (kDebugMode) {
-            print(
-                'succesfully loaded data for patient ${patient.id.toString()}');
-          }
         }
       });
     }
@@ -335,7 +331,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                       _selectDate(context, index),
                                       widget.eventLogs[index].date =
                                           _selectedDate,
-                                      print('todo save'),
+                                      saveToDb(widget.eventLogs[index])
                                     },
                                   ),
                                   IconButton(

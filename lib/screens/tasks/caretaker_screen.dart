@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
@@ -74,7 +73,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
               ),
               DataColumn(
                 label: Text(
-                  'Start Date',
+                  'Date of joining',
                   style: TextStyle(
                       fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
                 ),
@@ -177,8 +176,6 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                               if (checkboxState[id] == true) {
                                 if (getCaretaker(id) != null) {
                                   keysToRemove.add(id);
-                                } else {
-                                  print('Caretaker with id $id not found');
                                 }
                               }
                             }

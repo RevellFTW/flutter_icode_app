@@ -16,8 +16,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late String _email;
-  late String _password;
+  late String _email = '';
+  late String _password = '';
   bool _saving = false;
 
   @override
@@ -47,7 +47,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         CustomTextField(
                           textField: TextField(
                               onChanged: (value) {
-                                _email = value;
+                                if (value.isNotEmpty &&
+                                    value.contains('@') &&
+                                    value.contains('.') &&
+                                    value != _email) {
+                                  _email = value;
+                                }
                               },
                               style: const TextStyle(
                                 fontSize: 20,
@@ -59,7 +64,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           textField: TextField(
                             obscureText: true,
                             onChanged: (value) {
-                              _password = value;
+                              if (value.isNotEmpty && value != _password) {
+                                _password = value;
+                              }
                             },
                             style: const TextStyle(
                               fontSize: 20,

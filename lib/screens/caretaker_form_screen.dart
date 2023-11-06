@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todoapp/models/caretaker.dart';
 import '../global/variables.dart';
 import '../helper/firestore_helper.dart';
@@ -104,7 +105,9 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                   alignment: Alignment.centerLeft,
                   child: FloatingActionButton.extended(
                       label: Text(
-                        widget.caretaker.startDate.toString(),
+                        DateFormat('yyyy-MM-dd – kk:mm')
+                            .format(widget.caretaker.startDate)
+                            .toString(),
                       ),
                       icon: const Icon(Icons.calendar_today),
                       onPressed: () =>

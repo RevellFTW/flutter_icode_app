@@ -75,7 +75,7 @@ class _PatientScreenState extends State<PatientScreen> {
               ),
               DataColumn(
                 label: Text(
-                  'Entry Date',
+                  'Date of admission',
                   style: TextStyle(
                       fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
                 ),
@@ -177,8 +177,6 @@ class _PatientScreenState extends State<PatientScreen> {
                               if (checkboxState[id] == true) {
                                 if (getPatient(id) != null) {
                                   keysToRemove.add(id);
-                                } else {
-                                  print('Patient with id $id not found');
                                 }
                               }
                             }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../global/variables.dart';
 import '../helper/firestore_helper.dart';
 import '../models/patient.dart';
@@ -102,7 +103,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                   alignment: Alignment.centerLeft,
                   child: FloatingActionButton.extended(
                       label: Text(
-                        widget.patient.startDate.toString(),
+                        DateFormat('yyyy-MM-dd – kk:mm')
+                            .format(widget.patient.startDate)
+                            .toString(),
                       ),
                       icon: const Icon(Icons.calendar_today),
                       onPressed: () =>

@@ -5,6 +5,8 @@ import '../components/components.dart';
 import '../global/variables.dart';
 import '../screens/home_page.dart';
 
+bool back_office = false;
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
   static String id = 'welcome_screen';
@@ -24,6 +26,7 @@ class WelcomeScreen extends StatelessWidget {
       }
     }
     if (isBackOffice) {
+      back_office = true;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -41,21 +44,23 @@ class WelcomeScreen extends StatelessWidget {
     checkUserType(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(appName),
+        title: Text(back_office ? appName : 'Under construction'),
         backgroundColor: appBackgroundColor,
         foregroundColor: appForegroundColor,
       ),
       backgroundColor: Colors.white,
-      body: WillPopScope(
-        onWillPop: () async {
-          SystemNavigator.pop();
-          return false;
-        },
-        child: const Center(
-          child: ScreenTitle(
-            title:
-                'Here we will redirect to Welcome Page if user is back-office user',
-          ),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 30.0, right: 30, top: 10),
+        child: WillPopScope(
+          onWillPop: () async {
+            SystemNavigator.pop();
+            return false;
+          },
+          child: const Center(
+              // child: ScreenTitle(
+              //   //title: 'Page is under construction',
+              // ),
+              ),
         ),
       ),
     );
