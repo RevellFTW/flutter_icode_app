@@ -57,6 +57,8 @@ class _PatientScreenState extends State<PatientScreen> {
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
           child: DataTable(
+            columnSpacing: (MediaQuery.of(context).size.width / 10) * 0.5,
+            dataRowHeight: 80,
             showCheckboxColumn: false,
             columns: const <DataColumn>[
               DataColumn(
@@ -75,7 +77,7 @@ class _PatientScreenState extends State<PatientScreen> {
               ),
               DataColumn(
                 label: Text(
-                  'Date of admission',
+                  'Admission date',
                   style: TextStyle(
                       fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
                 ),

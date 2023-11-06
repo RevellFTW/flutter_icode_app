@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/models/caretaker.dart';
@@ -36,7 +35,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
   String _editKey = '';
   String? _nameDropdownValue = 'Do Laundry';
   String? _fabNameDropdownValue = 'Choose';
-  String? _personTypeDropdownValue = 'Choose';
   String? selectedCaretakerId;
   String? selectedPatientId;
 
@@ -59,6 +57,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
       _loadCaretakerData().then((value) {
         setState(() {
           caretakerList = value;
+          selectedCaretakerId = caretakerList.first.id.toString();
         });
       });
     } else {
@@ -191,7 +190,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                 },
                                                 dropdownMenuEntries:
                                                     getTaskNameDropdownEntries(
-                                                        widget
+                                                        index: widget
                                                             .eventLogs[
                                                                 int.parse(
                                                                     _editKey)]
@@ -273,10 +272,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                   });
                                 },
                                 onTapOutside: (newValue) {
-                                  if (currentTextFormFieldValue.isNotEmpty) {
-                                    widget.eventLogs[index].description =
-                                        currentTextFormFieldValue;
-                                  }
+                                  widget.eventLogs[index].description =
+                                      currentTextFormFieldValue;
                                   saveToDb(widget.eventLogs[index]);
                                 },
                                 onFieldSubmitted: (newValue) {
@@ -356,8 +353,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            selectedPatientId = patientList.first.id.toString();
-
             _descriptionController.clear();
             showDialog(
               context: context,
@@ -384,12 +379,16 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                   label: const Text('Event Log Name'),
                                   onSelected: (String? newValue) {
                                     setState(() {
-                                      _fabNameDropdownValue = newValue!;
+                                      widget.caller == Caller.patient
+                                          ? _nameDropdownValue = newValue!
+                                          : _fabNameDropdownValue = newValue!;
                                     });
                                   },
                                   dropdownMenuEntries:
-                                      getTaskNameDropdownEntries(
-                                          selectedPatientId!),
+                                      widget.caller == Caller.patient
+                                          ? getTaskNameDropdownEntries()
+                                          : getTaskNameDropdownEntries(
+                                              index: selectedPatientId!),
                                 ),
                               ),
                             ),
@@ -468,7 +467,9 @@ class _EventLogScreenState extends State<EventLogScreen> {
                         TextButton(
                           child: const Text('Add'),
                           onPressed: () {
-                            if (_descriptionController.text.isNotEmpty) {
+                            if (!(_descriptionController.text.isNotEmpty ||
+                                (_nameDropdownValue == 'Other' ||
+                                    _fabNameDropdownValue == 'Other'))) {
                               setState(() {
                                 if (widget.caller == Caller.patient) {
                                   widget.eventLogs.add(EventLog(
@@ -570,7 +571,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
     _nameDropdownValue = widget.eventLogs[int.parse(_editKey)].name;
   }
 
-  List<DropdownMenuEntry<String>> getTaskNameDropdownEntries(String index) {
+  List<DropdownMenuEntry<String>> getTaskNameDropdownEntries({String? index}) {
     return widget.caller == Caller.patient
         ? list.map<DropdownMenuEntry<String>>((String value) {
             return DropdownMenuEntry<String>(value: value, label: value);

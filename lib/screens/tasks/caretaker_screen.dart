@@ -53,7 +53,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
       ),
       body: SingleChildScrollView(
         child: SizedBox(
-          width: MediaQuery.of(context).size.width,
+          width: MediaQuery.of(context).size.width - 10,
           child: DataTable(
             showCheckboxColumn: false,
             columns: const <DataColumn>[
@@ -73,7 +73,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
               ),
               DataColumn(
                 label: Text(
-                  'Date of joining',
+                  'Joining date',
                   style: TextStyle(
                       fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
                 ),

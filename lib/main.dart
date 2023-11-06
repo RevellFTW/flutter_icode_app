@@ -40,8 +40,6 @@ class _MyAppState extends State<MyApp> {
     appName = 'Caretaker App';
     // if (currentUser.role == 'back-office') {
     appName = 'Back-Office Caretaker App';
-    appForegroundColor = appForegroundColor;
-    appBackgroundColor = appBackgroundColor;
     // }
   }
 
@@ -50,7 +48,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(useMaterial3: true),
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       //home: HomePage(),
       initialRoute: HomeScreen.id,
       routes: {
