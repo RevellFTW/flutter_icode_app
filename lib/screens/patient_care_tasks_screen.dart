@@ -105,8 +105,13 @@ class _CareTasksPageState extends State<CareTasksPage> {
     return dateTime;
   }
 
-  Future<bool> isDatePicked(BuildContext context, String initialDateString,
-      Frequency selectedModifier, bool isModifying, bool isClickedDirectly,
+  Future<bool> isDatePicked(
+      StateSetter setState,
+      BuildContext context,
+      String initialDateString,
+      Frequency selectedModifier,
+      bool isModifying,
+      bool isClickedDirectly,
       {int index = -1}) async {
     if (selectedModifier == Frequency.daily) {
       // For daily, only pick time
@@ -273,6 +278,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
         context: context,
         builder: (BuildContext context) {
           return MonthlyPicker(
+              setState: setState,
               initialDate: isClickedDirectly
                   ? mHTAStringToDateTime(initialDateString)
                   : DateTime.now());
@@ -445,6 +451,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                         String index = _editIndex.toString();
                                         if (newValue != dropdownValue) {
                                           bool result = await isDatePicked(
+                                              setState,
                                               context,
                                               widget.patient
                                                   .careTasks[_editIndex].date,
@@ -524,6 +531,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     ),
                                     icon: const Icon(Icons.calendar_today),
                                     onPressed: () => isDatePicked(
+                                        setState,
                                         context,
                                         widget.patient.careTasks[index].date,
                                         widget.patient.careTasks[index]
@@ -582,6 +590,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                     bool result = false;
                                     if (newValue != dropdownValue) {
                                       result = await isDatePicked(
+                                          setState,
                                           context,
                                           DateTime.now().toString(),
                                           Frequency.values.byName(newValue!),
@@ -613,6 +622,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                   onPressed: () {
                                     setState(() {
                                       isDatePicked(
+                                          setState,
                                           context,
                                           DateTime.now().toString(),
                                           Frequency.values

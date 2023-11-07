@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 class MonthlyPicker extends StatefulWidget {
   final DateTime initialDate;
+  final StateSetter setState;
 
-  const MonthlyPicker({super.key, required this.initialDate});
+  const MonthlyPicker(
+      {super.key, required this.initialDate, required this.setState});
 
   @override
   _MonthlyPickerState createState() => _MonthlyPickerState();
@@ -11,7 +13,7 @@ class MonthlyPicker extends StatefulWidget {
 
 class _MonthlyPickerState extends State<MonthlyPicker> {
   late DateTime _selectedDate;
-  late int _selectedMonth;
+  late int _selectedMonth = DateTime.now().month;
   late int _selectedYear = DateTime.now().year;
 
   @override
@@ -43,6 +45,7 @@ class _MonthlyPickerState extends State<MonthlyPicker> {
                 onChanged: (value) {
                   setState(() {
                     _selectedMonth = value!;
+                    _selectedDate = DateTime(_selectedYear, _selectedMonth, 1);
                   });
                 },
               ),

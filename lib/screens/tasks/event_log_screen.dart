@@ -325,7 +325,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                     ),
                                     icon: const Icon(Icons.calendar_today),
                                     onPressed: () => {
-                                      _selectDate(context, index),
+                                      _selectDate(context, setState, index),
                                       widget.eventLogs[index].date =
                                           _selectedDate,
                                       saveToDb(widget.eventLogs[index])
@@ -447,12 +447,14 @@ class _EventLogScreenState extends State<EventLogScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 30.0),
                                 child: FloatingActionButton.extended(
-                                  label: Text(selectedDateTime),
-                                  icon: const Icon(Icons.calendar_today),
-                                  onPressed: () => {
-                                    _selectDate(context, -1),
-                                  },
-                                ),
+                                    label: Text(DateFormat('yyyy-MM-dd – kk:mm')
+                                        .format(_selectedDate)),
+                                    icon: const Icon(Icons.calendar_today),
+                                    onPressed: () => {
+                                          setState(() {
+                                            _selectDate(context, setState, -1);
+                                          }),
+                                        }),
                               ),
                             ),
                           ]),
@@ -512,7 +514,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context, int index) async {
+  void _selectDate(
+      BuildContext context, StateSetter setState, int index) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
@@ -520,6 +523,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
       lastDate: DateTime(2101),
     );
     if (picked != null) {
+      // ignore: use_build_context_synchronously
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(picked),
