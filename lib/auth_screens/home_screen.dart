@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                       Hero(
                         tag: 'signup_btn',
                         child: CustomButton(
-                          buttonText: 'Sign Up',
+                          buttonText: 'Sign Up As Patient',
                           isOutlined: true,
                           onPressed: () {
                             Navigator.pushNamed(context, SignUpScreen.id);
