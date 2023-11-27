@@ -150,27 +150,22 @@ class _PatientScreenState extends State<PatientScreen> {
           child: DataTable(
             columnSpacing: (MediaQuery.of(context).size.width / 10) * 0.5,
             dataRowHeight: 80,
+            headingRowHeight: 0,
             showCheckboxColumn: false,
             columns: const <DataColumn>[
               DataColumn(
                 label: Text(
-                  'Select',
-                  style: TextStyle(
-                      fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+                  '',
                 ),
               ),
               DataColumn(
                 label: Text(
-                  'Name',
-                  style: TextStyle(
-                      fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+                  '',
                 ),
               ),
               DataColumn(
                 label: Text(
-                  'Admission date',
-                  style: TextStyle(
-                      fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+                  '',
                 ),
               ),
             ],
