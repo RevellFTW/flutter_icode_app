@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
+import '../../helper/flutter_flow/flutter_flow_icon_button.dart';
+import '../../helper/flutter_flow/flutter_flow_theme.dart';
 import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/patient.dart';
@@ -48,10 +50,99 @@ class _PatientScreenState extends State<PatientScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(appName),
-        backgroundColor: appBackgroundColor,
-        foregroundColor: appForegroundColor,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: appBackgroundColor,
+          foregroundColor: appForegroundColor,
+          automaticallyImplyLeading: false,
+          actions: const [],
+          flexibleSpace: FlexibleSpaceBar(
+            title: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 14),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Flexible(
+                          child: Align(
+                            alignment: AlignmentDirectional(0.00, 0.00),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(4, 0, 0, 0),
+                              child: Text(
+                                'CuramusApp',
+                                style: FlutterFlowTheme.of(context)
+                                    .headlineMedium
+                                    .override(
+                                      fontFamily: 'Outfit',
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text(
+                            'Curamus Back-Office',
+                            style: FlutterFlowTheme.of(context)
+                                .headlineMedium
+                                .override(
+                                  fontFamily: 'Outfit',
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                ),
+                          ),
+                          Flexible(
+                            child: Align(
+                              alignment: AlignmentDirectional(1.00, 0.00),
+                              child: Padding(
+                                padding:
+                                    EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
+                                child: FlutterFlowIconButton(
+                                  borderColor: Colors.transparent,
+                                  borderRadius: 30,
+                                  borderWidth: 1,
+                                  buttonSize: 50,
+                                  icon: Icon(
+                                    Icons.dehaze_sharp,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  onPressed: () async {
+                                    // context.pushNamed('settings');
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            centerTitle: true,
+            expandedTitleScale: 1.0,
+          ),
+          elevation: 2,
+        ),
       ),
       body: SingleChildScrollView(
         child: SizedBox(

@@ -56,6 +56,17 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   loading_overlay: ^0.3.0
   rflutter_alert: ^2.0.7
+  flutter_animate: ^4.3.0
+  table_calendar: ^3.0.9
+  font_awesome_flutter: ^10.6.0
+  emoji_flag_converter: ^1.1.0
+  swipeable_card_stack: ^0.0.5
+  json_path: ^0.6.3
+  from_css_color: ^2.0.0
+  page_transition: ^2.1.0
+  timeago: ^3.6.0
+  auto_size_text: ^3.0.0
+  fl_chart: ^0.65.0
 
 dev_dependencies:
   flutter_test:
