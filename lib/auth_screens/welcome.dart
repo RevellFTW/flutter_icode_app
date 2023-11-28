@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../components/components.dart';
 import '../global/variables.dart';
 import '../screens/home_page.dart';
+import 'home_screen.dart';
 
 bool back_office = false;
 
@@ -27,14 +28,22 @@ class WelcomeScreen extends StatelessWidget {
     }
     if (isBackOffice) {
       back_office = true;
+      // ignore: use_build_context_synchronously
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
       );
+    } else if (auth.currentUser == null) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
     } else {
       // Display your message here
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You are not a back office user')),
+        const SnackBar(content: Text('You are not a back office user')),
       );
     }
   }
