@@ -20,6 +20,8 @@ class PatientScreen extends StatefulWidget {
 class _PatientScreenState extends State<PatientScreen> {
   final TextEditingController _patientNameController = TextEditingController();
   List<Patient> patients = [];
+  TextEditingController _searchController = TextEditingController();
+  List<Patient> _filteredPatients = [];
 
   Patient? getPatient(int id) {
     return patients.firstWhere((patient) => patient.id == id);
@@ -32,11 +34,13 @@ class _PatientScreenState extends State<PatientScreen> {
     _loadData().then((value) {
       setState(() {
         patients = value;
-        for (var patient in patients) {
-          checkboxState[patient.id] = false;
-        }
+        _filteredPatients = patients;
       });
     });
+    _searchController.addListener(() {
+      filterPatients();
+    });
+    filterPatients();
   }
 
   Future<List<Patient>> _loadData() async {
@@ -45,6 +49,20 @@ class _PatientScreenState extends State<PatientScreen> {
 
     // Return the loaded data
     return data;
+  }
+
+  void filterPatients() {
+    if (_searchController.text.isEmpty) {
+      setState(() {
+        _filteredPatients = patients;
+      });
+    }
+    String searchText = _searchController.text;
+    setState(() {
+      _filteredPatients = patients.where((patient) {
+        return patient.name.toLowerCase().contains(searchText.toLowerCase());
+      }).toList();
+    });
   }
 
   @override
@@ -144,143 +162,243 @@ class _PatientScreenState extends State<PatientScreen> {
           elevation: 2,
         ),
       ),
-      body: SingleChildScrollView(
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: DataTable(
-            columnSpacing: (MediaQuery.of(context).size.width / 10) * 0.5,
-            dataRowHeight: 80,
-            headingRowHeight: 0,
-            showCheckboxColumn: false,
-            columns: const <DataColumn>[
-              DataColumn(
-                label: Text(
-                  '',
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(16, 14, 16, 0),
+            child: TextFormField(
+              controller: _searchController,
+              onEditingComplete: filterPatients,
+              obscureText: false,
+              decoration: InputDecoration(
+                labelText: 'Search for patients...',
+                labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: FlutterFlowTheme.of(context).primaryBackground,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: FlutterFlowTheme.of(context).primary,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: FlutterFlowTheme.of(context).error,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: FlutterFlowTheme.of(context).error,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: FlutterFlowTheme.of(context).primaryBackground,
+                prefixIcon: Icon(
+                  Icons.search_outlined,
+                  color: FlutterFlowTheme.of(context).secondaryText,
                 ),
               ),
-              DataColumn(
-                label: Text(
-                  '',
+              style: FlutterFlowTheme.of(context).bodyMedium,
+              maxLines: null,
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(16, 12, 0, 0),
+                child: Text(
+                  'Patients matching search',
+                  style: FlutterFlowTheme.of(context).labelMedium,
                 ),
               ),
-              DataColumn(
-                label: Text(
-                  '',
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(4, 12, 16, 0),
+                child: Text(
+                  _filteredPatients.length.toString(),
+                  style: FlutterFlowTheme.of(context).bodyMedium,
                 ),
               ),
             ],
-            rows: patients
-                .map((Patient patient) => DataRow(
-                      onSelectChanged: (bool? selected) {
-                        if (selected == true) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  PatientFormScreen(patient: patient)));
-                        }
-                      },
-                      cells: <DataCell>[
-                        DataCell(
-                          Checkbox(
-                            value: checkboxState[patient.id],
-                            onChanged: (bool? value) {
-                              setState(() {
-                                checkboxState[patient.id] = value!;
-                              });
-                            },
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 0),
+              child: ListView.builder(
+                  itemCount: _filteredPatients.length,
+                  itemBuilder: (context, i) {
+                    return Dismissible(
+                      key: ValueKey<int>(_filteredPatients[i].id),
+                      child: Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            boxShadow: const [
+                              BoxShadow(
+                                blurRadius: 0,
+                                color: Color(0xFFE0E3E7),
+                                offset: Offset(0, 1),
+                              )
+                            ],
+                            borderRadius: BorderRadius.circular(0),
+                            shape: BoxShape.rectangle,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8, 8, 8, 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Container(
+                                  width: 4,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12, 0, 0, 0),
+                                    child: Text(
+                                      _filteredPatients[i].name,
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyLarge,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      12, 0, 15, 0),
+                                  child: Text(
+                                    DateFormat.yMMMd()
+                                        .format(_filteredPatients[i].startDate),
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelMedium,
+                                  ),
+                                ),
+                                InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PatientFormScreen(
+                                                    patient:
+                                                        _filteredPatients[i])));
+                                  },
+                                  child: Card(
+                                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryBackground,
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              4, 4, 4, 4),
+                                      child: InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () async {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PatientFormScreen(
+                                                          patient:
+                                                              _filteredPatients[
+                                                                  i])));
+                                        },
+                                        child: Icon(
+                                          Icons.keyboard_arrow_right_rounded,
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        DataCell(Text(patient.name)),
-                        DataCell(
-                            Text(DateFormat.yMMMd().format(patient.startDate))),
-                      ],
-                    ))
-                .toList(),
+                      ),
+                      onDismissed: (direction) {
+                        setState(() {
+                          removePatient(_filteredPatients[i].id);
+                        });
+                        filterPatients();
+                      },
+                    );
+                  }),
+            ),
           ),
-        ),
+        ],
       ),
-      floatingActionButton: SpeedDial(icon: Icons.create, children: [
-        SpeedDialChild(
-          child: const Icon(Icons.add),
-          label: 'Add Patient',
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Add Patient'),
-                      content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            TextFormField(
-                              controller: _patientNameController,
-                              decoration: const InputDecoration(
-                                  labelText: 'Patient Name'),
-                            ),
-                          ]),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text('Cancel'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        TextButton(
-                          child: const Text('Add'),
-                          onPressed: () {
-                            addPatient(_patientNameController.text.toString());
-                            _patientNameController.clear();
-                            setState(() {});
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ));
-          },
-        ),
-        SpeedDialChild(
-          child: const Icon(Icons.delete),
-          label: 'Delete Patient(s)',
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Delete Patient(s)'),
-                      content: const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                                'Are you sure you want to delete the selected patient(s)?'),
-                          ]),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text('Cancel'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        TextButton(
-                          child: const Text('Delete'),
-                          onPressed: () {
-                            var keysToRemove = [];
-                            for (var id in checkboxState.keys) {
-                              if (checkboxState[id] == true) {
-                                if (getPatient(id) != null) {
-                                  keysToRemove.add(id);
-                                }
-                              }
-                            }
-                            setState(() {
-                              for (var id in keysToRemove) {
-                                removePatient(id);
-                              }
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ));
-          },
-        ),
-      ]),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: appBackgroundColor,
+        foregroundColor: appForegroundColor,
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Add Patient'),
+                    content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          TextFormField(
+                            controller: _patientNameController,
+                            decoration: const InputDecoration(
+                                labelText: 'Patient Name'),
+                          ),
+                        ]),
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('Add'),
+                        onPressed: () {
+                          addPatient(_patientNameController.text.toString());
+                          _patientNameController.clear();
+                          setState(() {});
+                          Navigator.of(context).pop();
+                          filterPatients();
+                        },
+                      ),
+                    ],
+                  ));
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -292,12 +410,10 @@ class _PatientScreenState extends State<PatientScreen> {
       careTasks: [],
     );
     patients.add(patient);
-    checkboxState[patient.id] = false;
     addPatientToDb(patient);
   }
 
   void removePatient(int id) {
-    checkboxState.remove(id);
     patients.removeWhere((patient) => patient.id == id);
     removePatientFromDb(id);
   }
