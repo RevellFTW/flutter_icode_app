@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:todoapp/helper/flutter_flow/flutter_flow_count_controller.dart';
+import 'package:todoapp/helper/flutter_flow/flutter_flow_drop_down.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
+import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
+import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
 import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/patient.dart';
@@ -10,6 +15,9 @@ import '../../models/event_log.dart';
 import '../home_page.dart';
 import '../tasks_and_logs/patient_care_tasks_screen.dart';
 import '../tasks_and_logs/event_log_screen.dart';
+
+import '../../models/patient_form_model.dart';
+export '../../models/patient_form_model.dart';
 
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;
@@ -26,6 +34,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   String currentTextFormFieldValue = '';
   Map<String, Map<String, String>> careTasks = {};
   late DateTime updatedDateTime;
+
+  late PatientFormModel _model;
 
   Future<List<EventLog>> loadEventLogsFromFirestore() async {
     List<EventLog> tasks = [];
@@ -50,6 +60,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   @override
   void initState() {
     super.initState();
+    _model = createModel(context, () => PatientFormModel());
     updatedDateTime = widget.patient.startDate;
     _nameController = TextEditingController(text: widget.patient.name);
   }
@@ -152,94 +163,670 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
           elevation: 2,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 30.0, right: 30, top: 10),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-                onChanged: (String newValue) {
-                  setState(() {
-                    currentTextFormFieldValue = newValue;
-                  });
-                },
-                onFieldSubmitted: (String newValue) {
-                  setState(() {
-                    if (currentTextFormFieldValue.isNotEmpty) {
-                      widget.patient.name = currentTextFormFieldValue;
-                      modifyPatientInDb(widget.patient);
-                    } else {
-                      _nameController.text = widget.patient.name;
-                    }
-                  });
-                },
-                onTapOutside: (newValue) {
-                  if (currentTextFormFieldValue.isNotEmpty) {
-                    setState(() {
-                      widget.patient.name = currentTextFormFieldValue;
-                      modifyPatientInDb(widget.patient);
-                    });
-                  } else {
-                    setState(() {
-                      _nameController.text = widget.patient.name;
-                    });
-                  }
-                  FocusScope.of(context).unfocus();
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: FloatingActionButton.extended(
-                      label: Text(
-                        DateFormat('yyyy-MM-dd – kk:mm')
-                            .format(widget.patient.startDate)
-                            .toString(),
+      body: SafeArea(
+        top: true,
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: const AlignmentDirectional(-1.00, 0.00),
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
+                    child: Text(
+                      'Patient Doe\'s sheet',
+                      style:
+                          FlutterFlowTheme.of(context).headlineMedium.override(
+                                fontFamily: 'Outfit',
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w500,
+                              ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Align(
+                            alignment: const AlignmentDirectional(-1.00, 0.00),
+                            child: Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 0, 12),
+                              child: FFButtonWidget(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) => CareTasksPage(
+                                                patient: widget.patient)));
+                                  }
+                                },
+                                text: 'Care Tasks',
+                                options: FFButtonOptions(
+                                  width: 150,
+                                  height: 48,
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 0, 0),
+                                  iconPadding:
+                                      const EdgeInsetsDirectional.fromSTEB(
+                                          0, 0, 0, 0),
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  textStyle: FlutterFlowTheme.of(context)
+                                      .titleSmall
+                                      .override(
+                                        fontFamily: 'Readex Pro',
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                  elevation: 4,
+                                  borderSide: const BorderSide(
+                                    color: Colors.transparent,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(60),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: Align(
+                              alignment: const AlignmentDirectional(1.00, 0.00),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 0, 0, 12),
+                                child: FFButtonWidget(
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      List<EventLog> tasks =
+                                          await loadEventLogsFromFirestore();
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EventLogScreen(
+                                                    eventLogs: tasks,
+                                                    eventLogName:
+                                                        "${widget.patient.name} Patient's Log",
+                                                    caller: Caller.patient,
+                                                    patient: widget.patient,
+                                                  )));
+                                    }
+                                  },
+                                  text: 'Event Logs',
+                                  options: FFButtonOptions(
+                                    width: 150,
+                                    height: 48,
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 0),
+                                    iconPadding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 0),
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                    elevation: 4,
+                                    borderSide: const BorderSide(
+                                      color: Colors.transparent,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(60),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      icon: const Icon(Icons.calendar_today),
-                      onPressed: () =>
-                          updateStartDate(widget.patient.startDate)),
+                      TextFormField(
+                        controller: _model.textFieldController1,
+                        focusNode: _model.textFieldFocusNode1,
+                        autofocus: true,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                          labelText: 'Name',
+                          labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                          hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        style: FlutterFlowTheme.of(context).bodyMedium,
+                        // validator: _model.textFieldController1Validator!
+                        //     .asValidator(context),
+                      ),
+                      TextFormField(
+                        controller: _model.textFieldController2,
+                        focusNode: _model.textFieldFocusNode2,
+                        autofocus: true,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                          labelText: 'Date of Birth',
+                          labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                          hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        style: FlutterFlowTheme.of(context).bodyMedium,
+                        // validator: _model.textFieldController2Validator
+                        //     .asValidator(context),
+                      ),
+                      TextFormField(
+                        controller: _model.textFieldController3,
+                        focusNode: _model.textFieldFocusNode3,
+                        autofocus: true,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                          labelText: 'Medical State',
+                          labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                          hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        style: FlutterFlowTheme.of(context).bodyMedium,
+                        // validator: _model.textFieldController3Validator
+                        //     .asValidator(context),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                10, 0, 0, 0),
+                            child: Text(
+                              'Daily hours ',
+                              style: FlutterFlowTheme.of(context).bodyMedium,
+                            ),
+                          ),
+                          Flexible(
+                            child: Align(
+                              alignment: const AlignmentDirectional(1.00, 0.00),
+                              child: Container(
+                                width: 160,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  borderRadius: BorderRadius.circular(8),
+                                  shape: BoxShape.rectangle,
+                                  border: Border.all(
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: FlutterFlowCountController(
+                                  decrementIconBuilder: (enabled) => FaIcon(
+                                    FontAwesomeIcons.minus,
+                                    color: enabled
+                                        ? FlutterFlowTheme.of(context)
+                                            .secondaryText
+                                        : FlutterFlowTheme.of(context)
+                                            .alternate,
+                                    size: 20,
+                                  ),
+                                  incrementIconBuilder: (enabled) => FaIcon(
+                                    FontAwesomeIcons.plus,
+                                    color: enabled
+                                        ? FlutterFlowTheme.of(context).primary
+                                        : FlutterFlowTheme.of(context)
+                                            .alternate,
+                                    size: 20,
+                                  ),
+                                  countBuilder: (count) => Text(
+                                    count.toString(),
+                                    style:
+                                        FlutterFlowTheme.of(context).titleLarge,
+                                  ),
+                                  count: _model.countControllerValue ??= 0,
+                                  updateCount: (count) => setState(() =>
+                                      _model.countControllerValue = count),
+                                  stepSize: 1,
+                                  minimum: 1,
+                                  maximum: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      TextFormField(
+                        controller: _model.textFieldController4,
+                        focusNode: _model.textFieldFocusNode4,
+                        autofocus: true,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                          labelText: 'Taken medicines',
+                          labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                          hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        style: FlutterFlowTheme.of(context).bodyMedium,
+                        // validator: _model.textFieldController4Validator
+                        //     .asValidator(context),
+                      ),
+                      TextFormField(
+                        controller: _model.textFieldController5,
+                        focusNode: _model.textFieldFocusNode5,
+                        autofocus: true,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                          labelText: 'Allergies',
+                          labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                          hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        style: FlutterFlowTheme.of(context).bodyMedium,
+                        // validator: _model.textFieldController5Validator
+                        //     .asValidator(context),
+                      ),
+                      Align(
+                        alignment: const AlignmentDirectional(0.00, 0.00),
+                        child: FlutterFlowDropDown(
+                          options: const [
+                            'Caretaker 1',
+                            'Caretaker 12',
+                            'Caretaker 13',
+                            'Caretaker 14'
+                          ],
+                          //todo fix this
+                          onChanged: (val) => setState(() =>
+                              _model.dropDownValue = val as List<String>?),
+                          width: 1480,
+                          height: 50,
+                          textStyle: FlutterFlowTheme.of(context).bodyMedium,
+                          hintText: 'Assigned Caretakers',
+                          icon: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: FlutterFlowTheme.of(context).secondaryText,
+                            size: 24,
+                          ),
+                          fillColor:
+                              FlutterFlowTheme.of(context).secondaryBackground,
+                          elevation: 2,
+                          borderColor: FlutterFlowTheme.of(context).alternate,
+                          borderWidth: 2,
+                          borderRadius: 8,
+                          margin: const EdgeInsetsDirectional.fromSTEB(
+                              16, 4, 16, 4),
+                          hidesUnderline: true,
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                10, 20, 0, 0),
+                            child: Text(
+                              'Relatives',
+                              style: FlutterFlowTheme.of(context).bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                      ListView(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 0, 0, 1),
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                //todo edit relative
+                                print('first inkwell tapped');
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      blurRadius: 0,
+                                      color: Color(0xFFE0E3E7),
+                                      offset: Offset(0, 1),
+                                    )
+                                  ],
+                                  borderRadius: BorderRadius.circular(0),
+                                  shape: BoxShape.rectangle,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      8, 8, 8, 8),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 0, 0, 0),
+                                          child: Text(
+                                            'Relative 1',
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 0, 0, 1),
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                //todo edit relative
+                                print('inkwell tapped');
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      blurRadius: 0,
+                                      color: Color(0xFFE0E3E7),
+                                      offset: Offset(0, 1),
+                                    )
+                                  ],
+                                  borderRadius: BorderRadius.circular(0),
+                                  shape: BoxShape.rectangle,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      8, 8, 8, 8),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 0, 0, 0),
+                                          child: Text(
+                                            'Relative 2',
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 0, 0, 1),
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                // context.pushNamed('EditRelative');
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      blurRadius: 0,
+                                      color: Color(0xFFE0E3E7),
+                                      offset: Offset(0, 1),
+                                    )
+                                  ],
+                                  borderRadius: BorderRadius.circular(0),
+                                  shape: BoxShape.rectangle,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      8, 8, 8, 8),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 0, 0, 0),
+                                          child: Text(
+                                            'Relative 3',
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 0, 0, 1),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                boxShadow: const [
+                                  BoxShadow(
+                                    blurRadius: 0,
+                                    color: Color(0xFFE0E3E7),
+                                    offset: Offset(0, 1),
+                                  )
+                                ],
+                                borderRadius: BorderRadius.circular(0),
+                                shape: BoxShape.rectangle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Align(
+                        alignment: const AlignmentDirectional(-1.00, 0.00),
+                        child: Padding(
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 12),
+                          child: FFButtonWidget(
+                            onPressed: () async {
+                              // context.pushNamed('AddRelative');
+                            },
+                            text: 'Add Relative',
+                            options: FFButtonOptions(
+                              width: 150,
+                              height: 48,
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 0, 0),
+                              iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 0, 0),
+                              color: FlutterFlowTheme.of(context).primary,
+                              textStyle: FlutterFlowTheme.of(context)
+                                  .titleSmall
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                              elevation: 4,
+                              borderSide: const BorderSide(
+                                color: Colors.transparent,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(60),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ].divide(const SizedBox(height: 12)),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      // ignore: use_build_context_synchronously
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              CareTasksPage(patient: widget.patient)));
-                    }
-                  },
-                  child: const Text('Care Tasks'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      List<EventLog> tasks = await loadEventLogsFromFirestore();
-                      // ignore: use_build_context_synchronously
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => EventLogScreen(
-                                eventLogs: tasks,
-                                eventLogName:
-                                    "${widget.patient.name} Patient's Log",
-                                caller: Caller.patient,
-                                patient: widget.patient,
-                              )));
-                    }
-                  },
-                  child: const Text('Event Logs'),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -254,6 +841,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
       lastDate: DateTime(DateTime.now().year + 100),
     );
     if (pickedDate != null) {
+      // ignore: use_build_context_synchronously
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(pickedDate),
