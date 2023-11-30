@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../helper/persistent_bottom_bar_scaffold.dart';
-import 'tasks/caretaker_screen.dart';
-import 'tasks/patient_screen.dart';
+import 'caretaker_screen.dart';
+import 'patient_screen.dart';
 
 class HomePage extends StatelessWidget {
   final _tab1navigatorKey = GlobalKey<NavigatorState>();

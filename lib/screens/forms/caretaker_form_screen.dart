@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/models/caretaker.dart';
-import '../global/variables.dart';
-import '../helper/firestore_helper.dart';
-import '../models/event_log.dart';
-import 'home_page.dart';
-import 'tasks/event_log_screen.dart';
+import '../../global/variables.dart';
+import '../../helper/firestore_helper.dart';
+import '../../models/event_log.dart';
+import '../home_page.dart';
+import '../tasks_and_logs/event_log_screen.dart';
 
 class CaretakerFormScreen extends StatefulWidget {
   final Caretaker caretaker;

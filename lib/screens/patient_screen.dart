@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
-import '../../helper/flutter_flow/flutter_flow_icon_button.dart';
-import '../../helper/flutter_flow/flutter_flow_theme.dart';
-import '../../global/variables.dart';
-import '../../helper/firestore_helper.dart';
-import '../../models/patient.dart';
-import '../patient_form_screen.dart';
-import '../settings.dart';
+import '../helper/flutter_flow/flutter_flow_icon_button.dart';
+import '../helper/flutter_flow/flutter_flow_theme.dart';
+import '../global/variables.dart';
+import '../helper/firestore_helper.dart';
+import '../models/patient.dart';
+import 'forms/patient_form_screen.dart';
+import 'settings.dart';
 
 class PatientScreen extends StatefulWidget {
   const PatientScreen({super.key});
@@ -29,6 +29,8 @@ class _PatientScreenState extends State<PatientScreen> {
 
   @override
   void initState() {
+    super.initState();
+
     _loadData().then((value) {
       setState(() {
         patients = value;
@@ -39,7 +41,6 @@ class _PatientScreenState extends State<PatientScreen> {
       filterPatients();
     });
     filterPatients();
-    super.initState();
   }
 
   @override
@@ -416,6 +417,12 @@ class _PatientScreenState extends State<PatientScreen> {
     Patient patient = Patient(
       id: patients.length + 1,
       startDate: DateTime.now(),
+      dateOfBirth: DateTime.now(),
+      medicalState: 'default',
+      allergies: 'default',
+      dailyHours: 0,
+      takenMedicines: '',
+      assignedCaretakers: [],
       name: string,
       careTasks: [],
     );

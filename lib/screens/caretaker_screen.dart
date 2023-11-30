@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
-import '../../global/variables.dart';
-import '../../models/caretaker.dart';
-import '../caretaker_form_screen.dart';
+import '../global/variables.dart';
+import '../models/caretaker.dart';
+import 'forms/caretaker_form_screen.dart';
 
 class CaretakerScreen extends StatefulWidget {
   const CaretakerScreen({super.key});
@@ -25,7 +25,6 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
 
   @override
   void initState() {
-    super.initState();
     _loadData().then((value) {
       setState(() {
         caretakers = value;
@@ -34,6 +33,13 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
         }
       });
     });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _caretakerNameController.dispose();
+    super.dispose();
   }
 
   Future<List<Caretaker>> _loadData() async {

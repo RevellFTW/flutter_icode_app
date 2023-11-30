@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:todoapp/models/care_task.dart';
-import '../global/variables.dart';
-import '../helper/firestore_helper.dart';
-import '../helper/monthly_picker.dart';
-import '../models/patient.dart';
+import '../../global/variables.dart';
+import '../../helper/firestore_helper.dart';
+import '../../helper/monthly_picker.dart';
+import '../../models/patient.dart';
 import 'package:intl/intl.dart';
 
 class CareTasksPage extends StatefulWidget {

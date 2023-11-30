@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todoapp/screens/tasks/patient_screen.dart';
+import 'package:todoapp/screens/patient_screen.dart';
 import '../providers/user_provider.dart';
-import 'tasks/caretaker_screen.dart';
+import 'caretaker_screen.dart';
 
 class Tabs extends StatefulWidget {
   const Tabs({super.key});

@@ -79,6 +79,12 @@ void addPatientToDb(Patient patient) {
     'startDate': patient.startDate,
     'careTasks':
         patient.careTasks.map((careTask) => careTask.toJson()).toList(),
+    'dateOfBirth': patient.dateOfBirth,
+    'medicalState': patient.medicalState,
+    'dailyHours': patient.dailyHours,
+    'takenMedicines': patient.takenMedicines,
+    'allergies': patient.allergies,
+    'assignedCaretakers': '',
   };
   addDocumentToCollection('patients', patientData);
 }
@@ -196,6 +202,12 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
         id: doc['id'],
         name: doc['name'],
         startDate: doc['startDate'].toDate(),
+        dateOfBirth: doc['dateOfBirth'].toDate(),
+        medicalState: doc['medicalState'],
+        dailyHours: doc['dailyHours'],
+        takenMedicines: doc['takenMedicines'],
+        allergies: doc['allergies'],
+        assignedCaretakers: [],
         careTasks: careTasks));
   }
 
