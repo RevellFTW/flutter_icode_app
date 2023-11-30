@@ -31,8 +31,14 @@ class PatientFormScreen extends StatefulWidget {
 class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
+  late TextEditingController _medicalStateController;
+  late TextEditingController _takenMedicinesController;
+  late TextEditingController _allergiesController;
   final _dateController = MaskedTextController(mask: '00/00/0000');
   String currentNameTextFormFieldValue = '';
+  String currentMedicalStateTextFormFieldValue = '';
+  String currentTakenMedicinesTextFormFieldValue = '';
+  String currentAllergiesTextFormFieldValue = '';
   Map<String, Map<String, String>> careTasks = {};
   late DateTime updatedDateTime;
 
@@ -66,6 +72,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     _nameController = TextEditingController(text: widget.patient.name);
     _dateController.text =
         "${widget.patient.dateOfBirth.day.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.month.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.year}";
+    _medicalStateController =
+        TextEditingController(text: widget.patient.medicalState);
+    _takenMedicinesController =
+        TextEditingController(text: widget.patient.takenMedicines);
+    _allergiesController =
+        TextEditingController(text: widget.patient.allergies);
   }
 
   @override
@@ -339,6 +351,20 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             currentNameTextFormFieldValue = newValue;
                           });
                         },
+                        onTapOutside: (newValue) {
+                          if (currentNameTextFormFieldValue.isNotEmpty) {
+                            setState(() {
+                              widget.patient.name =
+                                  currentNameTextFormFieldValue;
+                              modifyPatientInDb(widget.patient);
+                            });
+                          } else {
+                            setState(() {
+                              _nameController.text = widget.patient.name;
+                            });
+                          }
+                          FocusScope.of(context).unfocus();
+                        },
                         onFieldSubmitted: (String newValue) {
                           setState(() {
                             if (currentNameTextFormFieldValue.isNotEmpty) {
@@ -408,7 +434,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         },
                       ),
                       TextFormField(
-                        controller: _model.textFieldController3,
+                        controller: _medicalStateController,
                         focusNode: _model.textFieldFocusNode3,
                         autofocus: true,
                         obscureText: false,
@@ -446,6 +472,40 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           ),
                         ),
                         style: FlutterFlowTheme.of(context).bodyMedium,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            currentMedicalStateTextFormFieldValue = newValue;
+                          });
+                        },
+                        onTapOutside: (newValue) {
+                          if (currentMedicalStateTextFormFieldValue
+                              .isNotEmpty) {
+                            setState(() {
+                              widget.patient.medicalState =
+                                  currentMedicalStateTextFormFieldValue;
+                              modifyPatientInDb(widget.patient);
+                            });
+                          } else {
+                            setState(() {
+                              _medicalStateController.text =
+                                  widget.patient.medicalState;
+                            });
+                          }
+                          FocusScope.of(context).unfocus();
+                        },
+                        onFieldSubmitted: (String newValue) {
+                          setState(() {
+                            if (currentMedicalStateTextFormFieldValue
+                                .isNotEmpty) {
+                              widget.patient.medicalState =
+                                  currentMedicalStateTextFormFieldValue;
+                              modifyPatientInDb(widget.patient);
+                            } else {
+                              _medicalStateController.text =
+                                  widget.patient.medicalState;
+                            }
+                          });
+                        },
                         // validator: _model.textFieldController3Validator
                         //     .asValidator(context),
                       ),
@@ -513,7 +573,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         ],
                       ),
                       TextFormField(
-                        controller: _model.textFieldController4,
+                        controller: _takenMedicinesController,
                         focusNode: _model.textFieldFocusNode4,
                         autofocus: true,
                         obscureText: false,
@@ -551,11 +611,43 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           ),
                         ),
                         style: FlutterFlowTheme.of(context).bodyMedium,
-                        // validator: _model.textFieldController4Validator
-                        //     .asValidator(context),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            currentTakenMedicinesTextFormFieldValue = newValue;
+                          });
+                        },
+                        onTapOutside: (newValue) {
+                          if (currentTakenMedicinesTextFormFieldValue
+                              .isNotEmpty) {
+                            setState(() {
+                              widget.patient.takenMedicines =
+                                  currentTakenMedicinesTextFormFieldValue;
+                              modifyPatientInDb(widget.patient);
+                            });
+                          } else {
+                            setState(() {
+                              _takenMedicinesController.text =
+                                  widget.patient.takenMedicines;
+                            });
+                          }
+                          FocusScope.of(context).unfocus();
+                        },
+                        onFieldSubmitted: (String newValue) {
+                          setState(() {
+                            if (currentTakenMedicinesTextFormFieldValue
+                                .isNotEmpty) {
+                              widget.patient.takenMedicines =
+                                  currentTakenMedicinesTextFormFieldValue;
+                              modifyPatientInDb(widget.patient);
+                            } else {
+                              _takenMedicinesController.text =
+                                  widget.patient.takenMedicines;
+                            }
+                          });
+                        },
                       ),
                       TextFormField(
-                        controller: _model.textFieldController5,
+                        controller: _allergiesController,
                         focusNode: _model.textFieldFocusNode5,
                         autofocus: true,
                         obscureText: false,
@@ -593,8 +685,38 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           ),
                         ),
                         style: FlutterFlowTheme.of(context).bodyMedium,
-                        // validator: _model.textFieldController5Validator
-                        //     .asValidator(context),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            currentAllergiesTextFormFieldValue = newValue;
+                          });
+                        },
+                        onTapOutside: (newValue) {
+                          if (currentAllergiesTextFormFieldValue.isNotEmpty) {
+                            setState(() {
+                              widget.patient.allergies =
+                                  currentAllergiesTextFormFieldValue;
+                              modifyPatientInDb(widget.patient);
+                            });
+                          } else {
+                            setState(() {
+                              _allergiesController.text =
+                                  widget.patient.allergies;
+                            });
+                          }
+                          FocusScope.of(context).unfocus();
+                        },
+                        onFieldSubmitted: (String newValue) {
+                          setState(() {
+                            if (currentAllergiesTextFormFieldValue.isNotEmpty) {
+                              widget.patient.allergies =
+                                  currentAllergiesTextFormFieldValue;
+                              modifyPatientInDb(widget.patient);
+                            } else {
+                              _allergiesController.text =
+                                  widget.patient.allergies;
+                            }
+                          });
+                        },
                       ),
                       Align(
                         alignment: const AlignmentDirectional(0.00, 0.00),
