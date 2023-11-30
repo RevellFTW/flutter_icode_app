@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_count_controller.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_drop_down.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
@@ -15,7 +14,7 @@ import '../../models/event_log.dart';
 import '../home_page.dart';
 import '../tasks_and_logs/patient_care_tasks_screen.dart';
 import '../tasks_and_logs/event_log_screen.dart';
-
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import '../../models/patient_form_model.dart';
 export '../../models/patient_form_model.dart';
 
@@ -25,13 +24,15 @@ class PatientFormScreen extends StatefulWidget {
   const PatientFormScreen({super.key, required this.patient});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PatientFormScreenState createState() => _PatientFormScreenState();
 }
 
 class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
-  String currentTextFormFieldValue = '';
+  final _dateController = MaskedTextController(mask: '00/00/0000');
+  String currentNameTextFormFieldValue = '';
   Map<String, Map<String, String>> careTasks = {};
   late DateTime updatedDateTime;
 
@@ -63,6 +64,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     _model = createModel(context, () => PatientFormModel());
     updatedDateTime = widget.patient.startDate;
     _nameController = TextEditingController(text: widget.patient.name);
+    _dateController.text =
+        "${widget.patient.dateOfBirth.day.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.month.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.year}";
   }
 
   @override
@@ -294,7 +297,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         ],
                       ),
                       TextFormField(
-                        controller: _model.textFieldController1,
+                        controller: _nameController,
                         focusNode: _model.textFieldFocusNode1,
                         autofocus: true,
                         obscureText: false,
@@ -331,12 +334,32 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            currentNameTextFormFieldValue = newValue;
+                          });
+                        },
+                        onFieldSubmitted: (String newValue) {
+                          setState(() {
+                            if (currentNameTextFormFieldValue.isNotEmpty) {
+                              widget.patient.name =
+                                  currentNameTextFormFieldValue;
+                              modifyPatientInDb(widget.patient);
+                            } else {
+                              _nameController.text = widget.patient.name;
+                            }
+                          });
+                        },
                         style: FlutterFlowTheme.of(context).bodyMedium,
                         // validator: _model.textFieldController1Validator!
                         //     .asValidator(context),
                       ),
                       TextFormField(
-                        controller: _model.textFieldController2,
+                        onTap: () =>
+                            updateStartDate(widget.patient.dateOfBirth),
+                        //enabled: false,
+                        keyboardType: TextInputType.datetime,
+                        controller: _dateController,
                         focusNode: _model.textFieldFocusNode2,
                         autofocus: true,
                         obscureText: false,
@@ -374,8 +397,15 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           ),
                         ),
                         style: FlutterFlowTheme.of(context).bodyMedium,
-                        // validator: _model.textFieldController2Validator
-                        //     .asValidator(context),
+                        validator: (value) {
+                          String pattern = r'^\d{2}/\d{2}/\d{4}$';
+                          RegExp regex = RegExp(pattern);
+                          if (!regex.hasMatch(value!)) {
+                            return 'Invalid date format';
+                          } else {
+                            return null;
+                          }
+                        },
                       ),
                       TextFormField(
                         controller: _model.textFieldController3,
@@ -856,7 +886,10 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
             pickedTime.minute,
           );
         });
-        widget.patient.startDate = updatedDateTime;
+        widget.patient.dateOfBirth = updatedDateTime;
+        _dateController.text =
+            "${updatedDateTime.day.toString().padLeft(2, '0')}/${updatedDateTime.month.toString().padLeft(2, '0')}/${updatedDateTime.year}";
+
         modifyPatientInDb(widget.patient);
       }
     }

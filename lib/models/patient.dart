@@ -6,11 +6,11 @@ class Patient {
   int id;
   String name;
   DateTime startDate;
-  DateTime? dateOfBirth;
-  String? medicalState;
-  int? dailyHours;
-  String? takenMedicines;
-  String? allergies;
+  DateTime dateOfBirth;
+  String medicalState;
+  int dailyHours;
+  String takenMedicines;
+  String allergies;
   List<Caretaker>? assignedCaretakers;
   List<CareTask> careTasks;
 

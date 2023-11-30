@@ -20,6 +20,12 @@ void updatePatient(Patient patient, String documentID) {
     'startDate': patient.startDate,
     'careTasks':
         patient.careTasks.map((careTask) => careTask.toJson()).toList(),
+    'dateOfBirth': patient.dateOfBirth,
+    'medicalState': patient.medicalState,
+    'dailyHours': patient.dailyHours,
+    'takenMedicines': patient.takenMedicines,
+    'allergies': patient.allergies,
+    'assignedCaretakers': '',
   };
   documentReference.set(patientData, SetOptions(merge: true));
 }
