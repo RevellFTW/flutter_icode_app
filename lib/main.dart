@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
+import 'package:todoapp/screens/settings.dart';
 import 'auth_screens/home_screen.dart';
 import 'auth_screens/login_screen.dart';
 import 'auth_screens/signup_screen.dart';
@@ -56,6 +57,7 @@ class _MyAppState extends State<MyApp> {
         LoginScreen.id: (context) => const LoginScreen(),
         SignUpScreen.id: (context) => const SignUpScreen(),
         WelcomeScreen.id: (context) => const WelcomeScreen(),
+        SettingsScreen.id: (context) => const SettingsScreen(),
       },
     );
   }

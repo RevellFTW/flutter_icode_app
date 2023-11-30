@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../components/components.dart';
 import '../global/variables.dart';
 import '../screens/home_page.dart';
 import 'home_screen.dart';
 
 bool back_office = false;
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
   static String id = 'welcome_screen';
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    checkUserType(context);
+  }
 
   Future<void> checkUserType(BuildContext context) async {
     bool isBackOffice = false;
@@ -25,6 +34,8 @@ class WelcomeScreen extends StatelessWidget {
           isBackOffice = true;
         }
       }
+    } else {
+      Navigator.pushNamed(context, HomeScreen.id);
     }
     if (isBackOffice) {
       back_office = true;
@@ -32,12 +43,6 @@ class WelcomeScreen extends StatelessWidget {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
-      );
-    } else if (auth.currentUser == null) {
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else {
       // Display your message here

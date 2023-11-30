@@ -7,9 +7,9 @@ import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/patient.dart';
 import '../patient_form_screen.dart';
+import '../settings.dart';
 
 class PatientScreen extends StatefulWidget {
-  static const routeName = '/patient';
   const PatientScreen({super.key});
 
   @override
@@ -20,7 +20,7 @@ class PatientScreen extends StatefulWidget {
 class _PatientScreenState extends State<PatientScreen> {
   final TextEditingController _patientNameController = TextEditingController();
   List<Patient> patients = [];
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   List<Patient> _filteredPatients = [];
 
   Patient? getPatient(int id) {
@@ -29,8 +29,6 @@ class _PatientScreenState extends State<PatientScreen> {
 
   @override
   void initState() {
-    super.initState();
-
     _loadData().then((value) {
       setState(() {
         patients = value;
@@ -41,6 +39,14 @@ class _PatientScreenState extends State<PatientScreen> {
       filterPatients();
     });
     filterPatients();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _patientNameController.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<List<Patient>> _loadData() async {
@@ -69,7 +75,7 @@ class _PatientScreenState extends State<PatientScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100),
+        preferredSize: const Size.fromHeight(100),
         child: AppBar(
           backgroundColor: appBackgroundColor,
           foregroundColor: appForegroundColor,
@@ -77,23 +83,23 @@ class _PatientScreenState extends State<PatientScreen> {
           actions: const [],
           flexibleSpace: FlexibleSpaceBar(
             title: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 14),
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 14),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Flexible(
                           child: Align(
-                            alignment: AlignmentDirectional(0.00, 0.00),
+                            alignment: const AlignmentDirectional(0.00, 0.00),
                             child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(4, 0, 0, 0),
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  4, 0, 0, 0),
                               child: Text(
                                 'CuramusApp',
                                 style: FlutterFlowTheme.of(context)
@@ -112,7 +118,8 @@ class _PatientScreenState extends State<PatientScreen> {
                   ),
                   Flexible(
                     child: Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 8),
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 8),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
                         children: [
@@ -128,22 +135,25 @@ class _PatientScreenState extends State<PatientScreen> {
                           ),
                           Flexible(
                             child: Align(
-                              alignment: AlignmentDirectional(1.00, 0.00),
+                              alignment: const AlignmentDirectional(1.00, 0.00),
                               child: Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    12, 0, 0, 0),
                                 child: FlutterFlowIconButton(
                                   borderColor: Colors.transparent,
                                   borderRadius: 30,
                                   borderWidth: 1,
                                   buttonSize: 50,
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.dehaze_sharp,
                                     color: Colors.white,
                                     size: 30,
                                   ),
                                   onPressed: () async {
-                                    // context.pushNamed('settings');
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SettingsScreen()));
                                   },
                                 ),
                               ),

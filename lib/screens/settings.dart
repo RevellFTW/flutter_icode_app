@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
+  static const String id = 'settings_screen';
 
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
@@ -45,9 +46,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
         child: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primary,
+          backgroundColor: appBackgroundColor,
+          foregroundColor: appForegroundColor,
           automaticallyImplyLeading: false,
-          actions: [],
+          actions: const [],
           flexibleSpace: FlexibleSpaceBar(
             title: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 14),
@@ -83,44 +85,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
-                          child: FlutterFlowIconButton(
-                            borderColor: Colors.transparent,
-                            borderRadius: 30,
-                            borderWidth: 1,
-                            buttonSize: 50,
-                            icon: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Colors.white,
-                              size: 30,
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                12, 0, 0, 0),
+                            child: FlutterFlowIconButton(
+                              borderColor: Colors.transparent,
+                              borderRadius: 30,
+                              borderWidth: 1,
+                              buttonSize: 50,
+                              icon: const Icon(
+                                Icons.arrow_back_rounded,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                              onPressed: () async {
+                                context.pop();
+                              },
                             ),
-                            onPressed: () async {
-                              //context.pop();
-                            },
                           ),
-                        ),
-                        Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(4, 0, 0, 0),
-                          child: Text(
-                            'Back to Curamus Back-Office',
-                            style: FlutterFlowTheme.of(context)
-                                .headlineMedium
-                                .override(
-                                  fontFamily: 'Outfit',
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                4, 0, 0, 0),
+                            child: Text(
+                              'Back to Curamus Back-Office',
+                              style: FlutterFlowTheme.of(context)
+                                  .headlineMedium
+                                  .override(
+                                    fontFamily: 'Outfit',
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -161,7 +165,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       padding:
                           const EdgeInsetsDirectional.fromSTEB(9, 0, 10, 0),
                       child: Text(
-                        'Back-Office Doe',
+                        //todo add user name
+                        auth.currentUser!.email.toString(),
                         style: FlutterFlowTheme.of(context)
                             .headlineMedium
                             .override(
@@ -196,8 +201,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 0, 0),
             child: FFButtonWidget(
               onPressed: () async {
-                Navigator.pushNamed(context, HomeScreen.id);
                 auth.signOut();
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const HomeScreen()));
               },
               text: 'Log Out',
               options: FFButtonOptions(

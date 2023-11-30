@@ -7,7 +7,6 @@ import '../../models/caretaker.dart';
 import '../caretaker_form_screen.dart';
 
 class CaretakerScreen extends StatefulWidget {
-  static const routeName = '/caretaker';
   const CaretakerScreen({super.key});
 
   @override

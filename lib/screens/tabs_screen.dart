@@ -5,7 +5,6 @@ import '../providers/user_provider.dart';
 import 'tasks/caretaker_screen.dart';
 
 class Tabs extends StatefulWidget {
-  static const routeName = '/tabs-page';
   const Tabs({super.key});
 
   @override
