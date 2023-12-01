@@ -144,6 +144,11 @@ void removePatientFromDb(int id) async {
   await db.collection('patients').doc(docID).delete();
 }
 
+void removeRelativeFromDb(int id) async {
+  String docID = await getDocumentID(id, 'relatives');
+  await db.collection('relatives').doc(docID).delete();
+}
+
 void removeCaretakerFromDb(int id) async {
   String docID = await getDocumentID(id, 'caretakers');
   await db.collection('caretakers').doc(docID).delete();

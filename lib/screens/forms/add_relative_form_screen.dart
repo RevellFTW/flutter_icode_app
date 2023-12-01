@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
+import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
+import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
 import 'package:todoapp/models/relative.dart';
 
 class AddRelativeFormScreen extends StatefulWidget {
@@ -33,6 +35,8 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
   String currentPasswordTextFormFieldValue = '';
   String currentEmailTextFormFieldValue = '';
   String currentPhoneNumberTextFormFieldValue = '';
+
+  bool passwordFieldVisibility = false;
 
   bool notificationCheckbox = true;
 
@@ -145,19 +149,19 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
         body: SafeArea(
           top: true,
           child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Align(
-                          alignment: AlignmentDirectional(-1.00, 0.00),
+                          alignment: const AlignmentDirectional(-1.00, 0.00),
                           child: Text(
                             'Add new relative',
                             style: FlutterFlowTheme.of(context)
@@ -300,7 +304,7 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                         TextFormField(
                           controller: _passwordController,
                           autofocus: true,
-                          obscureText: !_model.textFieldVisibility,
+                          obscureText: !passwordFieldVisibility,
                           decoration: InputDecoration(
                             labelText: 'Password',
                             labelStyle:
@@ -336,12 +340,12 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                             ),
                             suffixIcon: InkWell(
                               onTap: () => setState(
-                                () => _model.textFieldVisibility =
-                                    !_model.textFieldVisibility,
+                                () => passwordFieldVisibility =
+                                    !passwordFieldVisibility,
                               ),
                               focusNode: FocusNode(skipTraversal: true),
                               child: Icon(
-                                _model.textFieldVisibility
+                                passwordFieldVisibility
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                                 size: 20,
@@ -349,12 +353,32 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
-                          validator: _model.textFieldController3Validator
-                              .asValidator(context),
+                          onChanged: (String newValue) {
+                            setState(() {
+                              currentPasswordTextFormFieldValue = newValue;
+                            });
+                          },
+                          onTapOutside: (newValue) {
+                            saveTextValue(currentPasswordTextFormFieldValue,
+                                _userNameController, (value) {
+                              widget.relative.password = value;
+                            }, () {
+                              _nameController.text = widget.relative.password;
+                            });
+                            FocusScope.of(context).unfocus();
+                          },
+                          onFieldSubmitted: (String newValue) {
+                            saveTextValue(currentPasswordTextFormFieldValue,
+                                _passwordController, (value) {
+                              widget.relative.password = value;
+                            }, () {
+                              _passwordController.text =
+                                  widget.relative.password;
+                            });
+                          },
                         ),
                         TextFormField(
-                          controller: _model.textFieldController4,
-                          focusNode: _model.textFieldFocusNode4,
+                          controller: _emailController,
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
@@ -392,12 +416,31 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
-                          validator: _model.textFieldController4Validator
-                              .asValidator(context),
+                          onChanged: (String newValue) {
+                            setState(() {
+                              currentEmailTextFormFieldValue = newValue;
+                            });
+                          },
+                          onTapOutside: (newValue) {
+                            saveTextValue(currentEmailTextFormFieldValue,
+                                _emailController, (value) {
+                              widget.relative.email = value;
+                            }, () {
+                              _emailController.text = widget.relative.email;
+                            });
+                            FocusScope.of(context).unfocus();
+                          },
+                          onFieldSubmitted: (String newValue) {
+                            saveTextValue(currentEmailTextFormFieldValue,
+                                _emailController, (value) {
+                              widget.relative.email = value;
+                            }, () {
+                              _emailController.text = widget.relative.email;
+                            });
+                          },
                         ),
                         TextFormField(
-                          controller: _model.textFieldController5,
-                          focusNode: _model.textFieldFocusNode5,
+                          controller: _phoneNumberController,
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
@@ -435,12 +478,32 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
-                          validator: _model.textFieldController5Validator
-                              .asValidator(context),
+                          onChanged: (String newValue) {
+                            setState(() {
+                              currentPhoneNumberTextFormFieldValue = newValue;
+                            });
+                          },
+                          onTapOutside: (newValue) {
+                            saveTextValue(currentPhoneNumberTextFormFieldValue,
+                                _emailController, (value) {
+                              widget.relative.email = value;
+                            }, () {
+                              _emailController.text = widget.relative.email;
+                            });
+                            FocusScope.of(context).unfocus();
+                          },
+                          onFieldSubmitted: (String newValue) {
+                            saveTextValue(currentPhoneNumberTextFormFieldValue,
+                                _emailController, (value) {
+                              widget.relative.email = value;
+                            }, () {
+                              _emailController.text = widget.relative.email;
+                            });
+                          },
                         ),
                         Theme(
                           data: ThemeData(
-                            checkboxTheme: CheckboxThemeData(
+                            checkboxTheme: const CheckboxThemeData(
                               visualDensity: VisualDensity.compact,
                               materialTapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap,
@@ -449,10 +512,10 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                                 FlutterFlowTheme.of(context).secondaryText,
                           ),
                           child: CheckboxListTile(
-                            value: _model.checkboxListTileValue ??= true,
+                            value: notificationCheckbox ??= true,
                             onChanged: (newValue) async {
-                              setState(() =>
-                                  _model.checkboxListTileValue = newValue!);
+                              setState(() => notificationCheckbox = newValue!);
+                              widget.relative.wantsToBeNotified = newValue!;
                             },
                             title: Text(
                               'Notifications',
@@ -470,36 +533,47 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                             controlAffinity: ListTileControlAffinity.trailing,
                           ),
                         ),
-                      ].divide(SizedBox(height: 12)),
+                      ].divide(const SizedBox(height: 12)),
                     ),
                   ),
                   Align(
-                    alignment: AlignmentDirectional(0.00, 0.00),
+                    alignment: const AlignmentDirectional(0.00, 0.00),
                     child: Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(0, 34, 0, 12),
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 34, 0, 12),
                       child: FFButtonWidget(
                         onPressed: () async {
-                          context.pushNamed('PatientScreen');
+                          if (!widget.modifying) {
+                            addRelativeToDb(widget.relative);
+                          } else {
+                            removeRelativeFromDb(widget.relative.id);
+                            //redirect
+                          }
                         },
-                        text: 'ADD',
-                        icon: Icon(
+                        text: widget.modifying ? 'DELETE' : 'ADD',
+                        icon: const Icon(
                           Icons.add,
                           size: 15,
                         ),
                         options: FFButtonOptions(
                           width: 600,
                           height: 48,
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                           iconPadding:
-                              EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          color: FlutterFlowTheme.of(context).primary,
+                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                          color: widget.modifying
+                              ? const Color(0xFFEFEFEF)
+                              : FlutterFlowTheme.of(context).primary,
                           textStyle:
                               FlutterFlowTheme.of(context).titleSmall.override(
                                     fontFamily: 'Readex Pro',
-                                    color: Colors.white,
+                                    color: widget.modifying
+                                        ? const Color(0xFFFF0800)
+                                        : Colors.white,
                                   ),
                           elevation: 4,
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Colors.transparent,
                             width: 1,
                           ),

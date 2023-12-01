@@ -5,6 +5,7 @@ class Relative {
   String password;
   String email;
   String phoneNumber;
+  bool wantsToBeNotified;
   List<int> assignedPatientIDs = [];
 
   Relative({
@@ -14,6 +15,7 @@ class Relative {
     required this.password,
     required this.email,
     required this.phoneNumber,
+    required this.wantsToBeNotified,
     required this.assignedPatientIDs,
   });
 }
