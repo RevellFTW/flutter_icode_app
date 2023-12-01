@@ -16,6 +16,7 @@ import '../tasks_and_logs/patient_care_tasks_screen.dart';
 import '../tasks_and_logs/event_log_screen.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import '../../models/patient_form_model.dart';
+import 'add_relative_form_screen.dart';
 export '../../models/patient_form_model.dart';
 
 class PatientFormScreen extends StatefulWidget {
@@ -145,7 +146,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                 size: 30,
                               ),
                               onPressed: () async {
-                                //context.pop();
+                                Navigator.of(context).pop();
                               },
                             ),
                           ),
@@ -944,6 +945,13 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           child: FFButtonWidget(
                             onPressed: () async {
                               // context.pushNamed('AddRelative');
+                              final int relativesCount =
+                                  await getRelativesCountFromFirestore();
+                              // ignore: use_build_context_synchronously
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => AddRelativeFormScreen(
+                                      relativeId: relativesCount + 1,
+                                      modifying: false)));
                             },
                             text: 'Add Relative',
                             options: FFButtonOptions(

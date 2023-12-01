@@ -105,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 size: 30,
                               ),
                               onPressed: () async {
-                                // context.pop();
+                                Navigator.of(context).pop();
                               },
                             ),
                           ),

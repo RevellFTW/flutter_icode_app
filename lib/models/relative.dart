@@ -1,11 +1,11 @@
 class Relative {
-  int id;
-  String name;
-  String userName;
-  String password;
-  String email;
-  String phoneNumber;
-  bool wantsToBeNotified;
+  int id = 0;
+  String name = '';
+  String userName = '';
+  String password = '';
+  String email = '';
+  String phoneNumber = '';
+  bool wantsToBeNotified = true;
   List<int> assignedPatientIDs = [];
 
   Relative({
@@ -18,4 +18,17 @@ class Relative {
     required this.wantsToBeNotified,
     required this.assignedPatientIDs,
   });
+  //initialize without values
+  Relative.justID(int idParam) {
+    id = idParam;
+    name = '';
+    password = '';
+    email = '';
+    email = '';
+    phoneNumber = '';
+    wantsToBeNotified = true;
+    assignedPatientIDs = [];
+  }
+
+  Relative.empty();
 }

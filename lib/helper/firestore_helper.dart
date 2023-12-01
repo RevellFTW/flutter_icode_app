@@ -58,6 +58,22 @@ void updateRelative(Relative relative, String documentID) {
   documentReference.set(relativeData, SetOptions(merge: true));
 }
 
+Future<Relative> getRelativeFromDb(int id) async {
+  String docID = await getDocumentID(id, 'relatives');
+  var snapshot = await db.collection('relatives').doc(docID).get();
+  Relative relative = Relative(
+    id: snapshot.data()!['id'],
+    name: snapshot.data()!['name'],
+    userName: snapshot.data()!['userName'],
+    password: snapshot.data()!['password'],
+    email: snapshot.data()!['email'],
+    phoneNumber: snapshot.data()!['phoneNumber'],
+    wantsToBeNotified: snapshot.data()!['wantsToBeNotified'],
+    assignedPatientIDs: snapshot.data()!['assignedPatientIDs'],
+  );
+  return relative;
+}
+
 void updateEventLog(EventLog eventLog, String documentID) {
   DocumentReference documentReference =
       FirebaseFirestore.instance.collection('patientTasks').doc(documentID);
@@ -202,6 +218,34 @@ Future<List<Caretaker>> loadCaretakersFromFirestore() async {
   }
 
   return caretakers;
+}
+
+Future<int> getRelativesCountFromFirestore() async {
+  QuerySnapshot querySnapshot = await db.collection('relatives').get();
+
+  return querySnapshot.docs.length;
+}
+
+Future<List<Relative>> loadRelativesFromFirestore() async {
+  List<Relative> relatives = [];
+  QuerySnapshot querySnapshot = await db.collection('relatives').get();
+
+  for (var doc in querySnapshot.docs) {
+    relatives.add(Relative(
+      id: doc['id'],
+      name: doc['name'],
+      userName: doc['userName'],
+      password: doc['password'],
+      email: doc['email'], // Add the missing identifier here
+      phoneNumber: doc['phoneNumber'], // Add the missing parameter here
+      wantsToBeNotified:
+          doc['wantsToBeNotified'], // Add the missing parameter here
+      assignedPatientIDs:
+          doc['assignedPatientIDs'], // Add the missing parameter here
+    ));
+  }
+
+  return relatives;
 }
 
 void deleteEventLogFromFireStore(EventLog eventLog) async {
