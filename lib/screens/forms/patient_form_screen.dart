@@ -218,13 +218,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                   0, 0, 0, 12),
                               child: FFButtonWidget(
                                 onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) => CareTasksPage(
-                                                patient: widget.patient)));
-                                  }
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => CareTasksPage(
+                                          patient: widget.patient)));
                                 },
                                 text: 'Care Tasks',
                                 options: FFButtonOptions(
@@ -261,21 +257,19 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     0, 0, 0, 12),
                                 child: FFButtonWidget(
                                   onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      List<EventLog> tasks =
-                                          await loadEventLogsFromFirestore();
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  EventLogScreen(
-                                                    eventLogs: tasks,
-                                                    eventLogName:
-                                                        "${widget.patient.name} Patient's Log",
-                                                    caller: Caller.patient,
-                                                    patient: widget.patient,
-                                                  )));
-                                    }
+                                    List<EventLog> tasks =
+                                        await loadEventLogsFromFirestore();
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EventLogScreen(
+                                                  eventLogs: tasks,
+                                                  eventLogName:
+                                                      "${widget.patient.name} Patient's Log",
+                                                  caller: Caller.patient,
+                                                  patient: widget.patient,
+                                                )));
                                   },
                                   text: 'Event Logs',
                                   options: FFButtonOptions(
@@ -560,9 +554,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     style:
                                         FlutterFlowTheme.of(context).titleLarge,
                                   ),
-                                  count: _model.countControllerValue ??= 0,
-                                  updateCount: (count) => setState(() =>
-                                      _model.countControllerValue = count),
+                                  count: widget.patient.dailyHours ??= 0,
+                                  updateCount: (count) => {
+                                    setState(() =>
+                                        widget.patient.dailyHours = count),
+                                    modifyPatientInDb(widget.patient)
+                                  },
                                   stepSize: 1,
                                   minimum: 1,
                                   maximum: 12,
