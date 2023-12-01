@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:todoapp/models/relative.dart';
 import '../global/variables.dart';
 import '../models/care_task.dart';
 import '../models/caretaker.dart';
@@ -42,6 +43,21 @@ void updateCaretaker(Caretaker caretaker, String documentID) {
   documentReference.set(caretakerData, SetOptions(merge: true));
 }
 
+void updateRelative(Relative relative, String documentID) {
+  DocumentReference documentReference =
+      FirebaseFirestore.instance.collection('relatives').doc(documentID);
+  Map<String, dynamic> relativeData = {
+    'id': relative.id,
+    'name': relative.name,
+    'userName': relative.userName,
+    'password': relative.password,
+    'email': relative.email,
+    'phoneNumber': relative.phoneNumber,
+    'assignedPatientIDs': relative.assignedPatientIDs,
+  };
+  documentReference.set(relativeData, SetOptions(merge: true));
+}
+
 void updateEventLog(EventLog eventLog, String documentID) {
   DocumentReference documentReference =
       FirebaseFirestore.instance.collection('patientTasks').doc(documentID);
@@ -54,6 +70,11 @@ void updateEventLog(EventLog eventLog, String documentID) {
     'caretakerId': eventLog.caretakerId,
   };
   documentReference.set(eventLogData, SetOptions(merge: true));
+}
+
+void modifyRelativeInDb(Relative relative) async {
+  String docID = await getDocumentID(relative.id, 'relatives');
+  updateRelative(relative, docID);
 }
 
 void modifyPatientInDb(Patient patient) async {
@@ -76,6 +97,19 @@ void addEventLogInDb(EventLog eventLog) async {
     'caretakerId': eventLog.caretakerId,
   };
   addDocumentToCollection('patientTasks', eventLogData);
+}
+
+void addRelativeToDb(Relative relative) {
+  Map<String, dynamic> relativeData = {
+    'id': relative.id,
+    'name': relative.name,
+    'userName': relative.userName,
+    'password': relative.password,
+    'email': relative.email,
+    'phoneNumber': relative.phoneNumber,
+    'assignedPatientIDs': relative.assignedPatientIDs,
+  };
+  addDocumentToCollection('relatives', relativeData);
 }
 
 void addPatientToDb(Patient patient) {
