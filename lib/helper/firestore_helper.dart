@@ -27,6 +27,7 @@ void updatePatient(Patient patient, String documentID) {
     'takenMedicines': patient.takenMedicines,
     'allergies': patient.allergies,
     'assignedCaretakers': '',
+    'relativeIDs': patient.relatives.map((relative) => relative.id).toList(),
   };
   documentReference.set(patientData, SetOptions(merge: true));
 }
@@ -53,7 +54,7 @@ void updateRelative(Relative relative, String documentID) {
     'password': relative.password,
     'email': relative.email,
     'phoneNumber': relative.phoneNumber,
-    'assignedPatientIDs': relative.assignedPatientIDs,
+    'wantsToBeNotified': relative.wantsToBeNotified,
   };
   documentReference.set(relativeData, SetOptions(merge: true));
 }
@@ -69,7 +70,6 @@ Future<Relative> getRelativeFromDb(int id) async {
     email: snapshot.data()!['email'],
     phoneNumber: snapshot.data()!['phoneNumber'],
     wantsToBeNotified: snapshot.data()!['wantsToBeNotified'],
-    assignedPatientIDs: snapshot.data()!['assignedPatientIDs'],
   );
   return relative;
 }
@@ -123,7 +123,7 @@ void addRelativeToDb(Relative relative) {
     'password': relative.password,
     'email': relative.email,
     'phoneNumber': relative.phoneNumber,
-    'assignedPatientIDs': relative.assignedPatientIDs,
+    'wantsToBeNotified': relative.wantsToBeNotified,
   };
   addDocumentToCollection('relatives', relativeData);
 }
@@ -141,6 +141,7 @@ void addPatientToDb(Patient patient) {
     'takenMedicines': patient.takenMedicines,
     'allergies': patient.allergies,
     'assignedCaretakers': '',
+    'relativeIDs': patient.relatives.map((relative) => relative.id).toList(),
   };
   addDocumentToCollection('patients', patientData);
 }
@@ -240,8 +241,6 @@ Future<List<Relative>> loadRelativesFromFirestore() async {
       phoneNumber: doc['phoneNumber'], // Add the missing parameter here
       wantsToBeNotified:
           doc['wantsToBeNotified'], // Add the missing parameter here
-      assignedPatientIDs:
-          doc['assignedPatientIDs'], // Add the missing parameter here
     ));
   }
 
@@ -260,6 +259,7 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
   for (var doc in querySnapshot.docs) {
     var careTasksCollection = doc['careTasks'];
     List<CareTask> careTasks = [];
+    List<Relative> relatives = [];
     for (var map in careTasksCollection) {
       String date = DateTime.now().toString();
       Frequency frequency = Frequency.weekly;
@@ -287,6 +287,13 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
           CareTask(taskName: taskName, taskFrequency: frequency, date: date));
     }
 
+    if (doc['relativeIDs'] != null) {
+      for (var value in doc['relativeIDs']) {
+        var relative = await getRelativeFromDb(value);
+        relatives.add(relative);
+      }
+    }
+
     patients.add(Patient(
         id: doc['id'],
         name: doc['name'],
@@ -297,7 +304,8 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
         takenMedicines: doc['takenMedicines'],
         allergies: doc['allergies'],
         assignedCaretakers: [],
-        careTasks: careTasks));
+        careTasks: careTasks,
+        relatives: relatives));
   }
 
   return patients;

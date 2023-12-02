@@ -22,6 +22,7 @@ class EventLogScreen extends StatefulWidget {
       this.caretaker});
 
   @override
+  // ignore: library_private_types_in_public_api
   _EventLogScreenState createState() => _EventLogScreenState();
 }
 

@@ -1,4 +1,5 @@
 import 'package:todoapp/models/caretaker.dart';
+import 'package:todoapp/models/relative.dart';
 
 import 'care_task.dart';
 
@@ -13,17 +14,18 @@ class Patient {
   String allergies;
   List<Caretaker>? assignedCaretakers;
   List<CareTask> careTasks;
+  List<Relative> relatives = [];
 
-  Patient({
-    required this.id,
-    required this.name,
-    required this.startDate,
-    required this.dateOfBirth,
-    required this.medicalState,
-    required this.dailyHours,
-    required this.takenMedicines,
-    required this.allergies,
-    required this.assignedCaretakers,
-    required this.careTasks,
-  });
+  Patient(
+      {required this.id,
+      required this.name,
+      required this.startDate,
+      required this.dateOfBirth,
+      required this.medicalState,
+      required this.dailyHours,
+      required this.takenMedicines,
+      required this.allergies,
+      required this.assignedCaretakers,
+      required this.careTasks,
+      required this.relatives});
 }

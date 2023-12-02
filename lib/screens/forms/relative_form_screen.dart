@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
+import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/models/relative.dart';
+import 'package:todoapp/screens/forms/patient_form_screen.dart';
 
-class AddRelativeFormScreen extends StatefulWidget {
-  final int relativeId;
+class RelativeFormScreen extends StatefulWidget {
+  final Relative relative;
   final bool modifying;
+  final Patient? patient;
 
-  AddRelativeFormScreen(
-      {super.key, required this.relativeId, required this.modifying});
+  const RelativeFormScreen(
+      {super.key,
+      required this.relative,
+      required this.modifying,
+      this.patient});
 
   @override
   // ignore: library_private_types_in_public_api
-  _AddRelativeFormScreenState createState() => _AddRelativeFormScreenState();
+  _RelativeFormScreenState createState() => _RelativeFormScreenState();
 }
 
-class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
-  late Relative relative;
-
+class _RelativeFormScreenState extends State<RelativeFormScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   late TextEditingController _nameController;
@@ -40,8 +41,6 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
 
   bool passwordFieldVisibility = false;
 
-  bool notificationCheckbox = true;
-
   @override
   void initState() {
     super.initState();
@@ -51,19 +50,13 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
     _emailController = TextEditingController();
     _phoneNumberController = TextEditingController();
     if (widget.modifying) {
-      getRelativeFromDb(widget.relativeId).then((value) {
-        setState(() {
-          relative = value;
-          _nameController.text = relative.name;
-          _userNameController.text = relative.userName;
-          _passwordController.text = relative.password;
-          _emailController.text = relative.email;
-          _phoneNumberController.text = relative.phoneNumber;
-          notificationCheckbox = relative.wantsToBeNotified;
-        });
+      setState(() {
+        _nameController.text = widget.relative.name;
+        _userNameController.text = widget.relative.userName;
+        _passwordController.text = widget.relative.password;
+        _emailController.text = widget.relative.email;
+        _phoneNumberController.text = widget.relative.phoneNumber;
       });
-    } else {
-      relative = Relative.justID(widget.relativeId);
     }
   }
 
@@ -83,7 +76,7 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
           child: AppBar(
             backgroundColor: FlutterFlowTheme.of(context).primary,
             automaticallyImplyLeading: false,
-            actions: [],
+            actions: const [],
             flexibleSpace: FlexibleSpaceBar(
               title: Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 14),
@@ -125,8 +118,8 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                         mainAxisSize: MainAxisSize.max,
                         children: [
                           Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                12, 0, 0, 0),
                             child: FlutterFlowIconButton(
                               borderColor: Colors.transparent,
                               borderRadius: 30,
@@ -245,9 +238,9 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                             saveTextValue(
                                 currentNameTextFormFieldValue, _nameController,
                                 (value) {
-                              relative.name = value;
+                              widget.relative.name = value;
                             }, () {
-                              _nameController.text = relative.name;
+                              _nameController.text = widget.relative.name;
                             });
                             FocusScope.of(context).unfocus();
                           },
@@ -255,9 +248,9 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                             saveTextValue(
                                 currentNameTextFormFieldValue, _nameController,
                                 (value) {
-                              relative.name = value;
+                              widget.relative.name = value;
                             }, () {
-                              _nameController.text = relative.name;
+                              _nameController.text = widget.relative.name;
                             });
                           },
                         ),
@@ -308,18 +301,18 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                           onTapOutside: (newValue) {
                             saveTextValue(currentUserNameTextFormFieldValue,
                                 _userNameController, (value) {
-                              relative.userName = value;
+                              widget.relative.userName = value;
                             }, () {
-                              _nameController.text = relative.userName;
+                              _nameController.text = widget.relative.userName;
                             });
                             FocusScope.of(context).unfocus();
                           },
                           onFieldSubmitted: (String newValue) {
                             saveTextValue(currentUserNameTextFormFieldValue,
                                 _userNameController, (value) {
-                              relative.userName = value;
+                              widget.relative.userName = value;
                             }, () {
-                              _nameController.text = relative.userName;
+                              _nameController.text = widget.relative.userName;
                             });
                           },
                         ),
@@ -382,19 +375,21 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                           },
                           onTapOutside: (newValue) {
                             saveTextValue(currentPasswordTextFormFieldValue,
-                                _userNameController, (value) {
-                              relative.password = value;
+                                _passwordController, (value) {
+                              widget.relative.password = value;
                             }, () {
-                              _nameController.text = relative.password;
+                              _passwordController.text =
+                                  widget.relative.password;
                             });
                             FocusScope.of(context).unfocus();
                           },
                           onFieldSubmitted: (String newValue) {
                             saveTextValue(currentPasswordTextFormFieldValue,
                                 _passwordController, (value) {
-                              relative.password = value;
+                              widget.relative.password = value;
                             }, () {
-                              _passwordController.text = relative.password;
+                              _passwordController.text =
+                                  widget.relative.password;
                             });
                           },
                         ),
@@ -445,18 +440,18 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                           onTapOutside: (newValue) {
                             saveTextValue(currentEmailTextFormFieldValue,
                                 _emailController, (value) {
-                              relative.email = value;
+                              widget.relative.email = value;
                             }, () {
-                              _emailController.text = relative.email;
+                              _emailController.text = widget.relative.email;
                             });
                             FocusScope.of(context).unfocus();
                           },
                           onFieldSubmitted: (String newValue) {
                             saveTextValue(currentEmailTextFormFieldValue,
                                 _emailController, (value) {
-                              relative.email = value;
+                              widget.relative.email = value;
                             }, () {
-                              _emailController.text = relative.email;
+                              _emailController.text = widget.relative.email;
                             });
                           },
                         ),
@@ -506,19 +501,21 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                           },
                           onTapOutside: (newValue) {
                             saveTextValue(currentPhoneNumberTextFormFieldValue,
-                                _emailController, (value) {
-                              relative.email = value;
+                                _phoneNumberController, (value) {
+                              widget.relative.phoneNumber = value;
                             }, () {
-                              _emailController.text = relative.email;
+                              _phoneNumberController.text =
+                                  widget.relative.phoneNumber;
                             });
                             FocusScope.of(context).unfocus();
                           },
                           onFieldSubmitted: (String newValue) {
                             saveTextValue(currentPhoneNumberTextFormFieldValue,
-                                _emailController, (value) {
-                              relative.email = value;
+                                _phoneNumberController, (value) {
+                              widget.relative.phoneNumber = value;
                             }, () {
-                              _emailController.text = relative.email;
+                              _phoneNumberController.text =
+                                  widget.relative.phoneNumber;
                             });
                           },
                         ),
@@ -533,10 +530,13 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                                 FlutterFlowTheme.of(context).secondaryText,
                           ),
                           child: CheckboxListTile(
-                            value: notificationCheckbox ??= true,
+                            value: widget.relative.wantsToBeNotified,
                             onChanged: (newValue) async {
-                              setState(() => notificationCheckbox = newValue!);
-                              relative.wantsToBeNotified = newValue!;
+                              setState(() => widget.relative.wantsToBeNotified =
+                                  newValue!);
+                              if (widget.modifying) {
+                                modifyRelativeInDb(widget.relative);
+                              }
                             },
                             title: Text(
                               'Notifications',
@@ -563,13 +563,23 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
                       padding:
                           const EdgeInsetsDirectional.fromSTEB(0, 34, 0, 12),
                       child: FFButtonWidget(
-                        onPressed: () async {
-                          if (!widget.modifying) {
-                            addRelativeToDb(relative);
-                          } else {
-                            removeRelativeFromDb(relative.id);
-                            //redirect
-                          }
+                        onPressed: () {
+                          setState(() {
+                            if (!widget.modifying) {
+                              widget.patient!.relatives.add(widget.relative);
+                              modifyPatientInDb(widget.patient!);
+                              addRelativeToDb(widget.relative);
+                            } else {
+                              removeRelativeFromDb(widget.relative.id);
+                              widget.patient!.relatives.remove(widget.relative);
+                              modifyPatientInDb(widget.patient!);
+                              //redirect
+                            }
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => PatientFormScreen(
+                                    patient: widget.patient!,
+                                    relatives: widget.patient!.relatives)));
+                          });
                         },
                         text: widget.modifying ? 'DELETE' : 'ADD',
                         icon: const Icon(
@@ -617,7 +627,7 @@ class _AddRelativeFormScreenState extends State<AddRelativeFormScreen> {
     if (currentFieldValue.isNotEmpty) {
       setState(() {
         setAttribute(currentFieldValue);
-        if (widget.modifying) modifyRelativeInDb(relative);
+        if (widget.modifying) modifyRelativeInDb(widget.relative);
       });
     } else {
       setState(() {

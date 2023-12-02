@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
+import 'package:todoapp/models/relative.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
 import '../helper/flutter_flow/flutter_flow_theme.dart';
 import '../global/variables.dart';
@@ -31,12 +31,13 @@ class _PatientScreenState extends State<PatientScreen> {
   void initState() {
     super.initState();
 
-    _loadData().then((value) {
+    _loadPatientData().then((value) {
       setState(() {
         patients = value;
         _filteredPatients = patients;
       });
     });
+
     _searchController.addListener(() {
       filterPatients();
     });
@@ -50,9 +51,17 @@ class _PatientScreenState extends State<PatientScreen> {
     super.dispose();
   }
 
-  Future<List<Patient>> _loadData() async {
+  Future<List<Patient>> _loadPatientData() async {
     // Load the data asynchronously
     final data = await loadPatientsFromFirestore();
+
+    // Return the loaded data
+    return data;
+  }
+
+  Future<List<Relative>> _loadRelativeData() async {
+    // Load the data asynchronously
+    final data = await loadRelativesFromFirestore();
 
     // Return the loaded data
     return data;
@@ -176,7 +185,7 @@ class _PatientScreenState extends State<PatientScreen> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(16, 14, 16, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 16, 0),
             child: TextFormField(
               controller: _searchController,
               onEditingComplete: filterPatients,
@@ -228,14 +237,14 @@ class _PatientScreenState extends State<PatientScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(16, 12, 0, 0),
+                padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 0, 0),
                 child: Text(
                   'Patients matching search',
                   style: FlutterFlowTheme.of(context).labelMedium,
                 ),
               ),
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(4, 12, 16, 0),
+                padding: const EdgeInsetsDirectional.fromSTEB(4, 12, 16, 0),
                 child: Text(
                   _filteredPatients.length.toString(),
                   style: FlutterFlowTheme.of(context).bodyMedium,
@@ -316,7 +325,10 @@ class _PatientScreenState extends State<PatientScreen> {
                                             builder: (context) =>
                                                 PatientFormScreen(
                                                     patient:
-                                                        _filteredPatients[i])));
+                                                        _filteredPatients[i],
+                                                    relatives:
+                                                        _filteredPatients[i]
+                                                            .relatives)));
                                   },
                                   child: Card(
                                     clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -342,7 +354,11 @@ class _PatientScreenState extends State<PatientScreen> {
                                                       PatientFormScreen(
                                                           patient:
                                                               _filteredPatients[
-                                                                  i])));
+                                                                  i],
+                                                          relatives:
+                                                              _filteredPatients[
+                                                                      i]
+                                                                  .relatives)));
                                         },
                                         child: Icon(
                                           Icons.keyboard_arrow_right_rounded,
@@ -425,6 +441,7 @@ class _PatientScreenState extends State<PatientScreen> {
       assignedCaretakers: [],
       name: string,
       careTasks: [],
+      relatives: [],
     );
     patients.add(patient);
     addPatientToDb(patient);

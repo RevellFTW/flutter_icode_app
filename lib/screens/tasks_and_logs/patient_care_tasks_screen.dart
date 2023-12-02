@@ -147,6 +147,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
         lastDate: DateTime(DateTime.now().year + 100),
       );
       if (pickedDate != null) {
+        // ignore: use_build_context_synchronously
         final TimeOfDay? pickedTime = await showTimePicker(
           context: context,
           initialTime: TimeOfDay.fromDateTime(pickedDate),
@@ -191,42 +192,42 @@ class _CareTasksPageState extends State<CareTasksPage> {
                   padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Monday'),
-                    child: Text('Monday'),
+                    child: const Text('Monday'),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Tuesday'),
-                    child: Text('Tuesday'),
+                    child: const Text('Tuesday'),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Wednesday'),
-                    child: Text('Wednesday'),
+                    child: const Text('Wednesday'),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Thursday'),
-                    child: Text('Thursday'),
+                    child: const Text('Thursday'),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Friday'),
-                    child: Text('Friday'),
+                    child: const Text('Friday'),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15),
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop('Saturday'),
-                    child: Text('Saturday'),
+                    child: const Text('Saturday'),
                   ),
                 ),
                 Padding(
@@ -244,31 +245,29 @@ class _CareTasksPageState extends State<CareTasksPage> {
       );
 
       // Once the user selects a day, proceed to pick time
-      if (selectedDay != null) {
-        final TimeOfDay? pickedTime = await showTimePicker(
-          context: context,
-          initialTime: isClickedDirectly
-              ? extractTimeFromInput(initialDateString)
-              : TimeOfDay.now(),
-        );
+      // ignore: use_build_context_synchronously
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: isClickedDirectly
+            ? extractTimeFromInput(initialDateString)
+            : TimeOfDay.now(),
+      );
 
-        if (pickedTime != null) {
-          TimeOfDay time =
-              TimeOfDay(hour: pickedTime.hour, minute: pickedTime.minute);
-          String formattedTime = '$selectedDay ${time.format(context)}';
-          setState(() {
-            selectedDateTime = formattedTime;
+      if (pickedTime != null) {
+        TimeOfDay time =
+            TimeOfDay(hour: pickedTime.hour, minute: pickedTime.minute);
+        // ignore: use_build_context_synchronously
+        String formattedTime = '$selectedDay ${time.format(context)}';
+        setState(() {
+          selectedDateTime = formattedTime;
 
-            if (index != -1) {
-              widget.patient.careTasks[index].date = selectedDateTime;
-              saveToDb();
-            }
-            if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
-          });
-          return true;
-        } else {
-          return false;
-        }
+          if (index != -1) {
+            widget.patient.careTasks[index].date = selectedDateTime;
+            saveToDb();
+          }
+          if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
+        });
+        return true;
       } else {
         return false;
       }
@@ -285,6 +284,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
         },
       );
       if (pickedDate != null) {
+        // ignore: use_build_context_synchronously
         final TimeOfDay? pickedTime = await showTimePicker(
           context: context,
           initialTime: TimeOfDay.fromDateTime(pickedDate),
@@ -311,28 +311,6 @@ class _CareTasksPageState extends State<CareTasksPage> {
       }
     }
     return false;
-  }
-
-// Helper function to get weekday from string
-  int _getWeekdayFromString(String day) {
-    switch (day) {
-      case 'Monday':
-        return DateTime.monday;
-      case 'Tuesday':
-        return DateTime.tuesday;
-      case 'Wednesday':
-        return DateTime.wednesday;
-      case 'Thursday':
-        return DateTime.thursday;
-      case 'Friday':
-        return DateTime.friday;
-      case 'Saturday':
-        return DateTime.saturday;
-      case 'Sunday':
-        return DateTime.sunday;
-      default:
-        return DateTime.monday;
-    }
   }
 
   @override

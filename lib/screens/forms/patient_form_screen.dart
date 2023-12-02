@@ -7,6 +7,7 @@ import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
+import 'package:todoapp/models/relative.dart';
 import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/patient.dart';
@@ -16,13 +17,14 @@ import '../tasks_and_logs/patient_care_tasks_screen.dart';
 import '../tasks_and_logs/event_log_screen.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import '../../models/patient_form_model.dart';
-import 'add_relative_form_screen.dart';
+import 'relative_form_screen.dart';
 export '../../models/patient_form_model.dart';
 
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;
-
-  const PatientFormScreen({super.key, required this.patient});
+  final List<Relative> relatives;
+  const PatientFormScreen(
+      {super.key, required this.patient, required this.relatives});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -42,7 +44,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   String currentAllergiesTextFormFieldValue = '';
   Map<String, Map<String, String>> careTasks = {};
   late DateTime updatedDateTime;
-
   late PatientFormModel _model;
 
   Future<List<EventLog>> loadEventLogsFromFirestore() async {
@@ -761,12 +762,14 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           ),
                         ],
                       ),
-                      ListView(
+                      ListView.builder(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         scrollDirection: Axis.vertical,
-                        children: [
-                          Padding(
+                        itemCount: widget.relatives.length,
+                        itemBuilder: (context, i) {
+                          return Padding(
+                            key: ValueKey<int>(widget.relatives[i].id),
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 0, 0, 0, 1),
                             child: InkWell(
@@ -775,8 +778,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                //todo edit relative
-                                print('first inkwell tapped');
+                                //goto edit relative
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => RelativeFormScreen(
+                                        modifying: true,
+                                        relative: widget.relatives[i],
+                                        patient: widget.patient)));
                               },
                               child: Container(
                                 width: double.infinity,
@@ -804,7 +811,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(12, 0, 0, 0),
                                           child: Text(
-                                            'Relative 1',
+                                            widget.relatives[i].name,
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge,
                                           ),
@@ -815,127 +822,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 0, 0, 1),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                //todo edit relative
-                                print('inkwell tapped');
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      blurRadius: 0,
-                                      color: Color(0xFFE0E3E7),
-                                      offset: Offset(0, 1),
-                                    )
-                                  ],
-                                  borderRadius: BorderRadius.circular(0),
-                                  shape: BoxShape.rectangle,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      8, 8, 8, 8),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(12, 0, 0, 0),
-                                          child: Text(
-                                            'Relative 2',
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyLarge,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 0, 0, 1),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                // context.pushNamed('EditRelative');
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      blurRadius: 0,
-                                      color: Color(0xFFE0E3E7),
-                                      offset: Offset(0, 1),
-                                    )
-                                  ],
-                                  borderRadius: BorderRadius.circular(0),
-                                  shape: BoxShape.rectangle,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      8, 8, 8, 8),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(12, 0, 0, 0),
-                                          child: Text(
-                                            'Relative 3',
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyLarge,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 0, 0, 1),
-                            child: Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 0,
-                                    color: Color(0xFFE0E3E7),
-                                    offset: Offset(0, 1),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.circular(0),
-                                shape: BoxShape.rectangle,
-                              ),
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
                       Align(
                         alignment: const AlignmentDirectional(-1.00, 0.00),
@@ -949,9 +837,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                   await getRelativesCountFromFirestore();
                               // ignore: use_build_context_synchronously
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => AddRelativeFormScreen(
-                                      relativeId: relativesCount + 1,
-                                      modifying: false)));
+                                  builder: (context) => RelativeFormScreen(
+                                      relative:
+                                          Relative.justID(relativesCount + 1),
+                                      modifying: false,
+                                      patient: widget.patient),
+                                  maintainState: false));
                             },
                             text: 'Add Relative',
                             options: FFButtonOptions(

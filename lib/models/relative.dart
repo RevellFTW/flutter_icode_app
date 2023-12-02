@@ -6,7 +6,6 @@ class Relative {
   String email = '';
   String phoneNumber = '';
   bool wantsToBeNotified = true;
-  List<int> assignedPatientIDs = [];
 
   Relative({
     required this.id,
@@ -16,7 +15,6 @@ class Relative {
     required this.email,
     required this.phoneNumber,
     required this.wantsToBeNotified,
-    required this.assignedPatientIDs,
   });
   //initialize without values
   Relative.justID(int idParam) {
@@ -27,7 +25,6 @@ class Relative {
     email = '';
     phoneNumber = '';
     wantsToBeNotified = true;
-    assignedPatientIDs = [];
   }
 
   Relative.empty();

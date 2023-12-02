@@ -13,6 +13,7 @@ class SettingsScreen extends StatefulWidget {
   static const String id = 'settings_screen';
 
   @override
+  // ignore: library_private_types_in_public_api
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
