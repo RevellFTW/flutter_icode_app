@@ -7,6 +7,7 @@ import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/screens/forms/patient_form_screen.dart';
+import 'package:todoapp/widget/custom_app_bar.dart';
 
 class RelativeFormScreen extends StatefulWidget {
   final Relative relative;
@@ -71,95 +72,12 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(100),
-          child: AppBar(
-            backgroundColor: FlutterFlowTheme.of(context).primary,
-            automaticallyImplyLeading: false,
-            actions: const [],
-            flexibleSpace: FlexibleSpaceBar(
-              title: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 14),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Flexible(
-                            child: Align(
-                              alignment: const AlignmentDirectional(0.00, 0.00),
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    4, 0, 0, 0),
-                                child: Text(
-                                  'CuramusApp',
-                                  style: FlutterFlowTheme.of(context)
-                                      .headlineMedium
-                                      .override(
-                                        fontFamily: 'Outfit',
-                                        color: Colors.white,
-                                        fontSize: 22,
-                                      ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                12, 0, 0, 0),
-                            child: FlutterFlowIconButton(
-                              borderColor: Colors.transparent,
-                              borderRadius: 30,
-                              borderWidth: 1,
-                              buttonSize: 50,
-                              icon: const Icon(
-                                Icons.arrow_back_rounded,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                4, 0, 0, 0),
-                            child: Text(
-                              'Back to Patient Doe\'s sheet',
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineMedium
-                                  .override(
-                                    fontFamily: 'Outfit',
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              centerTitle: true,
-              expandedTitleScale: 1.0,
-            ),
-            elevation: 2,
-          ),
+        appBar: CustomAppBar(
+          //todo make patient name dynamic
+          title: 'Back to Patient Doe\'s sheet',
+          onBackPressed: () async {
+            Navigator.of(context).pop();
+          },
         ),
         body: SafeArea(
           top: true,
