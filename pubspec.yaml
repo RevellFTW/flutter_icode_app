@@ -68,6 +68,7 @@ dependencies:
   auto_size_text: ^3.0.0
   fl_chart: ^0.65.0
   flutter_masked_text2: ^0.9.1
+  clean_calendar: ^1.1.0
 
 dev_dependencies:
   flutter_test:

@@ -3,7 +3,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:todoapp/helper/flutter_flow/flutter_flow_calendar.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/models/caretaker.dart';
@@ -48,7 +47,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
   String? selectedCaretakerId;
   String? selectedPatientId;
 
-  DateTime focusedDay = DateTime.now();
+  ValueNotifier<DateTime> selectedDay = ValueNotifier<DateTime>(DateTime.now());
+  ValueNotifier<DateTime> focusedDay = ValueNotifier<DateTime>(DateTime.now());
+
+  CalendarFormat calendarFormat = CalendarFormat.month;
 
   final FocusNode _focusNode = FocusNode();
   late List<String> list = [];
@@ -89,7 +91,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
       });
     }
     super.initState();
-    filterEventLogs(focusedDay);
+    filterEventLogs(selectedDay.value);
   }
 
   void filterEventLogs(DateTime dateParam) {
@@ -154,30 +156,44 @@ class _EventLogScreenState extends State<EventLogScreen> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
-                child: TableCalendar(
-                  firstDay: DateTime.utc(2020, 10, 16),
-                  lastDay: DateTime.utc(2030, 3, 14),
-                  focusedDay: focusedDay,
-                  calendarFormat: CalendarFormat.month,
-                  // selectedDayPredicate: (day) {
-                  //   // Use `selectedDayPredicate` to determine which day is currently selected.
-                  //   // If this returns true, then `day` is currently selected.
-                  //   return true;
-                  // },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    // Handle your date selection logic here.
-                    // `selectedDay` is the day that was just selected.
-                    // `focusedDay` is the day that is currently focused (i.e. the day that the calendar is centered around).
-                    // If you update the `selectedDay` variable here, the calendar will automatically update to reflect the new selected day.
-                    setState(() {
-                      selectedDay = selectedDay;
-                      focusedDay = focusedDay;
-
-                      filterEventLogs(selectedDay);
-                    });
-                  },
-                )),
+              padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+              child: ValueListenableBuilder<DateTime>(
+                  valueListenable: selectedDay,
+                  builder: (context, value, child) {
+                    return TableCalendar(
+                      firstDay: DateTime.utc(2020, 10, 16),
+                      lastDay: DateTime.utc(2030, 3, 14),
+                      focusedDay: focusedDay.value,
+                      onFormatChanged: (format) {
+                        if (calendarFormat != format) {
+                          setState(() {
+                            calendarFormat = format;
+                          });
+                        }
+                      },
+                      onPageChanged: (focusedDay) {
+                        this.focusedDay.value = focusedDay;
+                      },
+                      calendarFormat: calendarFormat,
+                      selectedDayPredicate: (day) {
+                        // Use `selectedDayPredicate` to determine which day is currently selected.
+                        // If this returns true, then `day` is currently selected.
+                        return isSameDay(value, day);
+                      },
+                      onDaySelected: (pSelectedDay, pFocusedDay) {
+                        // Handle your date selection logic here.
+                        // `selectedDay` is the day that was just selected.
+                        // `focusedDay` is the day that is currently focused (i.e. the day that the calendar is centered around).
+                        // If you update the `selectedDay` variable here, the calendar will automatically update to reflect the new selected day.
+                        setState(() {
+                          selectedDay.value = pSelectedDay;
+                          focusedDay.value = pFocusedDay;
+                          filterEventLogs(selectedDay.value);
+                        });
+                      },
+                    );
+                  }),
+            ),
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
               child: Container(
@@ -206,7 +222,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
                         size: 24,
                       ),
                       onPressed: () {
-                        focusedDay.subtract(const Duration(days: 1));
+                        selectedDay.value =
+                            selectedDay.value.subtract(const Duration(days: 1));
+                        focusedDay.value = selectedDay.value;
+                        filterEventLogs(selectedDay.value);
                       },
                     ),
                   ),
@@ -229,7 +248,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
                         size: 24,
                       ),
                       onPressed: () {
-                        focusedDay = focusedDay.add(const Duration(days: 1));
+                        selectedDay.value =
+                            selectedDay.value.add(const Duration(days: 1));
+                        focusedDay.value = selectedDay.value;
+                        filterEventLogs(selectedDay.value);
                       },
                     ),
                   ),
@@ -724,7 +746,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 }
                               });
                               addEventLogInDb(widget.eventLogs.last);
-                              filterEventLogs(focusedDay);
+                              filterEventLogs(selectedDay.value);
                               stateSetter();
                             }
                             Navigator.of(context).pop();
