@@ -500,10 +500,6 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                           });
                         },
                         text: widget.modifying ? 'DELETE' : 'ADD',
-                        icon: const Icon(
-                          Icons.add,
-                          size: 15,
-                        ),
                         options: FFButtonOptions(
                           width: 600,
                           height: 48,

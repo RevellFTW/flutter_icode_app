@@ -7,6 +7,14 @@ class EventLog {
       required this.caretakerId,
       required this.patientId});
 
+  EventLog.empty()
+      : id = 0,
+        name = '',
+        description = '',
+        date = DateTime.now(),
+        caretakerId = '',
+        patientId = '';
+
   final int id;
   String name;
   String description;

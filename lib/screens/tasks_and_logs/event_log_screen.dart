@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/models/caretaker.dart';
+import 'package:todoapp/screens/tasks_and_logs/event_log_form.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
-import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/event_log.dart';
 import '../../models/patient.dart';
@@ -50,7 +49,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
   ValueNotifier<DateTime> selectedDay = ValueNotifier<DateTime>(DateTime.now());
   ValueNotifier<DateTime> focusedDay = ValueNotifier<DateTime>(DateTime.now());
 
-  CalendarFormat calendarFormat = CalendarFormat.month;
+  CalendarFormat calendarFormat = CalendarFormat.week;
 
   final FocusNode _focusNode = FocusNode();
   late List<String> list = [];
@@ -328,7 +327,18 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                     hoverColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () async {
-                                      //todo edit field
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EventLogFormScreen(
+                                                    eventLog:
+                                                        _filteredEventLogs[i],
+                                                    caller: widget.caller,
+                                                    modifying: true,
+                                                    patient: widget.patient,
+                                                    caretaker:
+                                                        widget.caretaker)),
+                                      );
                                     },
                                     child: Card(
                                       clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -347,7 +357,20 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                           hoverColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
-                                            //todo edit field
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EventLogFormScreen(
+                                                          eventLog:
+                                                              _filteredEventLogs[
+                                                                  i],
+                                                          caller: widget.caller,
+                                                          modifying: true,
+                                                          patient:
+                                                              widget.patient,
+                                                          caretaker: widget
+                                                              .caretaker)),
+                                            );
                                           },
                                           child: Icon(
                                             Icons.keyboard_arrow_right_rounded,
@@ -378,161 +401,27 @@ class _EventLogScreenState extends State<EventLogScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            _descriptionController.clear();
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return AlertDialog(
-                      title: const Text('Add New Event Log'),
-                      content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 30.0),
-                                child: DropdownMenu<String>(
-                                  width: 202,
-                                  initialSelection:
-                                      widget.caller == Caller.patient
-                                          ? list.first
-                                          : individualCareTaskslistMap[
-                                                  selectedPatientId]!
-                                              .first,
-                                  label: const Text('Event Log Name'),
-                                  onSelected: (String? newValue) {
-                                    setState(() {
-                                      widget.caller == Caller.patient
-                                          ? _nameDropdownValue = newValue!
-                                          : _fabNameDropdownValue = newValue!;
-                                    });
-                                  },
-                                  dropdownMenuEntries:
-                                      widget.caller == Caller.patient
-                                          ? getTaskNameDropdownEntries()
-                                          : getTaskNameDropdownEntries(
-                                              index: selectedPatientId!),
-                                ),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 30.0),
-                                child: DropdownMenu<String>(
-                                    width: 202,
-                                    initialSelection:
-                                        widget.caller == Caller.patient
-                                            ? caretakerList.first.name
-                                            : patientList.first.name,
-                                    label: widget.caller == Caller.patient
-                                        ? const Text('Caretaker')
-                                        : const Text('Patient'),
-                                    onSelected: (String? newValue) {
-                                      setState(() {
-                                        if (widget.caller == Caller.patient &&
-                                            newValue != selectedCaretakerId) {
-                                          selectedCaretakerId = newValue!;
-                                        } else if (newValue !=
-                                            selectedPatientId) {
-                                          selectedPatientId = newValue!;
-                                          _loadData(newValue).then((value) {
-                                            //       _fabNameDropdownValue = value.first;
-                                            individualCareTaskslistMap.addAll(
-                                                {selectedPatientId!: value});
-                                            selectedPatientId = newValue;
-                                            _fabNameDropdownValue =
-                                                individualCareTaskslistMap[
-                                                        newValue]!
-                                                    .first;
-                                          });
-                                        }
-                                      });
-                                    },
-                                    dropdownMenuEntries:
-                                        getPersonTypeDropdownEntries()),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 8.0, left: 5, right: 25, bottom: 15),
-                                child: TextFormField(
-                                  controller: _descriptionController,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Description'),
-                                ),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 30.0),
-                                child: FloatingActionButton.extended(
-                                    label: Text(DateFormat('yyyy-MM-dd – kk:mm')
-                                        .format(_selectedDate)),
-                                    icon: const Icon(Icons.calendar_today),
-                                    onPressed: () => {
-                                          setState(() {
-                                            _selectDate(context, setState, -1);
-                                          }),
-                                        }),
-                              ),
-                            ),
-                          ]),
-                      //insert here
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text('Cancel'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        TextButton(
-                          child: const Text('Add'),
-                          onPressed: () {
-                            if (!(_descriptionController.text.isNotEmpty ||
-                                (_nameDropdownValue == 'Other' ||
-                                    _fabNameDropdownValue == 'Other'))) {
-                              setState(() {
-                                if (widget.caller == Caller.patient) {
-                                  widget.eventLogs.add(EventLog(
-                                    id: (widget.eventLogs.length + 1),
-                                    description: _descriptionController.text,
-                                    name: _nameDropdownValue!,
-                                    date: _selectedDate,
-                                    patientId: widget.patient!.id
-                                        .toString(), //if caller is patient, then patientId cannot be null
-                                    caretakerId: selectedCaretakerId!,
-                                  ));
-                                } else if (widget.caller == Caller.caretaker) {
-                                  widget.eventLogs.add(EventLog(
-                                    id: (widget.eventLogs.length + 1),
-                                    description: _descriptionController.text,
-                                    name: _fabNameDropdownValue!,
-                                    date: _selectedDate,
-                                    patientId: selectedPatientId!,
-                                    caretakerId: widget.caretaker!.id
-                                        .toString(), //if caller is caretaker, then caretakerId cannot be null
-                                  ));
-                                }
-                              });
-                              addEventLogInDb(widget.eventLogs.last);
-                              filterEventLogs(selectedDay.value);
-                              stateSetter();
-                            }
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            );
+            widget.caller == Caller.patient
+                ? Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => EventLogFormScreen(
+                        eventLog: EventLog.empty(),
+                        caller: widget.caller,
+                        modifying: false,
+                        patient: widget.patient,
+                        caretaker: widget.caretaker)))
+                : Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => EventLogFormScreen(
+                        eventLog: EventLog(
+                            id: 0,
+                            name: '',
+                            description: '',
+                            date: DateTime.now(),
+                            patientId: widget.patient!.id.toString(),
+                            caretakerId: widget.caretaker!.id.toString()),
+                        caller: widget.caller,
+                        modifying: false,
+                        patient: widget.patient,
+                        caretaker: widget.caretaker)));
           },
           child: const Icon(Icons.add),
         ),
