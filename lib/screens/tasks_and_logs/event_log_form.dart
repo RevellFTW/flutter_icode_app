@@ -42,6 +42,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
 
   late final DateTime updatedDateTime;
 
+//pass these as parameters instead
   late List<String> careTaskList = [];
   late Map<String, List<String>> individualCareTaskslistMap = {};
   late List<Caretaker> caretakerList = [];
@@ -62,6 +63,56 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
         _dateController.text = widget.eventLog.date.toString();
       });
     }
+    if (widget.caller == Caller.patient) {
+      _loadCaretasks(widget.patient!.id.toString()).then((value) {
+        setState(() {
+          careTaskList = value;
+          careTaskList.add('Other');
+        });
+      });
+      _loadCaretakerData().then((value) {
+        setState(() {
+          caretakerList = value;
+        });
+      });
+    } else {
+      _loadPatientData().then((value) {
+        setState(() {
+          patientList = value;
+        });
+        for (var patient in patientList) {
+          _loadCaretasks(patient.id.toString()).then((value) {
+            setState(() {
+              individualCareTaskslistMap.addAll({patient.id.toString(): value});
+            });
+          });
+        }
+      });
+    }
+  }
+
+  Future<List<Patient>> _loadPatientData() async {
+    // Load the data asynchronously
+    final data = await loadPatientsFromFirestore();
+
+    // Return the loaded data
+    return data;
+  }
+
+  Future<List<String>> _loadCaretasks(String patientId) async {
+    // Load the data asynchronously
+    final data = await getCareTaskNamesFromPatientId(patientId);
+
+    // Return the loaded data
+    return data;
+  }
+
+  Future<List<Caretaker>> _loadCaretakerData() async {
+    // Load the data asynchronously
+    final data = await loadCaretakersFromFirestore();
+
+    // Return the loaded data
+    return data;
   }
 
   @override
@@ -148,6 +199,12 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
+                          value: widget.caller == Caller.patient
+                              ? getTaskNameDropdownEntries().first.value
+                              : getTaskNameDropdownEntries(
+                                      index: widget.patient!.id.toString())
+                                  .first
+                                  .value,
                           items: widget.caller == Caller.patient
                               ? getTaskNameDropdownEntries()
                               : getTaskNameDropdownEntries(

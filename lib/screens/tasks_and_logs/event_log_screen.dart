@@ -361,15 +361,13 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       EventLogFormScreen(
-                                                          eventLog:
-                                                              _filteredEventLogs[
-                                                                  i],
-                                                          caller: widget.caller,
-                                                          modifying: true,
-                                                          patient:
-                                                              widget.patient,
-                                                          caretaker: widget
-                                                              .caretaker)),
+                                                        eventLog:
+                                                            _filteredEventLogs[
+                                                                i],
+                                                        caller: widget.caller,
+                                                        modifying: true,
+                                                        patient: widget.patient,
+                                                      )),
                                             );
                                           },
                                           child: Icon(
