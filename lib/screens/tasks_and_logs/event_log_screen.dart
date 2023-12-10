@@ -335,6 +335,12 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                         _filteredEventLogs[i],
                                                     caller: widget.caller,
                                                     modifying: true,
+                                                    careTaskList: list,
+                                                    individualCareTaskslistMap:
+                                                        individualCareTaskslistMap,
+                                                    patientList: patientList,
+                                                    caretakerList:
+                                                        caretakerList,
                                                     patient: widget.patient,
                                                     caretaker:
                                                         widget.caretaker)),
@@ -366,6 +372,13 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                                 i],
                                                         caller: widget.caller,
                                                         modifying: true,
+                                                        careTaskList: list,
+                                                        individualCareTaskslistMap:
+                                                            individualCareTaskslistMap,
+                                                        patientList:
+                                                            patientList,
+                                                        caretakerList:
+                                                            caretakerList,
                                                         patient: widget.patient,
                                                       )),
                                             );
@@ -405,6 +418,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
                         eventLog: EventLog.empty(),
                         caller: widget.caller,
                         modifying: false,
+                        careTaskList: list,
+                        individualCareTaskslistMap: individualCareTaskslistMap,
+                        patientList: patientList,
+                        caretakerList: caretakerList,
                         patient: widget.patient,
                         caretaker: widget.caretaker)))
                 : Navigator.of(context).push(MaterialPageRoute(
@@ -418,6 +435,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             caretakerId: widget.caretaker!.id.toString()),
                         caller: widget.caller,
                         modifying: false,
+                        careTaskList: list,
+                        individualCareTaskslistMap: individualCareTaskslistMap,
+                        patientList: patientList,
+                        caretakerList: caretakerList,
                         patient: widget.patient,
                         caretaker: widget.caretaker)));
           },

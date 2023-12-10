@@ -13,6 +13,10 @@ class EventLogFormScreen extends StatefulWidget {
   final EventLog eventLog;
   final Caller caller;
   final bool modifying;
+  final List<String> careTaskList;
+  final Map<String, List<String>> individualCareTaskslistMap;
+  final List<Caretaker> caretakerList;
+  final List<Patient> patientList;
   final Patient? patient;
   final Caretaker? caretaker;
 
@@ -21,6 +25,10 @@ class EventLogFormScreen extends StatefulWidget {
       required this.eventLog,
       required this.caller,
       required this.modifying,
+      required this.careTaskList,
+      required this.individualCareTaskslistMap,
+      required this.caretakerList,
+      required this.patientList,
       this.patient,
       this.caretaker});
 
@@ -42,11 +50,10 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
 
   late final DateTime updatedDateTime;
 
+  List<DropdownMenuItem<String>> taskNames = [];
+  List<DropdownMenuItem<String>> people = [];
+
 //pass these as parameters instead
-  late List<String> careTaskList = [];
-  late Map<String, List<String>> individualCareTaskslistMap = {};
-  late List<Caretaker> caretakerList = [];
-  late List<Patient> patientList = [];
 
   @override
   void initState() {
@@ -63,32 +70,14 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
         _dateController.text = widget.eventLog.date.toString();
       });
     }
-    if (widget.caller == Caller.patient) {
-      _loadCaretasks(widget.patient!.id.toString()).then((value) {
-        setState(() {
-          careTaskList = value;
-          careTaskList.add('Other');
-        });
-      });
-      _loadCaretakerData().then((value) {
-        setState(() {
-          caretakerList = value;
-        });
-      });
-    } else {
-      _loadPatientData().then((value) {
-        setState(() {
-          patientList = value;
-        });
-        for (var patient in patientList) {
-          _loadCaretasks(patient.id.toString()).then((value) {
-            setState(() {
-              individualCareTaskslistMap.addAll({patient.id.toString(): value});
-            });
-          });
-        }
-      });
-    }
+    taskNames = widget.caller == Caller.patient
+        ? getTaskNameDropdownEntries()
+        : getTaskNameDropdownEntries(index: widget.patient!.id.toString());
+    people = getPersonTypeDropdownEntries();
+
+    widget.caller == Caller.patient
+        ? widget.eventLog.patientId = widget.patient!.id.toString()
+        : widget.eventLog.caretakerId = widget.caretaker!.id.toString();
   }
 
   Future<List<Patient>> _loadPatientData() async {
@@ -199,20 +188,62 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
-                          value: widget.caller == Caller.patient
-                              ? getTaskNameDropdownEntries().first.value
-                              : getTaskNameDropdownEntries(
-                                      index: widget.patient!.id.toString())
-                                  .first
-                                  .value,
-                          items: widget.caller == Caller.patient
-                              ? getTaskNameDropdownEntries()
-                              : getTaskNameDropdownEntries(
-                                  index: widget.patient!.id.toString()),
+                          value: taskNames.first.value,
+                          items: taskNames,
                           onChanged: (value) {
                             setState(() {
                               widget.eventLog.name = value.toString();
                             });
+                          },
+                        ),
+                        DropdownButtonFormField(
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            labelText: widget.caller == Caller.patient
+                                ? 'Caretaker'
+                                : 'Patient',
+                            labelStyle:
+                                FlutterFlowTheme.of(context).labelMedium,
+                            hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).alternate,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).primary,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).error,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).error,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          style: FlutterFlowTheme.of(context).bodyMedium,
+                          value: people.first.value,
+                          items: people,
+                          onChanged: (value) {
+                            if (widget.caller == Caller.patient &&
+                                value != widget.caretaker!.id.toString()) {
+                              widget.eventLog.caretakerId = value.toString();
+                            } else if (value != widget.patient!.id.toString()) {
+                              widget.eventLog.patientId = value.toString();
+                            }
                           },
                         ),
                         TextFormField(
@@ -264,7 +295,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                                 _descriptionController, (value) {
                               widget.eventLog.description = value;
                             }, () {
-                              _nameController.text =
+                              _descriptionController.text =
                                   widget.eventLog.description;
                             });
                             FocusScope.of(context).unfocus();
@@ -274,7 +305,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                                 _descriptionController, (value) {
                               widget.eventLog.description = value;
                             }, () {
-                              _nameController.text =
+                              _descriptionController.text =
                                   widget.eventLog.description;
                             });
                           },
@@ -288,7 +319,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
-                            labelText: 'Date of Birth',
+                            labelText: 'Date',
                             labelStyle:
                                 FlutterFlowTheme.of(context).labelMedium,
                             hintStyle: FlutterFlowTheme.of(context).labelMedium,
@@ -331,6 +362,32 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                               return null;
                             }
                           },
+                          onChanged: (String newValue) {
+                            setState(() {
+                              currentDateTextFormFieldValue = newValue;
+                            });
+                          },
+                          onTapOutside: (newValue) {
+                            saveTextValue(
+                                currentDateTextFormFieldValue, _dateController,
+                                (value) {
+                              widget.eventLog.date = value;
+                            }, () {
+                              _dateController.text =
+                                  widget.eventLog.date.toString();
+                            });
+                            FocusScope.of(context).unfocus();
+                          },
+                          onFieldSubmitted: (String newValue) {
+                            saveTextValue(
+                                currentDateTextFormFieldValue, _dateController,
+                                (value) {
+                              widget.eventLog.date = value;
+                            }, () {
+                              _dateController.text =
+                                  widget.eventLog.date.toString();
+                            });
+                          },
                         ),
                       ].divide(const SizedBox(height: 12)),
                     ),
@@ -344,8 +401,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                         onPressed: () {
                           setState(() {
                             if (!widget.modifying) {
+                              addEventLogInDb(widget.eventLog);
                             } else {
-                              //modify eventLog in db
+                              deleteEventLogFromFireStore(widget.eventLog);
                             }
                             Navigator.of(context).pop();
                           });
@@ -433,26 +491,24 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
 
   List<DropdownMenuItem<String>> getTaskNameDropdownEntries({String? index}) {
     return widget.caller == Caller.patient
-        ? careTaskList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-                value: value, child: const Text('value'));
+        ? widget.careTaskList.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(value: value, child: Text(value));
           }).toList()
-        : individualCareTaskslistMap[index]!
+        : widget.individualCareTaskslistMap[index]!
             .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-                value: value, child: const Text('value'));
+            return DropdownMenuItem<String>(value: value, child: Text(value));
           }).toList();
   }
 
   List<DropdownMenuItem<String>> getPersonTypeDropdownEntries() {
     return widget.caller == Caller.patient
-        ? caretakerList.map<DropdownMenuItem<String>>((Caretaker value) {
+        ? widget.caretakerList.map<DropdownMenuItem<String>>((Caretaker value) {
             return DropdownMenuItem<String>(
-                value: value.id.toString(), child: const Text('value.name'));
+                value: value.id.toString(), child: Text(value.name));
           }).toList()
-        : patientList.map<DropdownMenuItem<String>>((Patient value) {
+        : widget.patientList.map<DropdownMenuItem<String>>((Patient value) {
             return DropdownMenuItem<String>(
-                value: value.id.toString(), child: const Text('value.name'));
+                value: value.id.toString(), child: Text(value.name));
           }).toList();
   }
 }
