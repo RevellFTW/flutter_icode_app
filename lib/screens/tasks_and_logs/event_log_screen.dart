@@ -146,7 +146,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
       child: Scaffold(
         appBar: CustomAppBar(
           //todo make patient name dynamic
-          title: 'Back to Patient Doe\'s sheet',
+          title: 'Back to ${widget.patient!.name}\'s sheet',
           onBackPressed: () async {
             Navigator.of(context).pop();
           },

@@ -46,26 +46,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   late DateTime updatedDateTime;
   late PatientFormModel _model;
 
-  Future<List<EventLog>> loadEventLogsFromFirestore() async {
-    List<EventLog> tasks = [];
-    QuerySnapshot querySnapshot = await db
-        .collection('patientTasks')
-        .where('patientId', isEqualTo: widget.patient.id.toString())
-        .get();
-
-    for (var doc in querySnapshot.docs) {
-      tasks.add(EventLog(
-          id: doc['id'],
-          name: doc['name'],
-          description: doc['description'],
-          date: doc['date'].toDate(),
-          caretakerId: doc['caretakerId'],
-          patientId: doc['patientId']));
-    }
-
-    return tasks;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -105,7 +85,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                   child: Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
                     child: Text(
-                      'Patient Doe\'s sheet',
+                      '${widget.patient.name}\'s sheet',
                       style:
                           FlutterFlowTheme.of(context).headlineMedium.override(
                                 fontFamily: 'Outfit',
@@ -171,7 +151,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                 child: FFButtonWidget(
                                   onPressed: () async {
                                     List<EventLog> tasks =
-                                        await loadEventLogsFromFirestore();
+                                        await loadEventLogsFromFirestore(
+                                            widget.patient.id);
                                     // ignore: use_build_context_synchronously
                                     Navigator.of(context).push(
                                         MaterialPageRoute(

@@ -7,6 +7,7 @@ import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/models/event_log.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/screens/home_page.dart';
+import 'package:todoapp/screens/tasks_and_logs/event_log_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 
 class EventLogFormScreen extends StatefulWidget {
@@ -399,13 +400,24 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           const EdgeInsetsDirectional.fromSTEB(0, 34, 0, 12),
                       child: FFButtonWidget(
                         onPressed: () {
-                          setState(() {
+                          setState(() async {
                             if (!widget.modifying) {
                               addEventLogInDb(widget.eventLog);
                             } else {
                               deleteEventLogFromFireStore(widget.eventLog);
                             }
-                            Navigator.of(context).pop();
+                            List<EventLog> tasks =
+                                await loadEventLogsFromFirestore(
+                                    widget.patient!.id);
+                            // ignore: use_build_context_synchronously
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => EventLogScreen(
+                                      eventLogs: tasks,
+                                      eventLogName:
+                                          "${widget.patient!.name} Patient's Log",
+                                      caller: Caller.patient,
+                                      patient: widget.patient,
+                                    )));
                           });
                         },
                         text: widget.modifying ? 'DELETE' : 'ADD',

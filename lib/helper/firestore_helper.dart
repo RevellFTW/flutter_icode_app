@@ -249,6 +249,26 @@ Future<List<Relative>> loadRelativesFromFirestore() async {
   return relatives;
 }
 
+Future<List<EventLog>> loadEventLogsFromFirestore(int id) async {
+  List<EventLog> tasks = [];
+  QuerySnapshot querySnapshot = await db
+      .collection('patientTasks')
+      .where('patientId', isEqualTo: id.toString())
+      .get();
+
+  for (var doc in querySnapshot.docs) {
+    tasks.add(EventLog(
+        id: doc['id'],
+        name: doc['name'],
+        description: doc['description'],
+        date: doc['date'].toDate(),
+        caretakerId: doc['caretakerId'],
+        patientId: doc['patientId']));
+  }
+
+  return tasks;
+}
+
 void deleteEventLogFromFireStore(EventLog eventLog) async {
   var eventLogId = await getDocumentID(eventLog.id, 'patientTasks');
   db.collection('patientTasks').doc(eventLogId).delete();
