@@ -187,7 +187,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
               builder: (context) => CareTasksForm(
                     patient: widget.patient,
                     modifying: false,
-                    caretaskIndex: widget.patient.careTasks.length,
+                    caretaskIndex: -1,
                   )));
         },
         child: const Icon(Icons.add),

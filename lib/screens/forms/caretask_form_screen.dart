@@ -120,7 +120,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
           selectedDateTime = time.format(context);
           if (index != -1) {
             widget.patient.careTasks[index].date = selectedDateTime;
-
+            _dateController.text = selectedDateTime;
             saveToDb();
           }
           if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
@@ -156,10 +156,12 @@ class _CareTasksFormState extends State<CareTasksForm> {
 
             if (index != -1) {
               widget.patient.careTasks[index].date = selectedDateTime;
+              _dateController.text = selectedDateTime;
               saveToDb();
             }
             if (!isModifying) {
               selectedDateTimeWhenAdding = selectedDateTime;
+              _dateController.text = selectedDateTime;
             }
           });
           return true;
@@ -254,9 +256,13 @@ class _CareTasksFormState extends State<CareTasksForm> {
           selectedDateTime = formattedTime;
           if (index != -1) {
             widget.patient.careTasks[index].date = selectedDateTime;
+            _dateController.text = selectedDateTime;
             saveToDb();
           }
-          if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
+          if (!isModifying) {
+            selectedDateTimeWhenAdding = selectedDateTime;
+            _dateController.text = selectedDateTime;
+          }
         });
         return true;
       } else {
@@ -289,9 +295,13 @@ class _CareTasksFormState extends State<CareTasksForm> {
 
             if (index != -1) {
               widget.patient.careTasks[index].date = selectedDateTime;
+              _dateController.text = selectedDateTime;
               saveToDb();
             }
-            if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
+            if (!isModifying) {
+              selectedDateTimeWhenAdding = selectedDateTime;
+              _dateController.text = selectedDateTime;
+            }
           });
           return true;
         } else {
@@ -465,27 +475,35 @@ class _CareTasksFormState extends State<CareTasksForm> {
                           },
                         ),
                         TextFormField(
-                          onTap: () => widget.modifying
-                              ? isDatePicked(
-                                  setState,
-                                  context,
-                                  widget.patient.careTasks[widget.caretaskIndex]
-                                      .date,
-                                  widget.patient.careTasks[widget.caretaskIndex]
-                                      .taskFrequency,
-                                  true,
-                                  true,
-                                  index: widget.caretaskIndex)
-                              : isDatePicked(
-                                  setState,
-                                  context,
-                                  widget.patient.careTasks[widget.caretaskIndex]
-                                      .date,
-                                  widget.patient.careTasks[widget.caretaskIndex]
-                                      .taskFrequency,
-                                  false,
-                                  false,
-                                  index: widget.caretaskIndex),
+                          onTap: () => {
+                            setState(() {
+                              widget.modifying
+                                  ? isDatePicked(
+                                      setState,
+                                      context,
+                                      widget.patient
+                                          .careTasks[widget.caretaskIndex].date,
+                                      widget
+                                          .patient
+                                          .careTasks[widget.caretaskIndex]
+                                          .taskFrequency,
+                                      true,
+                                      true,
+                                      index: widget.caretaskIndex)
+                                  : isDatePicked(
+                                      setState,
+                                      context,
+                                      widget.patient
+                                          .careTasks[widget.caretaskIndex].date,
+                                      widget
+                                          .patient
+                                          .careTasks[widget.caretaskIndex]
+                                          .taskFrequency,
+                                      false,
+                                      false,
+                                      index: widget.caretaskIndex);
+                            }),
+                          },
                           //enabled: false,
                           keyboardType: TextInputType.datetime,
                           controller: _dateController,
@@ -527,24 +545,6 @@ class _CareTasksFormState extends State<CareTasksForm> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
-                          validator: (value) {
-                            String pattern = r'^\d{2}/\d{2}/\d{4}$';
-                            RegExp regex = RegExp(pattern);
-                            if (!regex.hasMatch(value!)) {
-                              return 'Invalid date format';
-                            } else {
-                              return null;
-                            }
-                          },
-                          onChanged: (String newValue) {
-                            //ok
-                          },
-                          onTapOutside: (newValue) {
-                            //ok
-                          },
-                          onFieldSubmitted: (String newValue) {
-                            //ok
-                          },
                         ),
                       ].divide(const SizedBox(height: 12)),
                     ),
