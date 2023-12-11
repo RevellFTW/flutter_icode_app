@@ -170,8 +170,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
                       onDismissed: (direction) {
                         setState(() {
                           widget.patient.careTasks.removeAt(i);
-                          saveToDb();
                         });
+                        saveToDb();
                       },
                     );
                   }),

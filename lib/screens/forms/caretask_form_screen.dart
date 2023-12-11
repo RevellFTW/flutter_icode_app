@@ -10,6 +10,7 @@ import 'package:todoapp/models/event_log.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/screens/home_page.dart';
 import 'package:todoapp/screens/tasks_and_logs/event_log_screen.dart';
+import 'package:todoapp/screens/tasks_and_logs/caretask_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 
 class CareTasksForm extends StatefulWidget {
@@ -40,6 +41,8 @@ class _CareTasksFormState extends State<CareTasksForm> {
   late TextEditingController _dateController;
 
   String currentNameTextFormFieldValue = '';
+
+  String? frequencyCurrentFieldValue = '';
 
   saveToDb() {
     getDocumentID(widget.patient.id, 'patients').then((docID) {
@@ -398,6 +401,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                           onChanged: (String newValue) {
                             setState(() {
                               currentNameTextFormFieldValue = newValue;
+                              saveToDb();
                             });
                           },
                           onTapOutside: (newValue) {
@@ -407,6 +411,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                               if (widget.modifying) {
                                 widget.patient.careTasks[widget.caretaskIndex]
                                     .taskName = value;
+                                saveToDb();
                               }
                             }, () {});
                             FocusScope.of(context).unfocus();
@@ -415,8 +420,11 @@ class _CareTasksFormState extends State<CareTasksForm> {
                             saveTextValue(
                                 currentNameTextFormFieldValue, _nameController,
                                 (value) {
-                              widget.patient.careTasks[widget.caretaskIndex]
-                                  .taskName = value;
+                              if (widget.modifying) {
+                                widget.patient.careTasks[widget.caretaskIndex]
+                                    .taskName = value;
+                              }
+                              saveToDb();
                             }, () {});
                           },
                         ),
@@ -466,11 +474,16 @@ class _CareTasksFormState extends State<CareTasksForm> {
                           }).toList(),
                           onChanged: (value) {
                             setState(() {
-                              widget.patient.careTasks[widget.caretaskIndex]
-                                      .taskFrequency =
-                                  Frequency.values.byName(value.toString());
-                              value;
-                              //TODO handle different time picking based on selected frequency
+                              if (frequencyCurrentFieldValue != value) {
+                                _dateController.clear();
+                              }
+                              if (widget.modifying) {
+                                widget.patient.careTasks[widget.caretaskIndex]
+                                        .taskFrequency =
+                                    Frequency.values.byName(value.toString());
+                                saveToDb();
+                              }
+                              frequencyCurrentFieldValue = value;
                             });
                           },
                         ),
@@ -493,21 +506,17 @@ class _CareTasksFormState extends State<CareTasksForm> {
                                   : isDatePicked(
                                       setState,
                                       context,
-                                      widget.patient
-                                          .careTasks[widget.caretaskIndex].date,
-                                      widget
-                                          .patient
-                                          .careTasks[widget.caretaskIndex]
-                                          .taskFrequency,
+                                      DateTime.now().toString(),
+                                      Frequency.values.byName(
+                                          frequencyCurrentFieldValue
+                                              .toString()),
                                       false,
                                       false,
-                                      index: widget.caretaskIndex);
+                                      index: -1);
                             }),
                           },
-                          //enabled: false,
                           keyboardType: TextInputType.datetime,
                           controller: _dateController,
-                          // focusNode: _model.textFieldFocusNode2,
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
@@ -558,20 +567,23 @@ class _CareTasksFormState extends State<CareTasksForm> {
                         onPressed: () {
                           setState(() async {
                             if (!widget.modifying) {
-                              //todo adding
+                              widget.patient.careTasks.add(CareTask(
+                                  taskName: _nameController.text,
+                                  taskFrequency: Frequency.values
+                                      .byName(dropdownValue.toString()),
+                                  date: selectedDateTimeWhenAdding));
+                              saveToDb();
                             } else {
-                              //todo modify/delete
+                              widget.patient.careTasks
+                                  .removeAt(widget.caretaskIndex);
+                              saveToDb();
                             }
                             List<EventLog> tasks =
                                 await loadEventLogsFromFirestore(
-                                    widget.patient!.id);
+                                    widget.patient.id);
                             // ignore: use_build_context_synchronously
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => EventLogScreen(
-                                      eventLogs: tasks,
-                                      eventLogName:
-                                          "${widget.patient!.name} Patient's Log",
-                                      caller: Caller.patient,
+                                builder: (context) => CareTasksPage(
                                       patient: widget.patient,
                                     )));
                           });
