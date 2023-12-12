@@ -55,6 +55,15 @@ class _CareTasksFormState extends State<CareTasksForm> {
     super.initState();
     _nameController = TextEditingController();
     _dateController = TextEditingController();
+    selectedDateTimeWhenAdding = DateTime.now().toString();
+    _dateController.text = widget.modifying
+        ? widget.patient.careTasks[widget.caretaskIndex].date
+        : selectedDateTime;
+
+    frequencyCurrentFieldValue = widget.modifying
+        ? widget.patient.careTasks[widget.caretaskIndex].taskFrequency
+            .toString()
+        : dropdownValue;
   }
 
   @override
@@ -100,13 +109,8 @@ class _CareTasksFormState extends State<CareTasksForm> {
     return dateTime;
   }
 
-  Future<bool> isDatePicked(
-      StateSetter setState,
-      BuildContext context,
-      String initialDateString,
-      Frequency selectedModifier,
-      bool isModifying,
-      bool isClickedDirectly,
+  Future<bool> isDatePicked(BuildContext context, String initialDateString,
+      Frequency selectedModifier, bool isModifying, bool isClickedDirectly,
       {int index = -1}) async {
     if (selectedModifier == Frequency.daily) {
       // For daily, only pick time
@@ -126,7 +130,10 @@ class _CareTasksFormState extends State<CareTasksForm> {
             _dateController.text = selectedDateTime;
             saveToDb();
           }
-          if (!isModifying) selectedDateTimeWhenAdding = selectedDateTime;
+          if (!isModifying) {
+            selectedDateTimeWhenAdding = selectedDateTime;
+            _dateController.text = selectedDateTime;
+          }
         });
         return true;
       }
@@ -489,31 +496,26 @@ class _CareTasksFormState extends State<CareTasksForm> {
                         ),
                         TextFormField(
                           onTap: () => {
-                            setState(() {
-                              widget.modifying
-                                  ? isDatePicked(
-                                      setState,
-                                      context,
-                                      widget.patient
-                                          .careTasks[widget.caretaskIndex].date,
-                                      widget
-                                          .patient
-                                          .careTasks[widget.caretaskIndex]
-                                          .taskFrequency,
-                                      true,
-                                      true,
-                                      index: widget.caretaskIndex)
-                                  : isDatePicked(
-                                      setState,
-                                      context,
-                                      DateTime.now().toString(),
-                                      Frequency.values.byName(
-                                          frequencyCurrentFieldValue
-                                              .toString()),
-                                      false,
-                                      false,
-                                      index: -1);
-                            }),
+                            widget.modifying
+                                ? isDatePicked(
+                                    context,
+                                    widget.patient
+                                        .careTasks[widget.caretaskIndex].date,
+                                    widget
+                                        .patient
+                                        .careTasks[widget.caretaskIndex]
+                                        .taskFrequency,
+                                    true,
+                                    true,
+                                    index: widget.caretaskIndex)
+                                : isDatePicked(
+                                    context,
+                                    DateTime.now().toString(),
+                                    Frequency.values.byName(
+                                        frequencyCurrentFieldValue.toString()),
+                                    false,
+                                    false,
+                                    index: -1)
                           },
                           keyboardType: TextInputType.datetime,
                           controller: _dateController,
