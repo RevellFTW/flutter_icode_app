@@ -260,6 +260,13 @@ class _PatientScreenState extends State<PatientScreen> {
                   itemBuilder: (context, i) {
                     return Dismissible(
                       key: ValueKey<int>(_filteredPatients[i].id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
                       child: Padding(
                         padding:
                             const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
@@ -378,8 +385,8 @@ class _PatientScreenState extends State<PatientScreen> {
                       onDismissed: (direction) {
                         setState(() {
                           removePatient(_filteredPatients[i].id);
+                          filterPatients();
                         });
-                        filterPatients();
                       },
                     );
                   }),

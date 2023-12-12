@@ -265,6 +265,13 @@ class _EventLogScreenState extends State<EventLogScreen> {
                     itemBuilder: (context, i) {
                       return Dismissible(
                         key: ValueKey<int>(_filteredEventLogs[i].id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
                         child: Padding(
                           padding:
                               const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
