@@ -31,6 +31,7 @@ class CareTasksForm extends StatefulWidget {
 }
 
 class _CareTasksFormState extends State<CareTasksForm> {
+  String title = 'Add new Event log';
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<String> list = <String>['weekly', 'monthly', 'daily', 'once'];
@@ -41,7 +42,6 @@ class _CareTasksFormState extends State<CareTasksForm> {
   late TextEditingController _dateController;
 
   String currentNameTextFormFieldValue = '';
-
   String? frequencyCurrentFieldValue = '';
 
   saveToDb() {
@@ -53,12 +53,17 @@ class _CareTasksFormState extends State<CareTasksForm> {
   @override
   void initState() {
     super.initState();
+    if (widget.modifying) title = 'Modify Event Log';
     _nameController = TextEditingController();
     _dateController = TextEditingController();
     selectedDateTimeWhenAdding = DateTime.now().toString();
     _dateController.text = widget.modifying
         ? widget.patient.careTasks[widget.caretaskIndex].date
         : selectedDateTime;
+
+    _nameController.text = widget.modifying
+        ? widget.patient.careTasks[widget.caretaskIndex].taskName
+        : currentNameTextFormFieldValue;
 
     frequencyCurrentFieldValue = widget.modifying
         ? widget.patient.careTasks[widget.caretaskIndex].taskFrequency
@@ -354,7 +359,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                         Align(
                           alignment: const AlignmentDirectional(-1.00, 0.00),
                           child: Text(
-                            'Add new eventLog',
+                            title,
                             style: FlutterFlowTheme.of(context)
                                 .headlineMedium
                                 .override(
@@ -479,19 +484,24 @@ class _CareTasksFormState extends State<CareTasksForm> {
                               child: Text(value),
                             );
                           }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              if (frequencyCurrentFieldValue != value) {
-                                _dateController.clear();
-                              }
-                              if (widget.modifying) {
+                          onChanged: (value) async {
+                            bool result = await isDatePicked(
+                                context,
+                                widget.patient.careTasks[widget.caretaskIndex]
+                                    .date,
+                                Frequency.values.byName(value!),
+                                true,
+                                false,
+                                index: widget.caretaskIndex);
+                            if (result == true) {
+                              setState(() {
+                                dropdownValue = value;
                                 widget.patient.careTasks[widget.caretaskIndex]
                                         .taskFrequency =
-                                    Frequency.values.byName(value.toString());
+                                    Frequency.values.byName(value);
                                 saveToDb();
-                              }
-                              frequencyCurrentFieldValue = value;
-                            });
+                              });
+                            }
                           },
                         ),
                         TextFormField(
