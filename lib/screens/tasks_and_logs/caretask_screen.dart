@@ -130,6 +130,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                                   patient: widget.patient,
                                                   modifying: true,
                                                   caretaskIndex: i,
+                                                  isClickedDirectly: true,
                                                 )));
                                   },
                                   child: Card(
@@ -157,6 +158,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                                         patient: widget.patient,
                                                         modifying: true,
                                                         caretaskIndex: i,
+                                                        isClickedDirectly: true,
                                                       )));
                                         },
                                         child: Icon(
@@ -195,6 +197,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                     patient: widget.patient,
                     modifying: false,
                     caretaskIndex: -1,
+                    isClickedDirectly: false,
                   )));
         },
         child: const Icon(Icons.add),

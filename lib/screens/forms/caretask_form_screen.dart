@@ -17,12 +17,14 @@ class CareTasksForm extends StatefulWidget {
   final Patient patient;
   final int caretaskIndex;
   final bool modifying;
+  final bool isClickedDirectly;
 
   const CareTasksForm({
     super.key,
     required this.patient,
     required this.caretaskIndex,
     required this.modifying,
+    required this.isClickedDirectly,
   });
 
   @override
@@ -376,7 +378,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
-                            labelText: 'Task Name',
+                            labelText: 'Event Log Name',
                             labelStyle:
                                 FlutterFlowTheme.of(context).labelMedium,
                             hintStyle: FlutterFlowTheme.of(context).labelMedium,
@@ -485,22 +487,28 @@ class _CareTasksFormState extends State<CareTasksForm> {
                             );
                           }).toList(),
                           onChanged: (value) async {
-                            bool result = await isDatePicked(
-                                context,
-                                widget.patient.careTasks[widget.caretaskIndex]
-                                    .date,
-                                Frequency.values.byName(value!),
-                                true,
-                                false,
-                                index: widget.caretaskIndex);
-                            if (result == true) {
-                              setState(() {
-                                dropdownValue = value;
-                                widget.patient.careTasks[widget.caretaskIndex]
-                                        .taskFrequency =
-                                    Frequency.values.byName(value);
-                                saveToDb();
-                              });
+                            if (value != dropdownValue) {
+                              bool result = await isDatePicked(
+                                  context,
+                                  widget.patient.careTasks[widget.caretaskIndex]
+                                      .date,
+                                  Frequency.values.byName(value!),
+                                  widget.modifying,
+                                  widget.isClickedDirectly,
+                                  index: widget.caretaskIndex);
+                              if (result == true) {
+                                setState(() {
+                                  dropdownValue = value;
+                                  if (widget.modifying) {
+                                    widget
+                                            .patient
+                                            .careTasks[widget.caretaskIndex]
+                                            .taskFrequency =
+                                        Frequency.values.byName(value);
+                                    saveToDb();
+                                  }
+                                });
+                              }
                             }
                           },
                         ),
@@ -515,16 +523,16 @@ class _CareTasksFormState extends State<CareTasksForm> {
                                         .patient
                                         .careTasks[widget.caretaskIndex]
                                         .taskFrequency,
-                                    true,
-                                    true,
+                                    widget.modifying,
+                                    widget.isClickedDirectly,
                                     index: widget.caretaskIndex)
                                 : isDatePicked(
                                     context,
                                     DateTime.now().toString(),
-                                    Frequency.values.byName(
-                                        frequencyCurrentFieldValue.toString()),
-                                    false,
-                                    false,
+                                    Frequency.values
+                                        .byName(dropdownValue.toString()),
+                                    widget.modifying,
+                                    widget.isClickedDirectly,
                                     index: -1)
                           },
                           keyboardType: TextInputType.datetime,
