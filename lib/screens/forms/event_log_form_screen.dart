@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todoapp/global/variables.dart';
+import 'package:todoapp/helper/datetime_helper.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
@@ -54,11 +56,12 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
   List<DropdownMenuItem<String>> taskNames = [];
   List<DropdownMenuItem<String>> people = [];
 
-//pass these as parameters instead
+  String backToText = '';
+  String title = '';
 
   @override
   void initState() {
-    updatedDateTime = widget.eventLog.date;
+    updatedDateTime = yMHTAStringToDateTime(widget.eventLog.date);
 
     super.initState();
     _nameController = TextEditingController();
@@ -76,9 +79,15 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
         : getTaskNameDropdownEntries(index: widget.patient!.id.toString());
     people = getPersonTypeDropdownEntries();
 
-    widget.caller == Caller.patient
-        ? widget.eventLog.patientId = widget.patient!.id.toString()
-        : widget.eventLog.caretakerId = widget.caretaker!.id.toString();
+    if (widget.caller == Caller.patient) {
+      backToText = "Back to ${widget.patient!.name} Patient's Log";
+      title = "${widget.patient!.name} Patient's Log";
+      widget.eventLog.patientId = widget.patient!.id.toString();
+    } else if (widget.caller == Caller.caretaker) {
+      backToText = "Back to ${widget.caretaker!.name} Caretaker's Log";
+      title = "${widget.caretaker!.name} Caretaker's Log";
+      widget.eventLog.caretakerId = widget.caretaker!.id.toString();
+    }
   }
 
   Future<List<Patient>> _loadPatientData() async {
@@ -118,7 +127,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         appBar: CustomAppBar(
           //todo make patient name dynamic
-          title: 'Back to Patient Doe\'s sheet',
+          title: backToText,
           onBackPressed: () async {
             Navigator.of(context).pop();
           },
@@ -312,11 +321,12 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           },
                         ),
                         TextFormField(
-                          onTap: () => updateStartDate(widget.eventLog.date),
-                          //enabled: false,
+                          onTap: () => widget.modifying
+                              ? updateStartDate(
+                                  yMHTAStringToDateTime(widget.eventLog.date))
+                              : isDateUpdated(),
                           keyboardType: TextInputType.datetime,
                           controller: _dateController,
-                          // focusNode: _model.textFieldFocusNode2,
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
@@ -493,11 +503,62 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
             pickedTime.hour,
             pickedTime.minute,
           );
+          widget.eventLog.date =
+              DateFormat('yyyy-MM-dd h:mm a').format(updatedDateTime);
+          _dateController.text =
+              "${updatedDateTime.day.toString().padLeft(2, '0')}/${updatedDateTime.month.toString().padLeft(2, '0')}/${updatedDateTime.year}";
         });
-        widget.eventLog.date = updatedDateTime;
-        _dateController.text =
-            "${updatedDateTime.day.toString().padLeft(2, '0')}/${updatedDateTime.month.toString().padLeft(2, '0')}/${updatedDateTime.year}";
       }
+    }
+  }
+
+  Future<bool> isDateUpdated() async {
+    // For once, pick date and time
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(DateTime.now().year - 100),
+      lastDate: DateTime(DateTime.now().year + 100),
+    );
+    if (pickedDate != null) {
+      // ignore: use_build_context_synchronously
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(pickedDate),
+      );
+      if (pickedTime != null) {
+        setState(() {
+          selectedDateTime = DateFormat('yyyy-MM-dd h:mm a').format(DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          ));
+
+          // if (index != -1) {
+          //   widget.patient.careTasks[index].date = selectedDateTime;
+          //   _dateController.text = selectedDateTime;
+          //   saveToDb();
+          // }
+          selectedDateTimeWhenAdding = selectedDateTime;
+          _dateController.text =
+              yMHTAStringToDateTime(selectedDateTime).toString();
+          widget.eventLog.date =
+              DateFormat('yyyy-MM-dd h:mm a').format(DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          ));
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
   }
 

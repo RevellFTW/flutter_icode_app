@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class EventLog {
   EventLog(
       {required this.id,
@@ -11,14 +13,14 @@ class EventLog {
       : id = 0,
         name = '',
         description = '',
-        date = DateTime.now(),
+        date = DateFormat('yyyy-MM-dd h:mm a').format(DateTime.now()),
         caretakerId = '',
         patientId = '';
 
   final int id;
   String name;
   String description;
-  DateTime date;
+  String date;
   String? caretakerId;
   String? patientId;
 }

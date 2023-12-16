@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:todoapp/helper/datetime_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/models/caretaker.dart';
@@ -97,7 +98,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
     var justDate = DateUtils.dateOnly(dateParam);
     setState(() {
       _filteredEventLogs = widget.eventLogs.where((eventLog) {
-        return DateUtils.dateOnly(eventLog.date) == justDate;
+        return DateUtils.dateOnly(yMHTAStringToDateTime(eventLog.date)) ==
+            justDate;
       }).toList();
     });
   }
@@ -322,8 +324,9 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                         const EdgeInsetsDirectional.fromSTEB(
                                             12, 0, 15, 0),
                                     child: Text(
-                                      DateFormat.yMMMd()
-                                          .format(_filteredEventLogs[i].date),
+                                      DateFormat.yMMMd().format(
+                                          yMHTAStringToDateTime(
+                                              _filteredEventLogs[i].date)),
                                       style: FlutterFlowTheme.of(context)
                                           .labelMedium,
                                     ),
@@ -437,7 +440,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             id: 0,
                             name: '',
                             description: '',
-                            date: DateTime.now(),
+                            date: DateFormat('yyyy-MM-dd h:mm a')
+                                .format(DateTime.now()),
                             patientId: widget.patient!.id.toString(),
                             caretakerId: widget.caretaker!.id.toString()),
                         caller: widget.caller,
@@ -480,7 +484,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
           );
         });
         if (index != -1) {
-          widget.eventLogs[index].date = _selectedDate;
+          widget.eventLogs[index].date =
+              DateFormat('yyyy-MM-dd h:mm a').format(_selectedDate);
         }
       }
     }

@@ -261,7 +261,7 @@ Future<List<EventLog>> loadEventLogsFromFirestore(int id) async {
         id: doc['id'],
         name: doc['name'],
         description: doc['description'],
-        date: doc['date'].toDate(),
+        date: doc['date'],
         caretakerId: doc['caretakerId'],
         patientId: doc['patientId']));
   }

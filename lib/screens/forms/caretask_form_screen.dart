@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todoapp/global/variables.dart';
+import 'package:todoapp/helper/datetime_helper.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
@@ -8,8 +9,6 @@ import 'package:todoapp/helper/monthly_picker.dart';
 import 'package:todoapp/models/care_task.dart';
 import 'package:todoapp/models/event_log.dart';
 import 'package:todoapp/models/patient.dart';
-import 'package:todoapp/screens/home_page.dart';
-import 'package:todoapp/screens/tasks_and_logs/event_log_screen.dart';
 import 'package:todoapp/screens/tasks_and_logs/caretask_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 
@@ -76,11 +75,6 @@ class _CareTasksFormState extends State<CareTasksForm> {
   @override
   void dispose() {
     super.dispose();
-  }
-
-  DateTime yMHTAStringToDateTime(String date) {
-    DateTime dateTime = DateFormat("yyyy-MM-dd hh:mm a").parse(date);
-    return dateTime;
   }
 
   TimeOfDay extractTimeFromInput(String input) {
