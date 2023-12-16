@@ -115,7 +115,10 @@ void addEventLogInDb(EventLog eventLog) async {
   addDocumentToCollection('patientTasks', eventLogData);
 }
 
-void modifyEventLogInDb(EventLog eventLog) {}
+void modifyEventLogInDb(EventLog eventLog) async {
+  String docID = await getDocumentID(eventLog.id, 'patientTasks');
+  updateEventLog(eventLog, docID);
+}
 
 void addRelativeToDb(Relative relative) {
   Map<String, dynamic> relativeData = {

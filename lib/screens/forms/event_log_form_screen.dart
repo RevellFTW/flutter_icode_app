@@ -51,7 +51,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
   String currentDescriptionTextFormFieldValue = '';
   String currentDateTextFormFieldValue = '';
 
-  late final DateTime updatedDateTime;
+  late DateTime updatedDateTime;
 
   List<DropdownMenuItem<String>> taskNames = [];
   List<DropdownMenuItem<String>> people = [];
@@ -71,9 +71,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
       setState(() {
         _nameController.text = widget.eventLog.name;
         _descriptionController.text = widget.eventLog.description;
-        _dateController.text = widget.eventLog.date.toString();
       });
     }
+    _dateController.text = widget.eventLog.date.toString();
     taskNames = widget.caller == Caller.patient
         ? getTaskNameDropdownEntries()
         : getTaskNameDropdownEntries(index: widget.patient!.id.toString());
@@ -203,6 +203,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           onChanged: (value) {
                             setState(() {
                               widget.eventLog.name = value.toString();
+                              modifyEventLogInDb(widget.eventLog);
                             });
                           },
                         ),
@@ -321,10 +322,15 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           },
                         ),
                         TextFormField(
-                          onTap: () => widget.modifying
-                              ? updateStartDate(
-                                  yMHTAStringToDateTime(widget.eventLog.date))
-                              : isDateUpdated(),
+                          key: Key(_dateController.text),
+                          onTap: () async {
+                            if (widget.modifying) {
+                              await updateStartDate(
+                                  yMHTAStringToDateTime(widget.eventLog.date));
+                            } else {
+                              await isDateUpdated(updatedDateTime);
+                            }
+                          },
                           keyboardType: TextInputType.datetime,
                           controller: _dateController,
                           autofocus: true,
@@ -364,41 +370,15 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
-                          validator: (value) {
-                            String pattern = r'^\d{2}/\d{2}/\d{4}$';
-                            RegExp regex = RegExp(pattern);
-                            if (!regex.hasMatch(value!)) {
-                              return 'Invalid date format';
-                            } else {
-                              return null;
-                            }
-                          },
-                          onChanged: (String newValue) {
-                            setState(() {
-                              currentDateTextFormFieldValue = newValue;
-                            });
-                          },
-                          onTapOutside: (newValue) {
-                            saveTextValue(
-                                currentDateTextFormFieldValue, _dateController,
-                                (value) {
-                              widget.eventLog.date = value;
-                            }, () {
-                              _dateController.text =
-                                  widget.eventLog.date.toString();
-                            });
-                            FocusScope.of(context).unfocus();
-                          },
-                          onFieldSubmitted: (String newValue) {
-                            saveTextValue(
-                                currentDateTextFormFieldValue, _dateController,
-                                (value) {
-                              widget.eventLog.date = value;
-                            }, () {
-                              _dateController.text =
-                                  widget.eventLog.date.toString();
-                            });
-                          },
+                          // validator: (value) {
+                          //   String pattern = r'^\d{2}/\d{2}/\d{4}$';
+                          //   RegExp regex = RegExp(pattern);
+                          //   if (!regex.hasMatch(value!)) {
+                          //     return 'Invalid date format';
+                          //   } else {
+                          //     return null;
+                          //   }
+                          // },
                         ),
                       ].divide(const SizedBox(height: 12)),
                     ),
@@ -505,18 +485,21 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
           );
           widget.eventLog.date =
               DateFormat('yyyy-MM-dd h:mm a').format(updatedDateTime);
-          _dateController.text =
-              "${updatedDateTime.day.toString().padLeft(2, '0')}/${updatedDateTime.month.toString().padLeft(2, '0')}/${updatedDateTime.year}";
+          setState(() {
+            _dateController.text = widget.eventLog.date;
+          });
+
+          modifyEventLogInDb(widget.eventLog);
         });
       }
     }
   }
 
-  Future<bool> isDateUpdated() async {
+  Future<bool> isDateUpdated(DateTime time) async {
     // For once, pick date and time
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: time,
       firstDate: DateTime(DateTime.now().year - 100),
       lastDate: DateTime(DateTime.now().year + 100),
     );
@@ -535,15 +518,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
             pickedTime.hour,
             pickedTime.minute,
           ));
-
-          // if (index != -1) {
-          //   widget.patient.careTasks[index].date = selectedDateTime;
-          //   _dateController.text = selectedDateTime;
-          //   saveToDb();
-          // }
           selectedDateTimeWhenAdding = selectedDateTime;
-          _dateController.text =
-              yMHTAStringToDateTime(selectedDateTime).toString();
+          updatedDateTime = yMHTAStringToDateTime(selectedDateTime);
+          _dateController.text = selectedDateTime;
           widget.eventLog.date =
               DateFormat('yyyy-MM-dd h:mm a').format(DateTime(
             pickedDate.year,
