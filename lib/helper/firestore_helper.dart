@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todoapp/models/relative.dart';
+import 'package:todoapp/screens/home_page.dart';
 import '../global/variables.dart';
 import '../models/care_task.dart';
 import '../models/caretaker.dart';
@@ -260,12 +261,17 @@ Future<List<Relative>> loadRelativesFromFirestore() async {
   return relatives;
 }
 
-Future<List<EventLog>> loadEventLogsFromFirestore(int id) async {
+Future<List<EventLog>> loadEventLogsFromFirestore(int id, Caller caller) async {
   List<EventLog> tasks = [];
-  QuerySnapshot querySnapshot = await db
-      .collection('patientTasks')
-      .where('patientId', isEqualTo: id.toString())
-      .get();
+  QuerySnapshot querySnapshot = caller == Caller.patient
+      ? await db
+          .collection('patientTasks')
+          .where('patientId', isEqualTo: id.toString())
+          .get()
+      : await db
+          .collection('patientTasks')
+          .where('caretakerId', isEqualTo: id.toString())
+          .get();
 
   for (var doc in querySnapshot.docs) {
     tasks.add(EventLog(

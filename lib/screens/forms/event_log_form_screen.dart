@@ -395,7 +395,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                             }
                             List<EventLog> tasks =
                                 await loadEventLogsFromFirestore(
-                                    widget.patient!.id);
+                                    widget.patient!.id, widget.caller);
                             // ignore: use_build_context_synchronously
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => EventLogScreen(

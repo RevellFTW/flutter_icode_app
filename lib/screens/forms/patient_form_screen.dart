@@ -152,7 +152,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                   onPressed: () async {
                                     List<EventLog> tasks =
                                         await loadEventLogsFromFirestore(
-                                            widget.patient.id);
+                                            widget.patient.id, Caller.patient);
                                     // ignore: use_build_context_synchronously
                                     Navigator.of(context).push(
                                         MaterialPageRoute(

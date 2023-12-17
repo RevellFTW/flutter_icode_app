@@ -9,6 +9,7 @@ import 'package:todoapp/helper/monthly_picker.dart';
 import 'package:todoapp/models/care_task.dart';
 import 'package:todoapp/models/event_log.dart';
 import 'package:todoapp/models/patient.dart';
+import 'package:todoapp/screens/home_page.dart';
 import 'package:todoapp/screens/tasks_and_logs/caretask_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 
@@ -561,7 +562,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                             }
                             List<EventLog> tasks =
                                 await loadEventLogsFromFirestore(
-                                    widget.patient.id);
+                                    widget.patient.id, Caller.patient);
                             // ignore: use_build_context_synchronously
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => CareTasksPage(
