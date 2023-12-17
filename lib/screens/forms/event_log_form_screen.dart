@@ -203,7 +203,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           onChanged: (value) {
                             setState(() {
                               widget.eventLog.name = value.toString();
-                              modifyEventLogInDb(widget.eventLog);
+                              if (widget.modifying) {
+                                modifyEventLogInDb(widget.eventLog);
+                              }
                             });
                           },
                         ),
@@ -249,12 +251,16 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           value: people.first.value,
                           items: people,
                           onChanged: (value) {
-                            if (widget.caller == Caller.patient &&
-                                value != widget.caretaker!.id.toString()) {
-                              widget.eventLog.caretakerId = value.toString();
-                            } else if (value != widget.patient!.id.toString()) {
-                              widget.eventLog.patientId = value.toString();
-                            }
+                            setState(() {
+                              if (widget.caller == Caller.patient) {
+                                widget.eventLog.caretakerId = value.toString();
+                              } else {
+                                widget.eventLog.patientId = value.toString();
+                              }
+                              if (widget.modifying) {
+                                modifyEventLogInDb(widget.eventLog);
+                              }
+                            });
                           },
                         ),
                         TextFormField(
@@ -370,15 +376,6 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
-                          // validator: (value) {
-                          //   String pattern = r'^\d{2}/\d{2}/\d{4}$';
-                          //   RegExp regex = RegExp(pattern);
-                          //   if (!regex.hasMatch(value!)) {
-                          //     return 'Invalid date format';
-                          //   } else {
-                          //     return null;
-                          //   }
-                          // },
                         ),
                       ].divide(const SizedBox(height: 12)),
                     ),

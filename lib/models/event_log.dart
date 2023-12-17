@@ -9,9 +9,8 @@ class EventLog {
       required this.caretakerId,
       required this.patientId});
 
-  EventLog.empty()
-      : id = 0,
-        name = '',
+  EventLog.empty(this.id)
+      : name = '',
         description = '',
         date = DateFormat('yyyy-MM-dd h:mm a').format(DateTime.now()),
         caretakerId = '',

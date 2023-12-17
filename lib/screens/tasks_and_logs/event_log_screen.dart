@@ -425,7 +425,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
             widget.caller == Caller.patient
                 ? Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => EventLogFormScreen(
-                        eventLog: EventLog.empty(),
+                        eventLog: EventLog.empty(widget.eventLogs.length + 1),
                         caller: widget.caller,
                         modifying: false,
                         careTaskList: list,
@@ -437,7 +437,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                 : Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => EventLogFormScreen(
                         eventLog: EventLog(
-                            id: 0,
+                            id: widget.eventLogs.length + 1,
                             name: '',
                             description: '',
                             date: DateFormat('yyyy-MM-dd h:mm a')
