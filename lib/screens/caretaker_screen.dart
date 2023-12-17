@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
-import 'package:todoapp/helper/firestore_helper.dart';
+import 'package:todoapp/models/relative.dart';
+import '../helper/flutter_flow/flutter_flow_icon_button.dart';
+import '../helper/flutter_flow/flutter_flow_theme.dart';
 import '../global/variables.dart';
+import '../helper/firestore_helper.dart';
 import '../models/caretaker.dart';
 import 'forms/caretaker_form_screen.dart';
+import 'settings.dart';
 
 class CaretakerScreen extends StatefulWidget {
   const CaretakerScreen({super.key});
@@ -15,9 +18,11 @@ class CaretakerScreen extends StatefulWidget {
 }
 
 class _CaretakerScreenState extends State<CaretakerScreen> {
-  List<Caretaker> caretakers = [];
   final TextEditingController _caretakerNameController =
       TextEditingController();
+  List<Caretaker> caretakers = [];
+  final TextEditingController _searchController = TextEditingController();
+  List<Caretaker> _filteredCaretakers = [];
 
   Caretaker? getCaretaker(int id) {
     return caretakers.firstWhere((caretaker) => caretaker.id == id);
@@ -25,195 +30,424 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
 
   @override
   void initState() {
-    _loadData().then((value) {
+    super.initState();
+
+    _loadCaretakerData().then((value) {
       setState(() {
         caretakers = value;
-        for (var caretaker in caretakers) {
-          checkboxState[caretaker.id] = false;
-        }
+        _filteredCaretakers = caretakers;
       });
     });
-    super.initState();
+
+    _searchController.addListener(() {
+      filterCaretakers();
+    });
+    filterCaretakers();
   }
 
   @override
   void dispose() {
     _caretakerNameController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  Future<List<Caretaker>> _loadData() async {
+  Future<List<Caretaker>> _loadCaretakerData() async {
     // Load the data asynchronously
     final data = await loadCaretakersFromFirestore();
+
+    // Return the loaded data
     return data;
+  }
+
+  Future<List<Relative>> _loadRelativeData() async {
+    // Load the data asynchronously
+    final data = await loadRelativesFromFirestore();
+
+    // Return the loaded data
+    return data;
+  }
+
+  void filterCaretakers() {
+    if (_searchController.text.isEmpty) {
+      setState(() {
+        _filteredCaretakers = caretakers;
+      });
+    }
+    String searchText = _searchController.text;
+    setState(() {
+      _filteredCaretakers = caretakers.where((caretaker) {
+        return caretaker.name.toLowerCase().contains(searchText.toLowerCase());
+      }).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(appName),
-        backgroundColor: appBackgroundColor,
-        foregroundColor: appForegroundColor,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: appBackgroundColor,
+          foregroundColor: appForegroundColor,
+          automaticallyImplyLeading: false,
+          actions: const [],
+          flexibleSpace: FlexibleSpaceBar(
+            title: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 14),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Flexible(
+                          child: Align(
+                            alignment: const AlignmentDirectional(0.00, 0.00),
+                            child: Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  4, 0, 0, 0),
+                              child: Text(
+                                'CuramusApp',
+                                style: FlutterFlowTheme.of(context)
+                                    .headlineMedium
+                                    .override(
+                                      fontFamily: 'Outfit',
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text(
+                            'Curamus Back-Office',
+                            style: FlutterFlowTheme.of(context)
+                                .headlineMedium
+                                .override(
+                                  fontFamily: 'Outfit',
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                ),
+                          ),
+                          Flexible(
+                            child: Align(
+                              alignment: const AlignmentDirectional(1.00, 0.00),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    12, 0, 0, 0),
+                                child: FlutterFlowIconButton(
+                                  borderColor: Colors.transparent,
+                                  borderRadius: 30,
+                                  borderWidth: 1,
+                                  buttonSize: 50,
+                                  icon: const Icon(
+                                    Icons.dehaze_sharp,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  onPressed: () async {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SettingsScreen()));
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            centerTitle: true,
+            expandedTitleScale: 1.0,
+          ),
+          elevation: 2,
+        ),
       ),
-      body: SingleChildScrollView(
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width - 10,
-          child: DataTable(
-            showCheckboxColumn: false,
-            columns: const <DataColumn>[
-              DataColumn(
-                label: Text(
-                  'Select',
-                  style: TextStyle(
-                      fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 16, 0),
+            child: TextFormField(
+              controller: _searchController,
+              onEditingComplete: filterCaretakers,
+              obscureText: false,
+              decoration: InputDecoration(
+                labelText: 'Search for caretakers...',
+                labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: FlutterFlowTheme.of(context).primaryBackground,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: FlutterFlowTheme.of(context).primary,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: FlutterFlowTheme.of(context).error,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: FlutterFlowTheme.of(context).error,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: FlutterFlowTheme.of(context).primaryBackground,
+                prefixIcon: Icon(
+                  Icons.search_outlined,
+                  color: FlutterFlowTheme.of(context).secondaryText,
                 ),
               ),
-              DataColumn(
-                label: Text(
-                  'Name',
-                  style: TextStyle(
-                      fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+              style: FlutterFlowTheme.of(context).bodyMedium,
+              maxLines: null,
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 0, 0),
+                child: Text(
+                  'Caretakers matching search',
+                  style: FlutterFlowTheme.of(context).labelMedium,
                 ),
               ),
-              DataColumn(
-                label: Text(
-                  'Joining date',
-                  style: TextStyle(
-                      fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(4, 12, 16, 0),
+                child: Text(
+                  _filteredCaretakers.length.toString(),
+                  style: FlutterFlowTheme.of(context).bodyMedium,
                 ),
               ),
             ],
-            rows: caretakers
-                .map((Caretaker caretaker) => DataRow(
-                      onSelectChanged: (bool? selected) {
-                        if (selected == true) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  CaretakerFormScreen(caretaker: caretaker)));
-                        }
-                      },
-                      cells: <DataCell>[
-                        DataCell(
-                          Checkbox(
-                            value: checkboxState[caretaker.id],
-                            onChanged: (bool? value) {
-                              setState(() {
-                                checkboxState[caretaker.id] = value!;
-                              });
-                            },
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 0),
+              child: ListView.builder(
+                  itemCount: _filteredCaretakers.length,
+                  itemBuilder: (context, i) {
+                    return Dismissible(
+                      key: ValueKey<int>(_filteredCaretakers[i].id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      child: Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            boxShadow: const [
+                              BoxShadow(
+                                blurRadius: 0,
+                                color: Color(0xFFE0E3E7),
+                                offset: Offset(0, 1),
+                              )
+                            ],
+                            borderRadius: BorderRadius.circular(0),
+                            shape: BoxShape.rectangle,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8, 8, 8, 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Container(
+                                  width: 4,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12, 0, 0, 0),
+                                    child: Text(
+                                      _filteredCaretakers[i].name,
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyLarge,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      12, 0, 15, 0),
+                                  child: Text(
+                                    DateFormat.yMMMd().format(
+                                        _filteredCaretakers[i].startDate),
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelMedium,
+                                  ),
+                                ),
+                                InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                CaretakerFormScreen(
+                                                  caretaker:
+                                                      _filteredCaretakers[i],
+                                                )));
+                                  },
+                                  child: Card(
+                                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryBackground,
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              4, 4, 4, 4),
+                                      child: InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () async {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CaretakerFormScreen(
+                                                        caretaker:
+                                                            _filteredCaretakers[
+                                                                i],
+                                                      )));
+                                        },
+                                        child: Icon(
+                                          Icons.keyboard_arrow_right_rounded,
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        DataCell(Text(caretaker.name)),
-                        DataCell(Text(
-                            DateFormat.yMMMd().format(caretaker.startDate))),
-                      ],
-                    ))
-                .toList(),
+                      ),
+                      onDismissed: (direction) {
+                        setState(() {
+                          removeCaretaker(_filteredCaretakers[i].id);
+                          filterCaretakers();
+                        });
+                      },
+                    );
+                  }),
+            ),
           ),
-        ),
+        ],
       ),
-      floatingActionButton: SpeedDial(icon: Icons.create, children: [
-        SpeedDialChild(
-          child: const Icon(Icons.add),
-          label: 'Add Caretaker',
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Add Caretaker'),
-                      content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            TextFormField(
-                              controller: _caretakerNameController,
-                              decoration: const InputDecoration(
-                                  labelText: 'Caretaker Name'),
-                            ),
-                          ]),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text('Cancel'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        TextButton(
-                          child: const Text('Add'),
-                          onPressed: () {
-                            addCaretaker(
-                                _caretakerNameController.text.toString());
-                            _caretakerNameController.clear();
-                            setState(() {});
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ));
-          },
-        ),
-        SpeedDialChild(
-          child: const Icon(Icons.delete),
-          label: 'Delete Caretaker(s)',
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Delete Caretaker(s)'),
-                      content: const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                                'Are you sure you want to delete the selected caretaker(s)?'),
-                          ]),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text('Cancel'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        TextButton(
-                          child: const Text('Delete'),
-                          onPressed: () {
-                            var keysToRemove = [];
-                            for (var id in checkboxState.keys) {
-                              if (checkboxState[id] == true) {
-                                if (getCaretaker(id) != null) {
-                                  keysToRemove.add(id);
-                                }
-                              }
-                            }
-                            setState(() {
-                              for (var id in keysToRemove) {
-                                removeCaretaker(id);
-                              }
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ));
-          },
-        ),
-      ]),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: appBackgroundColor,
+        foregroundColor: appForegroundColor,
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Add Caretaker'),
+                    content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          TextFormField(
+                            controller: _caretakerNameController,
+                            decoration: const InputDecoration(
+                                labelText: 'Caretaker Name'),
+                          ),
+                        ]),
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('Add'),
+                        onPressed: () {
+                          addCaretaker(
+                              _caretakerNameController.text.toString());
+                          _caretakerNameController.clear();
+                          setState(() {});
+                          Navigator.of(context).pop();
+                          filterCaretakers();
+                        },
+                      ),
+                    ],
+                  ));
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
   void addCaretaker(String string) {
     Caretaker caretaker = Caretaker(
-      id: caretakers.length + 1,
-      startDate: DateTime.now(),
-      name: string,
-      patients: [],
-    );
+        id: caretakers.length + 1,
+        startDate: DateTime.now(),
+        dateOfBirth: DateTime.now(),
+        workTypes: '',
+        availability: '',
+        email: '',
+        name: string,
+        patients: []);
     caretakers.add(caretaker);
-    checkboxState[caretaker.id] = false;
     addCaretakerToDb(caretaker);
   }
 
   void removeCaretaker(int id) {
-    checkboxState.remove(id);
     caretakers.removeWhere((caretaker) => caretaker.id == id);
     removeCaretakerFromDb(id);
   }

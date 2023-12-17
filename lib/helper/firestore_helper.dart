@@ -156,6 +156,10 @@ void addCaretakerToDb(Caretaker caretaker) {
     'id': caretaker.id,
     'name': caretaker.name,
     'startDate': caretaker.startDate,
+    'dateOfBirth': caretaker.dateOfBirth,
+    'email': caretaker.email,
+    'workTypes': caretaker.workTypes,
+    'availability': caretaker.availability,
     'patients': '',
   };
   addDocumentToCollection('caretakers', caretakerData);
@@ -219,6 +223,10 @@ Future<List<Caretaker>> loadCaretakersFromFirestore() async {
     caretakers.add(Caretaker(
       id: doc['id'],
       name: doc['name'],
+      email: doc['email'],
+      workTypes: doc['workTypes'],
+      availability: doc['availability'],
+      dateOfBirth: doc['dateOfBirth'].toDate(),
       startDate: doc['startDate'].toDate(),
     ));
   }
