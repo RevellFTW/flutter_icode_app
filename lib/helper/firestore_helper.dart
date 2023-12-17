@@ -39,6 +39,10 @@ void updateCaretaker(Caretaker caretaker, String documentID) {
   Map<String, dynamic> caretakerData = {
     'id': caretaker.id,
     'name': caretaker.name,
+    'dateOfBirth': caretaker.dateOfBirth,
+    'email': caretaker.email,
+    'workTypes': caretaker.workTypes,
+    'availability': caretaker.availability,
     'startDate': caretaker.startDate,
     'patients': '',
   };

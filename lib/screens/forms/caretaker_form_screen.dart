@@ -1,22 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:todoapp/helper/flutter_flow/flutter_flow_count_controller.dart';
-import 'package:todoapp/helper/flutter_flow/flutter_flow_drop_down.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
-import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
-import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/caretaker.dart';
 import '../../models/event_log.dart';
 import '../home_page.dart';
-import '../tasks_and_logs/caretask_screen.dart';
 import '../tasks_and_logs/event_log_screen.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
-import 'relative_form_screen.dart';
 
 class CaretakerFormScreen extends StatefulWidget {
   final Caretaker caretaker;
@@ -31,12 +25,12 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
   late TextEditingController _nameController;
   late TextEditingController _workTypesController;
   late TextEditingController _availabilityController;
-  late TextEditingController _allergiesController;
+  late TextEditingController _emailController;
   final _dateController = MaskedTextController(mask: '00/00/0000');
   String currentNameTextFormFieldValue = '';
   String currentWorkTypesTextFormFieldValue = '';
   String currentAvailabilityTextFormFieldValue = '';
-  String currentAllergiesTextFormFieldValue = '';
+  String currentEmailTextFormFieldValue = '';
   Map<String, Map<String, String>> careTasks = {};
   late DateTime updatedDateTime;
 
@@ -51,6 +45,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
         TextEditingController(text: widget.caretaker.workTypes);
     _availabilityController =
         TextEditingController(text: widget.caretaker.availability);
+    _emailController = TextEditingController(text: widget.caretaker.email);
   }
 
   @override
@@ -107,17 +102,77 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                         await loadEventLogsFromFirestore(
                                             widget.caretaker.id,
                                             Caller.caretaker);
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                EventLogScreen(
-                                                  eventLogs: tasks,
-                                                  eventLogName:
-                                                      "${widget.caretaker.name} Caretaker's Log",
-                                                  caller: Caller.caretaker,
-                                                  caretaker: widget.caretaker,
-                                                )));
+                                    if (tasks.isNotEmpty && tasks != null) {
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EventLogScreen(
+                                                    eventLogs: tasks,
+                                                    eventLogName:
+                                                        "${widget.caretaker.name} Caretaker's Log",
+                                                    caller: Caller.caretaker,
+                                                    caretaker: widget.caretaker,
+                                                  )));
+                                    } else {
+                                      showDialog<void>(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                              'No event logs found',
+                                              style: FlutterFlowTheme.of(
+                                                      context)
+                                                  // ignore: deprecated_member_use_from_same_package
+                                                  .bodyText1
+                                                  .override(
+                                                    fontFamily: 'Poppins',
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primaryText,
+                                                  ),
+                                            ),
+                                            content: Text(
+                                              'No event logs found for this caretaker',
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyText1
+                                                      .override(
+                                                        fontFamily: 'Poppins',
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primaryText,
+                                                      ),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                child: Text(
+                                                  'Ok',
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyText1
+                                                      .override(
+                                                        fontFamily: 'Poppins',
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primaryText,
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
+                                            backgroundColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .secondaryBackground,
+                                            elevation: 4,
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                   text: 'Event Logs',
                                   options: FFButtonOptions(
@@ -218,8 +273,6 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                           });
                         },
                         style: FlutterFlowTheme.of(context).bodyMedium,
-                        // validator: _model.textFieldController1Validator!
-                        //     .asValidator(context),
                       ),
                       TextFormField(
                         onTap: () =>
@@ -271,6 +324,75 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                           } else {
                             return null;
                           }
+                        },
+                      ),
+                      TextFormField(
+                        controller: _emailController,
+                        autofocus: true,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                          hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        style: FlutterFlowTheme.of(context).bodyMedium,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            currentEmailTextFormFieldValue = newValue;
+                          });
+                        },
+                        onTapOutside: (newValue) {
+                          if (currentEmailTextFormFieldValue.isNotEmpty) {
+                            setState(() {
+                              widget.caretaker.email =
+                                  currentEmailTextFormFieldValue;
+                              modifyCaretakerInDb(widget.caretaker);
+                            });
+                          } else {
+                            setState(() {
+                              _emailController.text = widget.caretaker.email;
+                            });
+                          }
+                          FocusScope.of(context).unfocus();
+                        },
+                        onFieldSubmitted: (String newValue) {
+                          setState(() {
+                            if (currentEmailTextFormFieldValue.isNotEmpty) {
+                              widget.caretaker.email =
+                                  currentEmailTextFormFieldValue;
+                              modifyCaretakerInDb(widget.caretaker);
+                            } else {
+                              _emailController.text = widget.caretaker.email;
+                            }
+                          });
                         },
                       ),
                       TextFormField(
