@@ -256,6 +256,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                                 widget.eventLog.caretakerId = value.toString();
                               } else {
                                 widget.eventLog.patientId = value.toString();
+                                taskNames = getTaskNameDropdownEntries(
+                                    index: value.toString());
+                                widget.eventLog.name = taskNames.first.value!;
                               }
                               if (widget.modifying) {
                                 modifyEventLogInDb(widget.eventLog);
