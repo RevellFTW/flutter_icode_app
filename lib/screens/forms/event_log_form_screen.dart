@@ -394,16 +394,22 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                               deleteEventLogFromFireStore(widget.eventLog);
                             }
                             List<EventLog> tasks =
-                                await loadEventLogsFromFirestore(
-                                    widget.patient!.id, widget.caller);
+                                widget.caller == Caller.patient
+                                    ? await loadEventLogsFromFirestore(
+                                        widget.patient!.id, widget.caller)
+                                    : await loadEventLogsFromFirestore(
+                                        widget.caretaker!.id, widget.caller);
                             // ignore: use_build_context_synchronously
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => EventLogScreen(
                                       eventLogs: tasks,
-                                      eventLogName:
-                                          "${widget.patient!.name} Patient's Log",
+                                      eventLogName: widget.caller ==
+                                              Caller.patient
+                                          ? "${widget.patient!.name} Patient's Log"
+                                          : "${widget.caretaker!.name} Caretaker's Log",
                                       caller: Caller.patient,
                                       patient: widget.patient,
+                                      caretaker: widget.caretaker,
                                     )));
                           });
                         },

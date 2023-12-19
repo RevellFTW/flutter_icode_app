@@ -28,4 +28,19 @@ class Patient {
       required this.assignedCaretakers,
       required this.careTasks,
       required this.relatives});
+
+  static Patient empty() {
+    return Patient(
+        id: 0,
+        name: '',
+        startDate: DateTime.now(),
+        dateOfBirth: DateTime.now(),
+        medicalState: '',
+        dailyHours: 0,
+        takenMedicines: '',
+        allergies: '',
+        assignedCaretakers: [],
+        careTasks: [],
+        relatives: []);
+  }
 }

@@ -40,10 +40,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
 
   DateTime _selectedDate = DateTime.now();
 
-  int _editIndex = -1;
   String _editKey = '';
-  String? _nameDropdownValue = 'Do Laundry';
-  String? _fabNameDropdownValue = 'Choose';
   String? selectedCaretakerId;
   String? selectedPatientId;
 
@@ -61,6 +58,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
 
   @override
   void initState() {
+    super.initState();
+
     if (widget.caller == Caller.patient) {
       _loadData(widget.patient!.id.toString()).then((value) {
         setState(() {
@@ -81,16 +80,16 @@ class _EventLogScreenState extends State<EventLogScreen> {
 
           selectedPatientId = patientList.first.id.toString();
         });
-        for (var patient in patientList) {
-          _loadData(patient.id.toString()).then((value) {
+        for (var patientElement in patientList) {
+          _loadData(patientElement.id.toString()).then((value) {
             setState(() {
-              individualCareTaskslistMap.addAll({patient.id.toString(): value});
+              individualCareTaskslistMap
+                  .addAll({patientElement.id.toString(): value});
             });
           });
         }
       });
     }
-    super.initState();
     filterEventLogs(selectedDay.value);
   }
 
@@ -140,7 +139,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
       onTap: () {
         setState(() {
           _editKey = '';
-          _editIndex = -1;
           _focusNode.unfocus();
           FocusScope.of(context).unfocus();
         });
@@ -148,7 +146,9 @@ class _EventLogScreenState extends State<EventLogScreen> {
       child: Scaffold(
         appBar: CustomAppBar(
           //todo make patient name dynamic
-          title: 'Back to ${widget.patient!.name}\'s sheet',
+          title: widget.caller == Caller.patient
+              ? 'Back to ${widget.patient!.name}\'s sheet'
+              : 'Back to ${widget.caretaker!.name}\'s sheet',
           onBackPressed: () async {
             Navigator.of(context).pop();
           },
@@ -337,6 +337,15 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                     hoverColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () async {
+                                      Patient patient =
+                                          widget.caller == Caller.caretaker
+                                              ? patientList
+                                                  .where((element) =>
+                                                      element.id.toString() ==
+                                                      _filteredEventLogs[i]
+                                                          .patientId)
+                                                  .first
+                                              : widget.patient!;
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
@@ -351,7 +360,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                     patientList: patientList,
                                                     caretakerList:
                                                         caretakerList,
-                                                    patient: widget.patient,
+                                                    patient: patient,
                                                     caretaker:
                                                         widget.caretaker)),
                                       );
@@ -373,24 +382,34 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                           hoverColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
+                                            Patient patient = widget.caller ==
+                                                    Caller.caretaker
+                                                ? patientList
+                                                    .where((element) =>
+                                                        element.id.toString() ==
+                                                        _filteredEventLogs[i]
+                                                            .patientId)
+                                                    .first
+                                                : widget.patient!;
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       EventLogFormScreen(
-                                                        eventLog:
-                                                            _filteredEventLogs[
-                                                                i],
-                                                        caller: widget.caller,
-                                                        modifying: true,
-                                                        careTaskList: list,
-                                                        individualCareTaskslistMap:
-                                                            individualCareTaskslistMap,
-                                                        patientList:
-                                                            patientList,
-                                                        caretakerList:
-                                                            caretakerList,
-                                                        patient: widget.patient,
-                                                      )),
+                                                          eventLog:
+                                                              _filteredEventLogs[
+                                                                  i],
+                                                          caller: widget.caller,
+                                                          modifying: true,
+                                                          careTaskList: list,
+                                                          individualCareTaskslistMap:
+                                                              individualCareTaskslistMap,
+                                                          patientList:
+                                                              patientList,
+                                                          caretakerList:
+                                                              caretakerList,
+                                                          patient: patient,
+                                                          caretaker: widget
+                                                              .caretaker)),
                                             );
                                           },
                                           child: Icon(
@@ -421,6 +440,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
+          heroTag: null,
           onPressed: () {
             widget.caller == Caller.patient
                 ? Navigator.of(context).push(MaterialPageRoute(
@@ -511,14 +531,12 @@ class _EventLogScreenState extends State<EventLogScreen> {
   }
 
   void setIndex(int index) {
-    _editIndex = index;
     _editKey = index.toString();
   }
 
   void setFormTexts() {
     _descriptionController.text =
         widget.eventLogs[int.parse(_editKey)].description;
-    _nameDropdownValue = widget.eventLogs[int.parse(_editKey)].name;
   }
 
   List<DropdownMenuEntry<String>> getTaskNameDropdownEntries({String? index}) {
