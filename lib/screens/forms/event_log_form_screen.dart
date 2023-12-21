@@ -126,10 +126,32 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         appBar: CustomAppBar(
-          //todo make patient name dynamic
           title: backToText,
           onBackPressed: () async {
-            Navigator.of(context).pop();
+            if (widget.caller == Caller.patient) {
+              List<EventLog> eventLogs = await loadEventLogsFromFirestore(
+                  widget.patient!.id, widget.caller);
+              Navigator.of(context).pop(MaterialPageRoute(
+                  builder: (context) => EventLogScreen(
+                        eventLogs: eventLogs,
+                        eventLogName: "${widget.patient!.name} Patient's Log",
+                        caller: Caller.patient,
+                        patient: widget.patient,
+                        caretaker: widget.caretaker,
+                      )));
+            } else {
+              List<EventLog> eventLogs = await loadEventLogsFromFirestore(
+                  widget.caretaker!.id, widget.caller);
+              Navigator.of(context).pop(MaterialPageRoute(
+                  builder: (context) => EventLogScreen(
+                        eventLogs: eventLogs,
+                        eventLogName:
+                            "${widget.caretaker!.name} Caretaker's Log",
+                        caller: Caller.caretaker,
+                        patient: widget.patient,
+                        caretaker: widget.caretaker,
+                      )));
+            }
           },
         ),
         body: SafeArea(

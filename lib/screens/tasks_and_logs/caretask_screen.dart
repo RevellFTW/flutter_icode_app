@@ -6,6 +6,7 @@ import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/screens/forms/caretask_form_screen.dart';
+import 'package:todoapp/screens/forms/patient_form_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 
 class CareTasksPage extends StatefulWidget {
@@ -45,7 +46,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
       appBar: CustomAppBar(
         title: 'Back to ${widget.patient.name}\'s sheet',
         onBackPressed: () {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(MaterialPageRoute(
+              builder: (context) => PatientFormScreen(
+                    patient: widget.patient,
+                  )));
         },
       ),
       body: Column(

@@ -331,11 +331,8 @@ class _PatientScreenState extends State<PatientScreen> {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 PatientFormScreen(
-                                                    patient:
-                                                        _filteredPatients[i],
-                                                    relatives:
-                                                        _filteredPatients[i]
-                                                            .relatives)));
+                                                  patient: _filteredPatients[i],
+                                                )));
                                   },
                                   child: Card(
                                     clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -359,13 +356,10 @@ class _PatientScreenState extends State<PatientScreen> {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       PatientFormScreen(
-                                                          patient:
-                                                              _filteredPatients[
-                                                                  i],
-                                                          relatives:
-                                                              _filteredPatients[
-                                                                      i]
-                                                                  .relatives)));
+                                                        patient:
+                                                            _filteredPatients[
+                                                                i],
+                                                      )));
                                         },
                                         child: Icon(
                                           Icons.keyboard_arrow_right_rounded,

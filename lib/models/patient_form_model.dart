@@ -30,7 +30,7 @@ class PatientFormModel extends FlutterFlowModel<PatientFormScreen> {
   TextEditingController? textFieldController5;
   String? Function(BuildContext, String?)? textFieldController5Validator;
   // State field(s) for DropDown widget.
-  List<String>? dropDownValue;
+  List<dynamic>? dropDownValue;
   FormFieldController<String>? dropDownValueController;
 
   /// Initialization and disposal methods.

@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_count_controller.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_drop_down.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
+import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/models/relative.dart';
+import 'package:todoapp/screens/patient_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 import '../../global/variables.dart';
 import '../../helper/firestore_helper.dart';
@@ -22,9 +25,7 @@ export '../../models/patient_form_model.dart';
 
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;
-  final List<Relative> relatives;
-  const PatientFormScreen(
-      {super.key, required this.patient, required this.relatives});
+  const PatientFormScreen({super.key, required this.patient});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -46,9 +47,21 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   late DateTime updatedDateTime;
   late PatientFormModel _model;
 
+  List<Relative> relatives = [];
+  List<Caretaker> caretakerList = [];
+
+  Future<List<Caretaker>> _loadCaretakers() async {
+    // Load the data asynchronously
+    final data = await loadCaretakersFromFirestore();
+
+    // Return the loaded data
+    return data;
+  }
+
   @override
   void initState() {
     super.initState();
+    relatives = widget.patient.relatives;
     _model = createModel(context, () => PatientFormModel());
     updatedDateTime = widget.patient.startDate;
     _nameController = TextEditingController(text: widget.patient.name);
@@ -60,6 +73,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         TextEditingController(text: widget.patient.takenMedicines);
     _allergiesController =
         TextEditingController(text: widget.patient.allergies);
+
+    _loadCaretakers().then((value) {
+      setState(() {
+        caretakerList = value;
+      });
+    });
   }
 
   @override
@@ -68,7 +87,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
       appBar: CustomAppBar(
         title: 'Back to Curamus Back-Office',
         onBackPressed: () async {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(
+              MaterialPageRoute(builder: (context) => const PatientScreen()));
         },
       ),
       body: SafeArea(
@@ -611,34 +631,31 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       ),
                       Align(
                         alignment: const AlignmentDirectional(0.00, 0.00),
-                        child: FlutterFlowDropDown(
-                          options: const [
-                            'Caretaker 1',
-                            'Caretaker 12',
-                            'Caretaker 13',
-                            'Caretaker 14'
-                          ],
-                          //todo fix this
-                          onChanged: (val) => setState(() =>
-                              _model.dropDownValue = val as List<String>?),
-                          width: 1480,
-                          height: 50,
-                          textStyle: FlutterFlowTheme.of(context).bodyMedium,
-                          hintText: 'Assigned Caretakers',
-                          icon: Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: FlutterFlowTheme.of(context).secondaryText,
-                            size: 24,
-                          ),
-                          fillColor:
-                              FlutterFlowTheme.of(context).secondaryBackground,
-                          elevation: 2,
+                        child: MultiSelectDropDown<String>(
+                          onOptionSelected: (List<ValueItem> selectedOptions) {
+                            setState(() {
+                              _model.dropDownValue = selectedOptions
+                                  .map((option) => option.value)
+                                  .toList();
+                              widget.patient.assignedCaretakers = caretakerList
+                                  .where((element) => _model.dropDownValue!
+                                      .contains(element.id.toString()))
+                                  .toList();
+                              modifyPatientInDb(widget.patient);
+                            });
+                          },
+                          options: caretakerListToValueItemList(caretakerList),
+                          // selectedOptions: caretakerListToValueItemList(
+                          //     widget.patient.assignedCaretakers!),
+                          selectionType: SelectionType.multi,
+                          chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+                          dropdownHeight: 300,
+                          optionTextStyle:
+                              FlutterFlowTheme.of(context).bodyMedium,
+                          selectedOptionIcon: const Icon(Icons.check_circle),
                           borderColor: FlutterFlowTheme.of(context).alternate,
                           borderWidth: 2,
                           borderRadius: 8,
-                          margin: const EdgeInsetsDirectional.fromSTEB(
-                              16, 4, 16, 4),
-                          hidesUnderline: true,
                         ),
                       ),
                       Row(
@@ -658,10 +675,10 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         scrollDirection: Axis.vertical,
-                        itemCount: widget.relatives.length,
+                        itemCount: relatives.length,
                         itemBuilder: (context, i) {
                           return Padding(
-                            key: ValueKey<int>(widget.relatives[i].id),
+                            key: ValueKey<int>(relatives[i].id),
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 0, 0, 0, 1),
                             child: InkWell(
@@ -674,7 +691,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => RelativeFormScreen(
                                         modifying: true,
-                                        relative: widget.relatives[i],
+                                        relative: relatives[i],
                                         patient: widget.patient)));
                               },
                               child: Container(
@@ -703,7 +720,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(12, 0, 0, 0),
                                           child: Text(
-                                            widget.relatives[i].name,
+                                            relatives[i].name,
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge,
                                           ),
@@ -771,6 +788,16 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         ),
       ),
     );
+  }
+
+  List<ValueItem<String>> caretakerListToValueItemList(
+      List<Caretaker> caretakers) {
+    List<ValueItem<String>> caretakerValueItemList = [];
+    caretakers.forEach((caretaker) {
+      caretakerValueItemList.add(
+          ValueItem(label: caretaker.name, value: caretaker.id.toString()));
+    });
+    return caretakerValueItemList;
   }
 
   Future<void> updateStartDate(DateTime time) async {

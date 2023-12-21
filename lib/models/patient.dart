@@ -12,7 +12,7 @@ class Patient {
   int dailyHours;
   String takenMedicines;
   String allergies;
-  List<Caretaker>? assignedCaretakers;
+  List<Caretaker>? assignedCaretakers = [];
   List<CareTask> careTasks;
   List<Relative> relatives = [];
 

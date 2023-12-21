@@ -6,7 +6,9 @@ import 'package:todoapp/helper/datetime_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/models/caretaker.dart';
+import 'package:todoapp/screens/forms/caretaker_form_screen.dart';
 import 'package:todoapp/screens/forms/event_log_form_screen.dart';
+import 'package:todoapp/screens/forms/patient_form_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/event_log.dart';
@@ -150,7 +152,19 @@ class _EventLogScreenState extends State<EventLogScreen> {
               ? 'Back to ${widget.patient!.name}\'s sheet'
               : 'Back to ${widget.caretaker!.name}\'s sheet',
           onBackPressed: () async {
-            Navigator.of(context).pop();
+            widget.caller == Caller.patient
+                ? Navigator.of(context).pop(
+                    MaterialPageRoute(
+                        builder: (context) => PatientFormScreen(
+                              patient: widget.patient!,
+                            )),
+                  )
+                : Navigator.of(context).pop(
+                    MaterialPageRoute(
+                        builder: (context) => CaretakerFormScreen(
+                              caretaker: widget.caretaker!,
+                            )),
+                  );
           },
         ),
         body: Column(
@@ -446,7 +460,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                 ? Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => EventLogFormScreen(
                         eventLog: EventLog.empty(widget.eventLogs.length + 1),
-                        caller: widget.caller,
+                        caller: Caller.patient,
                         modifying: false,
                         careTaskList: list,
                         individualCareTaskslistMap: individualCareTaskslistMap,
@@ -462,15 +476,18 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             description: '',
                             date: DateFormat('yyyy-MM-dd h:mm a')
                                 .format(DateTime.now()),
-                            patientId: widget.patient!.id.toString(),
+                            patientId: selectedPatientId,
                             caretakerId: widget.caretaker!.id.toString()),
-                        caller: widget.caller,
+                        caller: Caller.caretaker,
                         modifying: false,
                         careTaskList: list,
                         individualCareTaskslistMap: individualCareTaskslistMap,
                         patientList: patientList,
                         caretakerList: caretakerList,
-                        patient: widget.patient,
+                        patient: patientList
+                            .where((element) =>
+                                element.id.toString() == selectedPatientId)
+                            .first,
                         caretaker: widget.caretaker)));
           },
           child: const Icon(Icons.add),

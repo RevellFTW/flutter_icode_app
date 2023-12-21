@@ -303,7 +303,10 @@ class _CareTasksFormState extends State<CareTasksForm> {
           //todo make patient name dynamic
           title: 'Back to ${widget.patient.name}\'s sheet',
           onBackPressed: () async {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(MaterialPageRoute(
+                builder: (context) => CareTasksPage(
+                      patient: widget.patient,
+                    )));
           },
         ),
         body: SafeArea(

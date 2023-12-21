@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
+import 'package:todoapp/screens/caretaker_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/caretaker.dart';
@@ -54,7 +55,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
       appBar: CustomAppBar(
         title: 'Back to Curamus Back-Office',
         onBackPressed: () async {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(
+              MaterialPageRoute(builder: (context) => const CaretakerScreen()));
         },
       ),
       body: SafeArea(
@@ -102,77 +104,17 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                         await loadEventLogsFromFirestore(
                                             widget.caretaker.id,
                                             Caller.caretaker);
-                                    if (tasks.isNotEmpty && tasks != null) {
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  EventLogScreen(
-                                                    eventLogs: tasks,
-                                                    eventLogName:
-                                                        "${widget.caretaker.name} Caretaker's Log",
-                                                    caller: Caller.caretaker,
-                                                    caretaker: widget.caretaker,
-                                                  )));
-                                    } else {
-                                      showDialog<void>(
-                                        context: context,
-                                        barrierDismissible: false,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: Text(
-                                              'No event logs found',
-                                              style: FlutterFlowTheme.of(
-                                                      context)
-                                                  // ignore: deprecated_member_use_from_same_package
-                                                  .bodyText1
-                                                  .override(
-                                                    fontFamily: 'Poppins',
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primaryText,
-                                                  ),
-                                            ),
-                                            content: Text(
-                                              'No event logs found for this caretaker',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyText1
-                                                      .override(
-                                                        fontFamily: 'Poppins',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
-                                                      ),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.pop(context),
-                                                child: Text(
-                                                  'Ok',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyText1
-                                                      .override(
-                                                        fontFamily: 'Poppins',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                            backgroundColor:
-                                                FlutterFlowTheme.of(context)
-                                                    .secondaryBackground,
-                                            elevation: 4,
-                                          );
-                                        },
-                                      );
-                                    }
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EventLogScreen(
+                                                  eventLogs: tasks,
+                                                  eventLogName:
+                                                      "${widget.caretaker.name} Caretaker's Log",
+                                                  caller: Caller.caretaker,
+                                                  caretaker: widget.caretaker,
+                                                )));
                                   },
                                   text: 'Event Logs',
                                   options: FFButtonOptions(

@@ -76,7 +76,9 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
           //todo make patient name dynamic
           title: 'Back to Patient Doe\'s sheet',
           onBackPressed: () async {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(MaterialPageRoute(
+                builder: (context) =>
+                    PatientFormScreen(patient: widget.patient!)));
           },
         ),
         body: SafeArea(
@@ -495,8 +497,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                             }
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => PatientFormScreen(
-                                    patient: widget.patient!,
-                                    relatives: widget.patient!.relatives)));
+                                    patient: widget.patient!)));
                           });
                         },
                         text: widget.modifying ? 'DELETE' : 'ADD',

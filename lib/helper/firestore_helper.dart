@@ -27,7 +27,7 @@ void updatePatient(Patient patient, String documentID) {
     'dailyHours': patient.dailyHours,
     'takenMedicines': patient.takenMedicines,
     'allergies': patient.allergies,
-    'assignedCaretakers': '',
+    'assignedCaretakers': patient.assignedCaretakers,
     'relativeIDs': patient.relatives.map((relative) => relative.id).toList(),
   };
   documentReference.set(patientData, SetOptions(merge: true));
@@ -150,7 +150,7 @@ void addPatientToDb(Patient patient) {
     'dailyHours': patient.dailyHours,
     'takenMedicines': patient.takenMedicines,
     'allergies': patient.allergies,
-    'assignedCaretakers': '',
+    'assignedCaretakers': patient.assignedCaretakers,
     'relativeIDs': patient.relatives.map((relative) => relative.id).toList(),
   };
   addDocumentToCollection('patients', patientData);
