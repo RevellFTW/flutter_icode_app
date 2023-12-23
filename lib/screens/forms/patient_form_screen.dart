@@ -285,8 +285,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           });
                         },
                         style: FlutterFlowTheme.of(context).bodyMedium,
-                        // validator: _model.textFieldController1Validator!
-                        //     .asValidator(context),
                       ),
                       TextFormField(
                         onTap: () =>
@@ -633,23 +631,21 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         alignment: const AlignmentDirectional(0.00, 0.00),
                         child: MultiSelectDropDown<String>(
                           onOptionSelected: (List<ValueItem> selectedOptions) {
-                            setState(() {
-                              _model.dropDownValue = selectedOptions
-                                  .map((option) => option.value)
-                                  .toList();
-                              widget.patient.assignedCaretakers = caretakerList
-                                  .where((element) => _model.dropDownValue!
-                                      .contains(element.id.toString()))
-                                  .toList();
-                              modifyPatientInDb(widget.patient);
-                            });
+                            var selectedItems = selectedOptions
+                                .map((option) => option.value)
+                                .toList();
+                            widget.patient.assignedCaretakers = caretakerList
+                                .where((element) => selectedItems
+                                    .contains(element.id.toString()))
+                                .toList();
+                            modifyPatientInDb(widget.patient);
                           },
                           options: caretakerListToValueItemList(caretakerList),
-                          // selectedOptions: caretakerListToValueItemList(
-                          //     widget.patient.assignedCaretakers!),
+                          selectedOptions: caretakerListToValueItemList(
+                              widget.patient.assignedCaretakers!),
                           selectionType: SelectionType.multi,
                           chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-                          dropdownHeight: 300,
+                          dropdownHeight: 140,
                           optionTextStyle:
                               FlutterFlowTheme.of(context).bodyMedium,
                           selectedOptionIcon: const Icon(Icons.check_circle),
