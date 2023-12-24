@@ -49,6 +49,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
           Navigator.of(context).pop(MaterialPageRoute(
               builder: (context) => PatientFormScreen(
                     patient: widget.patient,
+                    caretakerList: caretakerList,
                   )));
         },
       ),

@@ -27,7 +27,8 @@ void updatePatient(Patient patient, String documentID) {
     'dailyHours': patient.dailyHours,
     'takenMedicines': patient.takenMedicines,
     'allergies': patient.allergies,
-    'assignedCaretakers': patient.assignedCaretakers,
+    'assignedCaretakers':
+        patient.assignedCaretakers!.map((caretaker) => caretaker.id).toList(),
     'relativeIDs': patient.relatives.map((relative) => relative.id).toList(),
   };
   documentReference.set(patientData, SetOptions(merge: true));
@@ -150,7 +151,8 @@ void addPatientToDb(Patient patient) {
     'dailyHours': patient.dailyHours,
     'takenMedicines': patient.takenMedicines,
     'allergies': patient.allergies,
-    'assignedCaretakers': patient.assignedCaretakers,
+    'assignedCaretakers':
+        patient.assignedCaretakers!.map((caretaker) => caretaker.id).toList(),
     'relativeIDs': patient.relatives.map((relative) => relative.id).toList(),
   };
   addDocumentToCollection('patients', patientData);
@@ -337,6 +339,13 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
       }
     }
 
+    List<Caretaker> caretakers = doc['assignedCaretakers'] != null
+        ? await loadCaretakersFromFirestore()
+        : [];
+    List<Caretaker> assignedCaretakers = caretakers
+        .where((element) => doc['assignedCaretakers'].contains(element.id))
+        .toList();
+
     patients.add(Patient(
         id: doc['id'],
         name: doc['name'],
@@ -346,7 +355,7 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
         dailyHours: doc['dailyHours'],
         takenMedicines: doc['takenMedicines'],
         allergies: doc['allergies'],
-        assignedCaretakers: [],
+        assignedCaretakers: assignedCaretakers,
         careTasks: careTasks,
         relatives: relatives));
   }

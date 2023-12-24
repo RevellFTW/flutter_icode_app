@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
@@ -77,8 +78,10 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
           title: 'Back to Patient Doe\'s sheet',
           onBackPressed: () async {
             Navigator.of(context).pop(MaterialPageRoute(
-                builder: (context) =>
-                    PatientFormScreen(patient: widget.patient!)));
+                builder: (context) => PatientFormScreen(
+                      patient: widget.patient!,
+                      caretakerList: caretakerList,
+                    )));
           },
         ),
         body: SafeArea(
@@ -497,7 +500,9 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                             }
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => PatientFormScreen(
-                                    patient: widget.patient!)));
+                                      patient: widget.patient!,
+                                      caretakerList: caretakerList,
+                                    )));
                           });
                         },
                         text: widget.modifying ? 'DELETE' : 'ADD',

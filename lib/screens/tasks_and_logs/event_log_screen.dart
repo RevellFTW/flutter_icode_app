@@ -157,6 +157,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                     MaterialPageRoute(
                         builder: (context) => PatientFormScreen(
                               patient: widget.patient!,
+                              caretakerList: caretakerList,
                             )),
                   )
                 : Navigator.of(context).pop(

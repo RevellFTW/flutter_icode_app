@@ -18,6 +18,9 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    loadCaretakers().then((value) {
+      caretakerList = value;
+    });
   } catch (e) {
     log.severe('Could not initialize app: $e');
   }

@@ -1,3 +1,5 @@
+import 'package:multi_dropdown/multiselect_dropdown.dart';
+
 import '../helper/flutter_flow/flutter_flow_util.dart';
 import '../helper/flutter_flow/form_field_controller.dart';
 import '../screens/forms/patient_form_screen.dart' show PatientFormScreen;
@@ -34,8 +36,15 @@ class PatientFormModel extends FlutterFlowModel<PatientFormScreen> {
   FormFieldController<String>? dropDownValueController;
 
   /// Initialization and disposal methods.
+  ///
 
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    textFieldFocusNode1 = FocusNode();
+    textFieldFocusNode2 = FocusNode();
+    textFieldFocusNode3 = FocusNode();
+    textFieldFocusNode4 = FocusNode();
+    textFieldFocusNode5 = FocusNode();
+  }
 
   void dispose() {
     unfocusNode.dispose();

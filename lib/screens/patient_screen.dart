@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/models/relative.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
 import '../helper/flutter_flow/flutter_flow_theme.dart';
@@ -42,6 +43,12 @@ class _PatientScreenState extends State<PatientScreen> {
       filterPatients();
     });
     filterPatients();
+
+    loadCaretakers().then((value) {
+      setState(() {
+        caretakerList = value;
+      });
+    });
   }
 
   @override
@@ -332,6 +339,7 @@ class _PatientScreenState extends State<PatientScreen> {
                                             builder: (context) =>
                                                 PatientFormScreen(
                                                   patient: _filteredPatients[i],
+                                                  caretakerList: caretakerList,
                                                 )));
                                   },
                                   child: Card(
@@ -359,6 +367,8 @@ class _PatientScreenState extends State<PatientScreen> {
                                                         patient:
                                                             _filteredPatients[
                                                                 i],
+                                                        caretakerList:
+                                                            caretakerList,
                                                       )));
                                         },
                                         child: Icon(

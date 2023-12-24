@@ -25,7 +25,9 @@ export '../../models/patient_form_model.dart';
 
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;
-  const PatientFormScreen({super.key, required this.patient});
+  final List<Caretaker> caretakerList;
+  const PatientFormScreen(
+      {super.key, required this.patient, required this.caretakerList});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -47,21 +49,20 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   late DateTime updatedDateTime;
   late PatientFormModel _model;
 
+  List<ValueItem<String>> selectedCaretakerValueItems = [];
+
   List<Relative> relatives = [];
-  List<Caretaker> caretakerList = [];
 
-  Future<List<Caretaker>> _loadCaretakers() async {
-    // Load the data asynchronously
-    final data = await loadCaretakersFromFirestore();
-
-    // Return the loaded data
-    return data;
-  }
+  MultiSelectController<String> multiSelectDropdownController =
+      MultiSelectController<String>();
 
   @override
   void initState() {
     super.initState();
     relatives = widget.patient.relatives;
+    selectedCaretakerValueItems =
+        caretakerListToValueItemList(widget.patient.assignedCaretakers!);
+
     _model = createModel(context, () => PatientFormModel());
     updatedDateTime = widget.patient.startDate;
     _nameController = TextEditingController(text: widget.patient.name);
@@ -74,11 +75,11 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     _allergiesController =
         TextEditingController(text: widget.patient.allergies);
 
-    _loadCaretakers().then((value) {
-      setState(() {
-        caretakerList = value;
-      });
-    });
+    multiSelectDropdownController
+        .setOptions(caretakerListToValueItemList(widget.caretakerList));
+
+    multiSelectDropdownController
+        .setSelectedOptions(selectedCaretakerValueItems);
   }
 
   @override
@@ -271,7 +272,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               _nameController.text = widget.patient.name;
                             });
                           }
-                          FocusScope.of(context).unfocus();
+                          _model.textFieldFocusNode1!.unfocus();
                         },
                         onFieldSubmitted: (String newValue) {
                           setState(() {
@@ -397,7 +398,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                   widget.patient.medicalState;
                             });
                           }
-                          FocusScope.of(context).unfocus();
+                          _model.textFieldFocusNode3!.unfocus();
                         },
                         onFieldSubmitted: (String newValue) {
                           setState(() {
@@ -539,7 +540,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                   widget.patient.takenMedicines;
                             });
                           }
-                          FocusScope.of(context).unfocus();
+                          _model.textFieldFocusNode4!.unfocus();
                         },
                         onFieldSubmitted: (String newValue) {
                           setState(() {
@@ -612,7 +613,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                   widget.patient.allergies;
                             });
                           }
-                          FocusScope.of(context).unfocus();
+                          _model.textFieldFocusNode5!.unfocus();
                         },
                         onFieldSubmitted: (String newValue) {
                           setState(() {
@@ -630,19 +631,20 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       Align(
                         alignment: const AlignmentDirectional(0.00, 0.00),
                         child: MultiSelectDropDown<String>(
+                          controller: multiSelectDropdownController,
                           onOptionSelected: (List<ValueItem> selectedOptions) {
                             var selectedItems = selectedOptions
                                 .map((option) => option.value)
                                 .toList();
-                            widget.patient.assignedCaretakers = caretakerList
+                            widget.patient.assignedCaretakers = widget
+                                .caretakerList
                                 .where((element) => selectedItems
                                     .contains(element.id.toString()))
                                 .toList();
                             modifyPatientInDb(widget.patient);
                           },
-                          options: caretakerListToValueItemList(caretakerList),
-                          selectedOptions: caretakerListToValueItemList(
-                              widget.patient.assignedCaretakers!),
+                          options: caretakerListToValueItemList(
+                              widget.caretakerList),
                           selectionType: SelectionType.multi,
                           chipConfig: const ChipConfig(wrapType: WrapType.wrap),
                           dropdownHeight: 140,
