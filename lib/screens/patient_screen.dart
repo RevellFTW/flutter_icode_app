@@ -402,38 +402,12 @@ class _PatientScreenState extends State<PatientScreen> {
         backgroundColor: appBackgroundColor,
         foregroundColor: appForegroundColor,
         onPressed: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                    title: const Text('Add Patient'),
-                    content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _patientNameController,
-                            decoration: const InputDecoration(
-                                labelText: 'Patient Name'),
-                          ),
-                        ]),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('Add'),
-                        onPressed: () {
-                          addPatient(_patientNameController.text.toString());
-                          _patientNameController.clear();
-                          setState(() {});
-                          Navigator.of(context).pop();
-                          filterPatients();
-                        },
-                      ),
-                    ],
-                  ));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => PatientFormScreen(
+                    patient: Patient.empty(),
+                    caretakerList: caretakerList,
+                    modifying: false,
+                  )));
         },
         child: const Icon(Icons.add),
       ),

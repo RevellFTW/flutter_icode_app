@@ -15,7 +15,9 @@ import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class CaretakerFormScreen extends StatefulWidget {
   final Caretaker caretaker;
-  const CaretakerFormScreen({super.key, required this.caretaker});
+  final bool modifying;
+  const CaretakerFormScreen(
+      {super.key, required this.caretaker, this.modifying = true});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -73,7 +75,9 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                   child: Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
                     child: Text(
-                      '${widget.caretaker.name}\'s sheet',
+                      widget.modifying
+                          ? '${widget.caretaker.name}\'s sheet'
+                          : 'Add new caretaker',
                       style:
                           FlutterFlowTheme.of(context).headlineMedium.override(
                                 fontFamily: 'Outfit',
@@ -89,64 +93,73 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Flexible(
-                            child: Align(
-                              alignment: const AlignmentDirectional(1.00, 0.00),
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0, 0, 0, 12),
-                                child: FFButtonWidget(
-                                  onPressed: () async {
-                                    List<EventLog> tasks =
-                                        await loadEventLogsFromFirestore(
-                                            widget.caretaker.id,
-                                            Caller.caretaker);
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                EventLogScreen(
-                                                  eventLogs: tasks,
-                                                  eventLogName:
-                                                      "${widget.caretaker.name} Caretaker's Log",
-                                                  caller: Caller.caretaker,
-                                                  caretaker: widget.caretaker,
-                                                )));
-                                  },
-                                  text: 'Event Logs',
-                                  options: FFButtonOptions(
-                                    width: 150,
-                                    height: 48,
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0, 0, 0, 0),
-                                    iconPadding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0, 0, 0, 0),
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .override(
-                                          fontFamily: 'Readex Pro',
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.normal,
+                      widget.modifying
+                          ? Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Flexible(
+                                  child: Align(
+                                    alignment:
+                                        const AlignmentDirectional(1.00, 0.00),
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0, 0, 0, 12),
+                                      child: FFButtonWidget(
+                                        onPressed: () async {
+                                          List<EventLog> tasks =
+                                              await loadEventLogsFromFirestore(
+                                                  widget.caretaker.id,
+                                                  Caller.caretaker);
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EventLogScreen(
+                                                        eventLogs: tasks,
+                                                        eventLogName:
+                                                            "${widget.caretaker.name} Caretaker's Log",
+                                                        caller:
+                                                            Caller.caretaker,
+                                                        caretaker:
+                                                            widget.caretaker,
+                                                      )));
+                                        },
+                                        text: 'Event Logs',
+                                        options: FFButtonOptions(
+                                          width: 150,
+                                          height: 48,
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(0, 0, 0, 0),
+                                          iconPadding:
+                                              const EdgeInsetsDirectional
+                                                  .fromSTEB(0, 0, 0, 0),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          textStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleSmall
+                                                  .override(
+                                                    fontFamily: 'Readex Pro',
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                          elevation: 4,
+                                          borderSide: const BorderSide(
+                                            color: Colors.transparent,
+                                            width: 1,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(60),
                                         ),
-                                    elevation: 4,
-                                    borderSide: const BorderSide(
-                                      color: Colors.transparent,
-                                      width: 1,
+                                      ),
                                     ),
-                                    borderRadius: BorderRadius.circular(60),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                              ],
+                            )
+                          : Container(),
                       TextFormField(
                         controller: _nameController,
                         autofocus: true,
@@ -194,7 +207,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             setState(() {
                               widget.caretaker.name =
                                   currentNameTextFormFieldValue;
-                              modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying)
+                                modifyCaretakerInDb(widget.caretaker);
                             });
                           } else {
                             setState(() {
@@ -208,7 +222,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             if (currentNameTextFormFieldValue.isNotEmpty) {
                               widget.caretaker.name =
                                   currentNameTextFormFieldValue;
-                              modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying)
+                                modifyCaretakerInDb(widget.caretaker);
                             } else {
                               _nameController.text = widget.caretaker.name;
                             }
@@ -316,7 +331,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             setState(() {
                               widget.caretaker.email =
                                   currentEmailTextFormFieldValue;
-                              modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying)
+                                modifyCaretakerInDb(widget.caretaker);
                             });
                           } else {
                             setState(() {
@@ -330,7 +346,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             if (currentEmailTextFormFieldValue.isNotEmpty) {
                               widget.caretaker.email =
                                   currentEmailTextFormFieldValue;
-                              modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying)
+                                modifyCaretakerInDb(widget.caretaker);
                             } else {
                               _emailController.text = widget.caretaker.email;
                             }
@@ -385,7 +402,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             setState(() {
                               widget.caretaker.workTypes =
                                   currentWorkTypesTextFormFieldValue;
-                              modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying)
+                                modifyCaretakerInDb(widget.caretaker);
                             });
                           } else {
                             setState(() {
@@ -400,7 +418,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             if (currentWorkTypesTextFormFieldValue.isNotEmpty) {
                               widget.caretaker.workTypes =
                                   currentWorkTypesTextFormFieldValue;
-                              modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying)
+                                modifyCaretakerInDb(widget.caretaker);
                             } else {
                               _workTypesController.text =
                                   widget.caretaker.workTypes;
@@ -459,7 +478,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             setState(() {
                               widget.caretaker.availability =
                                   currentAvailabilityTextFormFieldValue;
-                              modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying)
+                                modifyCaretakerInDb(widget.caretaker);
                             });
                           } else {
                             setState(() {
@@ -475,13 +495,61 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                 .isNotEmpty) {
                               widget.caretaker.availability =
                                   currentAvailabilityTextFormFieldValue;
-                              modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying)
+                                modifyCaretakerInDb(widget.caretaker);
                             } else {
                               _availabilityController.text =
                                   widget.caretaker.availability;
                             }
                           });
                         },
+                      ),
+                      Align(
+                        alignment: const AlignmentDirectional(0.00, 0.00),
+                        child: Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0, 34, 0, 12),
+                          child: FFButtonWidget(
+                            onPressed: () {
+                              setState(() {
+                                if (!widget.modifying) {
+                                  addCaretakerToDb(widget.caretaker);
+                                } else {
+                                  removeCaretakerFromDb(widget.caretaker.id);
+                                }
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CaretakerScreen()));
+                              });
+                            },
+                            text: widget.modifying ? 'DELETE' : 'ADD',
+                            options: FFButtonOptions(
+                              width: 600,
+                              height: 48,
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 0, 0),
+                              iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 0, 0),
+                              color: widget.modifying
+                                  ? const Color(0xFFEFEFEF)
+                                  : FlutterFlowTheme.of(context).primary,
+                              textStyle: FlutterFlowTheme.of(context)
+                                  .titleSmall
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    color: widget.modifying
+                                        ? const Color(0xFFFF0800)
+                                        : Colors.white,
+                                  ),
+                              elevation: 4,
+                              borderSide: const BorderSide(
+                                color: Colors.transparent,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(60),
+                            ),
+                          ),
+                        ),
                       ),
                     ].divide(const SizedBox(height: 12)),
                   ),
@@ -521,7 +589,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
         _dateController.text =
             "${updatedDateTime.day.toString().padLeft(2, '0')}/${updatedDateTime.month.toString().padLeft(2, '0')}/${updatedDateTime.year}";
 
-        modifyCaretakerInDb(widget.caretaker);
+        if (widget.modifying) modifyCaretakerInDb(widget.caretaker);
       }
     }
   }

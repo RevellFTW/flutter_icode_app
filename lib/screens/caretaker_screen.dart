@@ -394,39 +394,11 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
         backgroundColor: appBackgroundColor,
         foregroundColor: appForegroundColor,
         onPressed: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                    title: const Text('Add Caretaker'),
-                    content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _caretakerNameController,
-                            decoration: const InputDecoration(
-                                labelText: 'Caretaker Name'),
-                          ),
-                        ]),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('Add'),
-                        onPressed: () {
-                          addCaretaker(
-                              _caretakerNameController.text.toString());
-                          _caretakerNameController.clear();
-                          setState(() {});
-                          Navigator.of(context).pop();
-                          filterCaretakers();
-                        },
-                      ),
-                    ],
-                  ));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CaretakerFormScreen(
+                    caretaker: Caretaker.empty(),
+                    modifying: false,
+                  )));
         },
         child: const Icon(Icons.add),
       ),

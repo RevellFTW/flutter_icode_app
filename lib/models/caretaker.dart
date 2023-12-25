@@ -20,4 +20,16 @@ class Caretaker {
     required this.availability,
     this.patients = const [],
   });
+
+  static Caretaker empty() {
+    return Caretaker(
+        id: 0,
+        name: '',
+        startDate: DateTime.now(),
+        dateOfBirth: DateTime.now(),
+        email: '',
+        workTypes: '',
+        availability: '',
+        patients: []);
+  }
 }

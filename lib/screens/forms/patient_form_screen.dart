@@ -26,8 +26,12 @@ export '../../models/patient_form_model.dart';
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;
   final List<Caretaker> caretakerList;
+  final bool modifying;
   const PatientFormScreen(
-      {super.key, required this.patient, required this.caretakerList});
+      {super.key,
+      required this.patient,
+      required this.caretakerList,
+      this.modifying = true});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -59,27 +63,35 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   @override
   void initState() {
     super.initState();
-    relatives = widget.patient.relatives;
-    selectedCaretakerValueItems =
-        caretakerListToValueItemList(widget.patient.assignedCaretakers!);
-
     _model = createModel(context, () => PatientFormModel());
-    updatedDateTime = widget.patient.startDate;
-    _nameController = TextEditingController(text: widget.patient.name);
-    _dateController.text =
-        "${widget.patient.dateOfBirth.day.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.month.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.year}";
-    _medicalStateController =
-        TextEditingController(text: widget.patient.medicalState);
-    _takenMedicinesController =
-        TextEditingController(text: widget.patient.takenMedicines);
-    _allergiesController =
-        TextEditingController(text: widget.patient.allergies);
+    if (widget.modifying) {
+      relatives = widget.patient.relatives;
+      selectedCaretakerValueItems =
+          caretakerListToValueItemList(widget.patient.assignedCaretakers!);
 
-    multiSelectDropdownController
-        .setOptions(caretakerListToValueItemList(widget.caretakerList));
+      updatedDateTime = widget.patient.startDate;
+      _nameController = TextEditingController(text: widget.patient.name);
+      _dateController.text =
+          "${widget.patient.dateOfBirth.day.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.month.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.year}";
+      _medicalStateController =
+          TextEditingController(text: widget.patient.medicalState);
+      _takenMedicinesController =
+          TextEditingController(text: widget.patient.takenMedicines);
+      _allergiesController =
+          TextEditingController(text: widget.patient.allergies);
 
-    multiSelectDropdownController
-        .setSelectedOptions(selectedCaretakerValueItems);
+      multiSelectDropdownController
+          .setOptions(caretakerListToValueItemList(widget.caretakerList));
+
+      multiSelectDropdownController
+          .setSelectedOptions(selectedCaretakerValueItems);
+    } else {
+      _nameController = TextEditingController(text: '');
+      _dateController.text = '';
+      _medicalStateController = TextEditingController(text: '');
+      _takenMedicinesController = TextEditingController(text: '');
+      _allergiesController = TextEditingController(text: '');
+    }
   }
 
   @override
@@ -106,7 +118,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                   child: Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
                     child: Text(
-                      '${widget.patient.name}\'s sheet',
+                      widget.modifying
+                          ? '${widget.patient.name}\'s sheet'
+                          : 'Add new patient',
                       style:
                           FlutterFlowTheme.of(context).headlineMedium.override(
                                 fontFamily: 'Outfit',
@@ -122,101 +136,114 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Align(
-                            alignment: const AlignmentDirectional(-1.00, 0.00),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 0, 12),
-                              child: FFButtonWidget(
-                                onPressed: () async {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => CareTasksPage(
-                                          patient: widget.patient)));
-                                },
-                                text: 'Care Tasks',
-                                options: FFButtonOptions(
-                                  width: 150,
-                                  height: 48,
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
-                                  iconPadding:
-                                      const EdgeInsetsDirectional.fromSTEB(
-                                          0, 0, 0, 0),
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  elevation: 4,
-                                  borderSide: const BorderSide(
-                                    color: Colors.transparent,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(60),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            child: Align(
-                              alignment: const AlignmentDirectional(1.00, 0.00),
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0, 0, 0, 12),
-                                child: FFButtonWidget(
-                                  onPressed: () async {
-                                    List<EventLog> tasks =
-                                        await loadEventLogsFromFirestore(
-                                            widget.patient.id, Caller.patient);
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                EventLogScreen(
-                                                  eventLogs: tasks,
-                                                  eventLogName:
-                                                      "${widget.patient.name} Patient's Log",
-                                                  caller: Caller.patient,
-                                                  patient: widget.patient,
-                                                )));
-                                  },
-                                  text: 'Event Logs',
-                                  options: FFButtonOptions(
-                                    width: 150,
-                                    height: 48,
+                      widget.modifying
+                          ? Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Align(
+                                  alignment:
+                                      const AlignmentDirectional(-1.00, 0.00),
+                                  child: Padding(
                                     padding:
                                         const EdgeInsetsDirectional.fromSTEB(
-                                            0, 0, 0, 0),
-                                    iconPadding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0, 0, 0, 0),
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .override(
-                                          fontFamily: 'Readex Pro',
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.normal,
+                                            0, 0, 0, 12),
+                                    child: FFButtonWidget(
+                                      onPressed: () async {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CareTasksPage(
+                                                        patient:
+                                                            widget.patient)));
+                                      },
+                                      text: 'Care Tasks',
+                                      options: FFButtonOptions(
+                                        width: 150,
+                                        height: 48,
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0, 0, 0, 0),
+                                        iconPadding: const EdgeInsetsDirectional
+                                            .fromSTEB(0, 0, 0, 0),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                        elevation: 4,
+                                        borderSide: const BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1,
                                         ),
-                                    elevation: 4,
-                                    borderSide: const BorderSide(
-                                      color: Colors.transparent,
-                                      width: 1,
+                                        borderRadius: BorderRadius.circular(60),
+                                      ),
                                     ),
-                                    borderRadius: BorderRadius.circular(60),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                                Flexible(
+                                  child: Align(
+                                    alignment:
+                                        const AlignmentDirectional(1.00, 0.00),
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0, 0, 0, 12),
+                                      child: FFButtonWidget(
+                                        onPressed: () async {
+                                          List<EventLog> tasks =
+                                              await loadEventLogsFromFirestore(
+                                                  widget.patient.id,
+                                                  Caller.patient);
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EventLogScreen(
+                                                        eventLogs: tasks,
+                                                        eventLogName:
+                                                            "${widget.patient.name} Patient's Log",
+                                                        caller: Caller.patient,
+                                                        patient: widget.patient,
+                                                      )));
+                                        },
+                                        text: 'Event Logs',
+                                        options: FFButtonOptions(
+                                          width: 150,
+                                          height: 48,
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(0, 0, 0, 0),
+                                          iconPadding:
+                                              const EdgeInsetsDirectional
+                                                  .fromSTEB(0, 0, 0, 0),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          textStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleSmall
+                                                  .override(
+                                                    fontFamily: 'Readex Pro',
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                          elevation: 4,
+                                          borderSide: const BorderSide(
+                                            color: Colors.transparent,
+                                            width: 1,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(60),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Container(),
                       TextFormField(
                         controller: _nameController,
                         focusNode: _model.textFieldFocusNode1,
@@ -265,7 +292,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             setState(() {
                               widget.patient.name =
                                   currentNameTextFormFieldValue;
-                              modifyPatientInDb(widget.patient);
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
                             });
                           } else {
                             setState(() {
@@ -279,7 +307,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             if (currentNameTextFormFieldValue.isNotEmpty) {
                               widget.patient.name =
                                   currentNameTextFormFieldValue;
-                              modifyPatientInDb(widget.patient);
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
                             } else {
                               _nameController.text = widget.patient.name;
                             }
@@ -390,7 +419,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             setState(() {
                               widget.patient.medicalState =
                                   currentMedicalStateTextFormFieldValue;
-                              modifyPatientInDb(widget.patient);
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
                             });
                           } else {
                             setState(() {
@@ -406,7 +436,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                 .isNotEmpty) {
                               widget.patient.medicalState =
                                   currentMedicalStateTextFormFieldValue;
-                              modifyPatientInDb(widget.patient);
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
                             } else {
                               _medicalStateController.text =
                                   widget.patient.medicalState;
@@ -471,7 +502,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                   updateCount: (count) => {
                                     setState(() =>
                                         widget.patient.dailyHours = count),
-                                    modifyPatientInDb(widget.patient)
+                                    if (widget.modifying)
+                                      modifyPatientInDb(widget.patient)
                                   },
                                   stepSize: 1,
                                   minimum: 1,
@@ -532,7 +564,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             setState(() {
                               widget.patient.takenMedicines =
                                   currentTakenMedicinesTextFormFieldValue;
-                              modifyPatientInDb(widget.patient);
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
                             });
                           } else {
                             setState(() {
@@ -548,7 +581,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                 .isNotEmpty) {
                               widget.patient.takenMedicines =
                                   currentTakenMedicinesTextFormFieldValue;
-                              modifyPatientInDb(widget.patient);
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
                             } else {
                               _takenMedicinesController.text =
                                   widget.patient.takenMedicines;
@@ -605,7 +639,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             setState(() {
                               widget.patient.allergies =
                                   currentAllergiesTextFormFieldValue;
-                              modifyPatientInDb(widget.patient);
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
                             });
                           } else {
                             setState(() {
@@ -620,7 +655,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             if (currentAllergiesTextFormFieldValue.isNotEmpty) {
                               widget.patient.allergies =
                                   currentAllergiesTextFormFieldValue;
-                              modifyPatientInDb(widget.patient);
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
                             } else {
                               _allergiesController.text =
                                   widget.patient.allergies;
@@ -641,7 +677,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                 .where((element) => selectedItems
                                     .contains(element.id.toString()))
                                 .toList();
-                            modifyPatientInDb(widget.patient);
+                            if (widget.modifying)
+                              modifyPatientInDb(widget.patient);
                           },
                           options: caretakerListToValueItemList(
                               widget.caretakerList),
@@ -656,116 +693,189 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           borderRadius: 8,
                         ),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                10, 20, 0, 0),
-                            child: Text(
-                              'Relatives',
-                              style: FlutterFlowTheme.of(context).bodyMedium,
-                            ),
-                          ),
-                        ],
-                      ),
-                      ListView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        itemCount: relatives.length,
-                        itemBuilder: (context, i) {
-                          return Padding(
-                            key: ValueKey<int>(relatives[i].id),
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 0, 0, 1),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                //goto edit relative
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => RelativeFormScreen(
-                                        modifying: true,
-                                        relative: relatives[i],
-                                        patient: widget.patient)));
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      blurRadius: 0,
-                                      color: Color(0xFFE0E3E7),
-                                      offset: Offset(0, 1),
-                                    )
+                      widget.modifying
+                          ? Column(
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              10, 20, 0, 0),
+                                      child: Text(
+                                        'Relatives',
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium,
+                                      ),
+                                    ),
                                   ],
-                                  borderRadius: BorderRadius.circular(0),
-                                  shape: BoxShape.rectangle,
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      8, 8, 8, 8),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(12, 0, 0, 0),
-                                          child: Text(
-                                            relatives[i].name,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyLarge,
+                                ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: relatives.length,
+                                  itemBuilder: (context, i) {
+                                    return Padding(
+                                      key: ValueKey<int>(relatives[i].id),
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0, 0, 0, 1),
+                                      child: InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () async {
+                                          //goto edit relative
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      RelativeFormScreen(
+                                                          modifying: true,
+                                                          relative:
+                                                              relatives[i],
+                                                          patient:
+                                                              widget.patient)));
+                                        },
+                                        child: Container(
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            color: FlutterFlowTheme.of(context)
+                                                .secondaryBackground,
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                blurRadius: 0,
+                                                color: Color(0xFFE0E3E7),
+                                                offset: Offset(0, 1),
+                                              )
+                                            ],
+                                            borderRadius:
+                                                BorderRadius.circular(0),
+                                            shape: BoxShape.rectangle,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(8, 8, 8, 8),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                            12, 0, 0, 0),
+                                                    child: Text(
+                                                      relatives[i].name,
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyLarge,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ],
+                                    );
+                                  },
+                                ),
+                                Align(
+                                  alignment:
+                                      const AlignmentDirectional(-1.00, 0.00),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 12),
+                                    child: FFButtonWidget(
+                                      onPressed: () async {
+                                        // context.pushNamed('AddRelative');
+                                        final int relativesCount =
+                                            await getRelativesCountFromFirestore();
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RelativeFormScreen(
+                                                        relative:
+                                                            Relative.justID(
+                                                                relativesCount +
+                                                                    1),
+                                                        modifying: false,
+                                                        patient:
+                                                            widget.patient),
+                                                maintainState: false));
+                                      },
+                                      text: 'Add Relative',
+                                      options: FFButtonOptions(
+                                        width: 150,
+                                        height: 48,
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0, 0, 0, 0),
+                                        iconPadding: const EdgeInsetsDirectional
+                                            .fromSTEB(0, 0, 0, 0),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                        elevation: 4,
+                                        borderSide: const BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(60),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                              ],
+                            )
+                          : Container(),
                       Align(
-                        alignment: const AlignmentDirectional(-1.00, 0.00),
+                        alignment: const AlignmentDirectional(0.00, 0.00),
                         child: Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 12),
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0, 34, 0, 12),
                           child: FFButtonWidget(
-                            onPressed: () async {
-                              // context.pushNamed('AddRelative');
-                              final int relativesCount =
-                                  await getRelativesCountFromFirestore();
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => RelativeFormScreen(
-                                      relative:
-                                          Relative.justID(relativesCount + 1),
-                                      modifying: false,
-                                      patient: widget.patient),
-                                  maintainState: false));
+                            onPressed: () {
+                              setState(() {
+                                if (!widget.modifying) {
+                                  addPatientToDb(widget.patient);
+                                } else {
+                                  removePatientFromDb(widget.patient.id);
+                                }
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const PatientScreen()));
+                              });
                             },
-                            text: 'Add Relative',
+                            text: widget.modifying ? 'DELETE' : 'ADD',
                             options: FFButtonOptions(
-                              width: 150,
+                              width: 600,
                               height: 48,
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   0, 0, 0, 0),
                               iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                   0, 0, 0, 0),
-                              color: FlutterFlowTheme.of(context).primary,
+                              color: widget.modifying
+                                  ? const Color(0xFFEFEFEF)
+                                  : FlutterFlowTheme.of(context).primary,
                               textStyle: FlutterFlowTheme.of(context)
                                   .titleSmall
                                   .override(
                                     fontFamily: 'Readex Pro',
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.normal,
+                                    color: widget.modifying
+                                        ? const Color(0xFFFF0800)
+                                        : Colors.white,
                                   ),
                               elevation: 4,
                               borderSide: const BorderSide(
@@ -825,7 +935,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         _dateController.text =
             "${updatedDateTime.day.toString().padLeft(2, '0')}/${updatedDateTime.month.toString().padLeft(2, '0')}/${updatedDateTime.year}";
 
-        modifyPatientInDb(widget.patient);
+        if (widget.modifying) modifyPatientInDb(widget.patient);
       }
     }
   }
