@@ -30,13 +30,13 @@ class _PatientScreenState extends State<PatientScreen> {
 
   @override
   void initState() {
-    super.initState();
-
     _loadPatientData().then((value) {
-      setState(() {
-        patients = value;
-        _filteredPatients = patients;
-      });
+      if (mounted) {
+        setState(() {
+          patients = value;
+          _filteredPatients = patients;
+        });
+      }
     });
 
     _searchController.addListener(() {
@@ -45,10 +45,20 @@ class _PatientScreenState extends State<PatientScreen> {
     filterPatients();
 
     loadCaretakers().then((value) {
-      setState(() {
-        caretakerList = value;
-      });
+      if (mounted) {
+        setState(() {
+          caretakerList = value;
+        });
+      }
     });
+    super.initState();
+  }
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 
   @override
@@ -399,6 +409,7 @@ class _PatientScreenState extends State<PatientScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         backgroundColor: appBackgroundColor,
         foregroundColor: appForegroundColor,
         onPressed: () {

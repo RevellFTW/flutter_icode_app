@@ -1,6 +1,5 @@
+import 'package:todoapp/auth_screens/new_login_screen.dart';
 import 'package:todoapp/global/variables.dart';
-
-import '../auth_screens/home_screen.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
 import '../helper/flutter_flow/flutter_flow_theme.dart';
 import '../helper/flutter_flow/flutter_flow_util.dart';
@@ -143,45 +142,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 8),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 0, 0),
-                  child: Text(
-                    'Logged In user:',
-                    style: FlutterFlowTheme.of(context).headlineMedium.override(
-                          fontFamily: 'Outfit',
-                          color: FlutterFlowTheme.of(context).primaryText,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic,
-                        ),
-                  ),
-                ),
-                Flexible(
-                  child: Align(
-                    alignment: const AlignmentDirectional(-1.00, 0.00),
-                    child: Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(9, 0, 10, 0),
-                      child: Text(
-                        //todo add user name
-                        auth.currentUser!.email.toString(),
-                        style: FlutterFlowTheme.of(context)
-                            .headlineMedium
-                            .override(
-                              fontFamily: 'Outfit',
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w500,
-                              fontStyle: FontStyle.italic,
-                            ),
-                      ),
+            child: Flexible(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start, // Align texts to the start
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 0, 0),
+                    child: Text(
+                      'Logged In user:',
+                      style:
+                          FlutterFlowTheme.of(context).headlineMedium.override(
+                                fontFamily: 'Outfit',
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                              ),
                     ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 10, 0),
+                    child: Text(
+                      //todo add user name
+                      auth.currentUser!.email.toString(),
+                      style:
+                          FlutterFlowTheme.of(context).headlineMedium.override(
+                                fontFamily: 'Outfit',
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.italic,
+                              ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(
@@ -204,7 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () async {
                 auth.signOut();
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const HomeScreen()));
+                    builder: (context) => const AuthWidget()));
               },
               text: 'Log Out',
               options: FFButtonOptions(

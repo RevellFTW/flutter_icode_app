@@ -33,7 +33,7 @@ class CareTasksForm extends StatefulWidget {
 }
 
 class _CareTasksFormState extends State<CareTasksForm> {
-  String title = 'Add new Event log';
+  String title = 'Add new care task';
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<String> list = <String>['weekly', 'monthly', 'daily', 'once'];
@@ -55,7 +55,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
   @override
   void initState() {
     super.initState();
-    if (widget.modifying) title = 'Modify Event Log';
+    if (widget.modifying) title = 'Modify care task';
     _nameController = TextEditingController();
     _dateController = TextEditingController();
     selectedDateTimeWhenAdding = DateTime.now().toString();
@@ -343,7 +343,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
-                            labelText: 'Event Log Name',
+                            labelText: 'Care task Name',
                             labelStyle:
                                 FlutterFlowTheme.of(context).labelMedium,
                             hintStyle: FlutterFlowTheme.of(context).labelMedium,
@@ -552,6 +552,15 @@ class _CareTasksFormState extends State<CareTasksForm> {
                         onPressed: () {
                           setState(() async {
                             if (!widget.modifying) {
+                              if (_nameController.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Please enter a name for the care task'),
+                                  ),
+                                );
+                                return;
+                              }
                               widget.patient.careTasks.add(CareTask(
                                   taskName: _nameController.text,
                                   taskFrequency: Frequency.values

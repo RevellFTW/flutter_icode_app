@@ -171,6 +171,23 @@ class _EventLogScreenState extends State<EventLogScreen> {
         body: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
+            Align(
+              alignment: const AlignmentDirectional(-1.00, 0.00),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(10, 15, 0, 0),
+                child: Text(
+                  widget.caller == Caller.patient
+                      ? '${widget.patient!.name}\'s event log'
+                      : '${widget.caretaker!.name}\'s event log',
+                  style: FlutterFlowTheme.of(context).headlineMedium.override(
+                        fontFamily: 'Outfit',
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+              ),
+            ),
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
               child: ValueListenableBuilder<DateTime>(

@@ -40,7 +40,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                           alignment: const AlignmentDirectional(0.00, 0.00),
                           child: Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(
-                                4, 0, 0, 0),
+                                0, 8, 0, 0),
                             child: Text(
                               'CuramusApp',
                               style: FlutterFlowTheme.of(context)
@@ -63,23 +63,29 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
-                          child: FlutterFlowIconButton(
-                            borderColor: Colors.transparent,
-                            borderRadius: 30,
-                            borderWidth: 1,
-                            buttonSize: 50,
-                            icon: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Colors.white,
-                              size: 30,
+                        InkWell(
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                12, 0, 0, 0),
+                            child: Container(
+                              width: 60, // Adjust these values as needed
+                              height: 60, // Adjust these values as needed
+                              child: const FlutterFlowIconButton(
+                                borderColor: Colors.transparent,
+                                borderRadius: 50,
+                                borderWidth: 1,
+                                buttonSize: 50,
+                                icon: Icon(
+                                  Icons.arrow_back_rounded,
+                                  color: Colors.white,
+                                  size: 25,
+                                ),
+                              ),
                             ),
-                            onPressed: () async {
-                              onBackPressed();
-                            },
                           ),
+                          onTap: () async {
+                            onBackPressed();
+                          },
                         ),
                         Flexible(
                           child: Padding(

@@ -33,10 +33,12 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
     super.initState();
 
     _loadCaretakerData().then((value) {
-      setState(() {
-        caretakers = value;
-        _filteredCaretakers = caretakers;
-      });
+      if (mounted) {
+        setState(() {
+          caretakers = value;
+          _filteredCaretakers = caretakers;
+        });
+      }
     });
 
     _searchController.addListener(() {
@@ -50,6 +52,13 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
     _caretakerNameController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 
   Future<List<Caretaker>> _loadCaretakerData() async {
@@ -391,6 +400,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         backgroundColor: appBackgroundColor,
         foregroundColor: appForegroundColor,
         onPressed: () {

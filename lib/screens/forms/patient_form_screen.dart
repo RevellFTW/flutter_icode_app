@@ -849,6 +849,21 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             onPressed: () {
                               setState(() {
                                 if (!widget.modifying) {
+                                  if (widget.patient.name.isEmpty ||
+                                      widget.patient.medicalState.isEmpty ||
+                                      widget.patient.assignedCaretakers!
+                                          .isEmpty ||
+                                      widget.patient.dailyHours < 1) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          "Please fill name, medical state, daily hours and assign at least one caretaker",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
                                   addPatientToDb(widget.patient);
                                 } else {
                                   removePatientFromDb(widget.patient.id);

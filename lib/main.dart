@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
+import 'package:todoapp/auth_screens/new_login_screen.dart';
 import 'package:todoapp/screens/settings.dart';
-import 'auth_screens/home_screen.dart';
-import 'auth_screens/login_screen.dart';
-import 'auth_screens/signup_screen.dart';
 import 'auth_screens/welcome.dart';
 import 'firebase_options.dart';
 import 'global/variables.dart';
@@ -54,11 +52,9 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(useMaterial3: true),
       debugShowCheckedModeBanner: false,
       //home: HomePage(),
-      initialRoute: HomeScreen.id,
+      initialRoute: AuthWidget.id,
       routes: {
-        HomeScreen.id: (context) => const HomeScreen(),
-        LoginScreen.id: (context) => const LoginScreen(),
-        SignUpScreen.id: (context) => const SignUpScreen(),
+        AuthWidget.id: (context) => const AuthWidget(),
         WelcomeScreen.id: (context) => const WelcomeScreen(),
         SettingsScreen.id: (context) => const SettingsScreen(),
       },

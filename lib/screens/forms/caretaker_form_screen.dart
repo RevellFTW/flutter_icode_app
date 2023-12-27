@@ -100,7 +100,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                 Flexible(
                                   child: Align(
                                     alignment:
-                                        const AlignmentDirectional(1.00, 0.00),
+                                        const AlignmentDirectional(-1.00, 0.00),
                                     child: Padding(
                                       padding:
                                           const EdgeInsetsDirectional.fromSTEB(
@@ -513,6 +513,19 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             onPressed: () {
                               setState(() {
                                 if (!widget.modifying) {
+                                  if (widget.caretaker.name.isEmpty ||
+                                      widget.caretaker.email.isEmpty ||
+                                      widget.caretaker.workTypes.isEmpty ||
+                                      widget.caretaker.availability.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Please fill all the fields',
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
                                   addCaretakerToDb(widget.caretaker);
                                 } else {
                                   removeCaretakerFromDb(widget.caretaker.id);

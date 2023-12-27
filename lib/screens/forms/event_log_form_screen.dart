@@ -414,6 +414,15 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                         onPressed: () {
                           setState(() async {
                             if (!widget.modifying) {
+                              if (widget.eventLog.name.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Please select a task name for the event log'),
+                                  ),
+                                );
+                                return;
+                              }
                               addEventLogInDb(widget.eventLog);
                             } else {
                               deleteEventLogFromFireStore(widget.eventLog);

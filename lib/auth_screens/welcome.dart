@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:todoapp/auth_screens/new_login_screen.dart';
 import '../global/variables.dart';
 import '../screens/home_page.dart';
-import 'home_screen.dart';
 
 bool back_office = false;
 
@@ -35,7 +35,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         }
       }
     } else {
-      Navigator.pushNamed(context, HomeScreen.id);
+      Navigator.pushNamed(context, AuthWidget.id);
     }
     if (isBackOffice) {
       back_office = true;

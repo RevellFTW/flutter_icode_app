@@ -55,6 +55,21 @@ class _CareTasksPageState extends State<CareTasksPage> {
       ),
       body: Column(
         children: [
+          Align(
+            alignment: const AlignmentDirectional(-1.00, 0.00),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(10, 15, 0, 0),
+              child: Text(
+                '${widget.patient.name}\'s care tasks',
+                style: FlutterFlowTheme.of(context).headlineMedium.override(
+                      fontFamily: 'Outfit',
+                      color: FlutterFlowTheme.of(context).primaryText,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+            ),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 0),
@@ -194,6 +209,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         backgroundColor: appBackgroundColor,
         foregroundColor: appForegroundColor,
         onPressed: () {
