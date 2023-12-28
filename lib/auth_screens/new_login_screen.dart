@@ -319,6 +319,58 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                             .text = value;
                                                       }
                                                     },
+                                                    onFieldSubmitted:
+                                                        (value) async {
+                                                      FocusManager
+                                                          .instance.primaryFocus
+                                                          ?.unfocus();
+                                                      setState(() {
+                                                        _saving = true;
+                                                      });
+                                                      try {
+                                                        await auth.signInWithEmailAndPassword(
+                                                            email: _model
+                                                                .emailAddressController
+                                                                .text,
+                                                            password: _model
+                                                                .passwordController
+                                                                .text);
+
+                                                        if (context.mounted) {
+                                                          setState(() {
+                                                            _saving = false;
+                                                            Navigator
+                                                                .popAndPushNamed(
+                                                                    context,
+                                                                    AuthWidget
+                                                                        .id);
+                                                          });
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              WelcomeScreen.id);
+                                                        }
+                                                      } catch (e) {
+                                                        // ignore: use_build_context_synchronously
+                                                        signUpAlert(
+                                                          context: context,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              _saving = false;
+                                                            });
+                                                            Navigator
+                                                                .popAndPushNamed(
+                                                                    context,
+                                                                    AuthWidget
+                                                                        .id);
+                                                          },
+                                                          title:
+                                                              'WRONG PASSWORD OR EMAIL',
+                                                          desc:
+                                                              'Confirm your email and password and try again',
+                                                          btnText: 'Try Now',
+                                                        ).show();
+                                                      }
+                                                    },
                                                     decoration: InputDecoration(
                                                       labelText: 'Email',
                                                       labelStyle:
@@ -406,6 +458,58 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                         _model
                                                             .passwordController
                                                             .text = value;
+                                                      }
+                                                    },
+                                                    onFieldSubmitted:
+                                                        (value) async {
+                                                      FocusManager
+                                                          .instance.primaryFocus
+                                                          ?.unfocus();
+                                                      setState(() {
+                                                        _saving = true;
+                                                      });
+                                                      try {
+                                                        await auth.signInWithEmailAndPassword(
+                                                            email: _model
+                                                                .emailAddressController
+                                                                .text,
+                                                            password: _model
+                                                                .passwordController
+                                                                .text);
+
+                                                        if (context.mounted) {
+                                                          setState(() {
+                                                            _saving = false;
+                                                            Navigator
+                                                                .popAndPushNamed(
+                                                                    context,
+                                                                    AuthWidget
+                                                                        .id);
+                                                          });
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              WelcomeScreen.id);
+                                                        }
+                                                      } catch (e) {
+                                                        // ignore: use_build_context_synchronously
+                                                        signUpAlert(
+                                                          context: context,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              _saving = false;
+                                                            });
+                                                            Navigator
+                                                                .popAndPushNamed(
+                                                                    context,
+                                                                    AuthWidget
+                                                                        .id);
+                                                          },
+                                                          title:
+                                                              'WRONG PASSWORD OR EMAIL',
+                                                          desc:
+                                                              'Confirm your email and password and try again',
+                                                          btnText: 'Try Now',
+                                                        ).show();
                                                       }
                                                     },
                                                     controller: _model
