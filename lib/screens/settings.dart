@@ -1,5 +1,6 @@
 import 'package:todoapp/auth_screens/new_login_screen.dart';
 import 'package:todoapp/global/variables.dart';
+import 'package:todoapp/main.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
 import '../helper/flutter_flow/flutter_flow_theme.dart';
 import '../helper/flutter_flow/flutter_flow_util.dart';
@@ -200,8 +201,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: FFButtonWidget(
               onPressed: () async {
                 auth.signOut();
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const AuthWidget()));
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const MyApp(),
+                  ),
+                );
               },
               text: 'Log Out',
               options: FFButtonOptions(

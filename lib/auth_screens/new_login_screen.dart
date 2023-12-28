@@ -205,44 +205,6 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                   0, 24, 0, 0),
                               child: Column(
                                 children: [
-                                  Align(
-                                    alignment: const Alignment(0, 0),
-                                    child: FlutterFlowButtonTabBar(
-                                      useToggleButtonStyle: true,
-                                      isScrollable: true,
-                                      labelStyle: FlutterFlowTheme.of(context)
-                                          .titleMedium,
-                                      unselectedLabelStyle: const TextStyle(),
-                                      labelColor: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      unselectedLabelColor:
-                                          FlutterFlowTheme.of(context)
-                                              .secondaryText,
-                                      backgroundColor:
-                                          FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                      unselectedBackgroundColor:
-                                          FlutterFlowTheme.of(context)
-                                              .alternate,
-                                      borderColor: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      borderWidth: 2,
-                                      borderRadius: 12,
-                                      elevation: 0,
-                                      labelPadding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              32, 0, 32, 0),
-                                      tabs: const [
-                                        Tab(
-                                          text: 'Sign In',
-                                        ),
-                                        Tab(
-                                          text: 'Sign Up As Patient',
-                                        ),
-                                      ],
-                                      controller: _model.tabBarController,
-                                    ),
-                                  ),
                                   Expanded(
                                     child: TabBarView(
                                       controller: _model.tabBarController,

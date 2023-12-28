@@ -15,6 +15,9 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool loading = true;
+  bool back_office = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,11 +54,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         const SnackBar(content: Text('You are not a back office user')),
       );
     }
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    checkUserType(context);
+    if (loading) {
+      return const Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            CircularProgressIndicator(),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(back_office ? appName : 'Under construction'),
@@ -70,11 +86,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             SystemNavigator.pop();
             return false;
           },
-          child: const Center(
-              // child: ScreenTitle(
-              //   //title: 'Page is under construction',
-              // ),
-              ),
+          child: const Center(),
         ),
       ),
     );

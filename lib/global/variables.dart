@@ -12,10 +12,10 @@ String selectedDateTime = DateTime.now().toString();
 //DateTime monthlyPickerSelectedDate = DateTime.now();
 String selectedDateTimeWhenAdding = "Select";
 Color appForegroundColor = Colors.white;
-Color appBackgroundColor = Colors.indigo.shade200;
+Color appBackgroundColor = const Color(0xff008080);
 Map<int, bool> checkboxState = {};
 
-const Color kTextColor = Color(0xFF4879C5);
+const Color kTextColor = Color(0xff008080);
 const InputDecoration kTextInputDecoration = InputDecoration(
   border: InputBorder.none,
   hintText: '',
