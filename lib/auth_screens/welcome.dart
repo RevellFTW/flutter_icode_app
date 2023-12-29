@@ -24,6 +24,43 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     checkUserType(context);
   }
 
+  @override
+  Widget build(BuildContext context) {
+    if (loading) {
+      firstLogin = false;
+      return const Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            CircularProgressIndicator(
+              backgroundColor: Colors.white,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            ),
+          ],
+        ),
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(back_office ? appName : 'Under construction'),
+        backgroundColor: appBackgroundColor,
+        foregroundColor: appForegroundColor,
+      ),
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.only(left: 30.0, right: 30, top: 10),
+        child: WillPopScope(
+          onWillPop: () async {
+            SystemNavigator.pop();
+            return false;
+          },
+          child: const Center(),
+        ),
+      ),
+    );
+  }
+
   Future<void> checkUserType(BuildContext context) async {
     bool isBackOffice = false;
 
@@ -57,38 +94,5 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     setState(() {
       loading = false;
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (loading) {
-      return const Padding(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            CircularProgressIndicator(),
-          ],
-        ),
-      );
-    }
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(back_office ? appName : 'Under construction'),
-        backgroundColor: appBackgroundColor,
-        foregroundColor: appForegroundColor,
-      ),
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.only(left: 30.0, right: 30, top: 10),
-        child: WillPopScope(
-          onWillPop: () async {
-            SystemNavigator.pop();
-            return false;
-          },
-          child: const Center(),
-        ),
-      ),
-    );
   }
 }

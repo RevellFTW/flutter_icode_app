@@ -14,7 +14,7 @@ String selectedDateTimeWhenAdding = "Select";
 Color appForegroundColor = Colors.white;
 Color appBackgroundColor = const Color(0xff008080);
 Map<int, bool> checkboxState = {};
-
+bool firstLogin = true;
 const Color kTextColor = Color(0xff008080);
 const InputDecoration kTextInputDecoration = InputDecoration(
   border: InputBorder.none,
