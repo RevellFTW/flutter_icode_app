@@ -141,9 +141,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 8),
-            child: Flexible(
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 8),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment:
