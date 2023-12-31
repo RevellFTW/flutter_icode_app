@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/models/relative.dart';
@@ -23,6 +24,7 @@ class _PatientScreenState extends State<PatientScreen> {
   List<Patient> patients = [];
   final TextEditingController _searchController = TextEditingController();
   List<Patient> _filteredPatients = [];
+  bool isTrashIconTapped = false;
 
   Patient? getPatient(int id) {
     return patients.firstWhere((patient) => patient.id == id);
@@ -42,7 +44,10 @@ class _PatientScreenState extends State<PatientScreen> {
     _searchController.addListener(() {
       filterPatients();
     });
-    filterPatients();
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   filterPatients();
+    // });
 
     loadCaretakers().then((value) {
       if (mounted) {
@@ -275,15 +280,19 @@ class _PatientScreenState extends State<PatientScreen> {
               child: ListView.builder(
                   itemCount: _filteredPatients.length,
                   itemBuilder: (context, i) {
-                    return Dismissible(
-                      key: ValueKey<int>(_filteredPatients[i].id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20),
-                        child: const Icon(Icons.delete, color: Colors.white),
+                    return Slidable(
+                      endActionPane: ActionPane(
+                        dismissible: DismissiblePane(onDismissed: () {}),
+                        motion: const ScrollMotion(),
+                        children: <Widget>[
+                          SlidableAction(
+                            onPressed: deletePatient(i),
+                            backgroundColor: Colors.red,
+                            icon: Icons.delete,
+                          ),
+                        ],
                       ),
+                      key: ValueKey<int>(_filteredPatients[i].id),
                       child: Padding(
                         padding:
                             const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
@@ -297,7 +306,7 @@ class _PatientScreenState extends State<PatientScreen> {
                                 blurRadius: 0,
                                 color: Color(0xFFE0E3E7),
                                 offset: Offset(0, 1),
-                              )
+                              ),
                             ],
                             borderRadius: BorderRadius.circular(0),
                             shape: BoxShape.rectangle,
@@ -345,12 +354,13 @@ class _PatientScreenState extends State<PatientScreen> {
                                   highlightColor: Colors.transparent,
                                   onTap: () async {
                                     Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PatientFormScreen(
-                                                  patient: _filteredPatients[i],
-                                                  caretakerList: caretakerList,
-                                                )));
+                                      MaterialPageRoute(
+                                        builder: (context) => PatientFormScreen(
+                                          patient: _filteredPatients[i],
+                                          caretakerList: caretakerList,
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: Card(
                                     clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -371,15 +381,14 @@ class _PatientScreenState extends State<PatientScreen> {
                                         highlightColor: Colors.transparent,
                                         onTap: () async {
                                           Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PatientFormScreen(
-                                                        patient:
-                                                            _filteredPatients[
-                                                                i],
-                                                        caretakerList:
-                                                            caretakerList,
-                                                      )));
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PatientFormScreen(
+                                                patient: _filteredPatients[i],
+                                                caretakerList: caretakerList,
+                                              ),
+                                            ),
+                                          );
                                         },
                                         child: Icon(
                                           Icons.keyboard_arrow_right_rounded,
@@ -396,12 +405,6 @@ class _PatientScreenState extends State<PatientScreen> {
                           ),
                         ),
                       ),
-                      onDismissed: (direction) {
-                        setState(() {
-                          removePatient(_filteredPatients[i].id);
-                          filterPatients();
-                        });
-                      },
                     );
                   }),
             ),
@@ -446,5 +449,16 @@ class _PatientScreenState extends State<PatientScreen> {
   void removePatient(int id) {
     patients.removeWhere((patient) => patient.id == id);
     removePatientFromDb(id);
+  }
+
+  void onPressed() {
+    isTrashIconTapped = true;
+  }
+
+  deletePatient(int i) {
+    setState(() {
+      removePatient(_filteredPatients[i].id);
+      filterPatients();
+    });
   }
 }
