@@ -29,9 +29,9 @@ class Patient {
       required this.careTasks,
       required this.relatives});
 
-  static Patient empty() {
+  static Patient empty(int id) {
     return Patient(
-        id: 0,
+        id: id,
         name: '',
         startDate: DateTime.now(),
         dateOfBirth: DateTime.now(),

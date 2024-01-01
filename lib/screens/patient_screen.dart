@@ -24,7 +24,6 @@ class _PatientScreenState extends State<PatientScreen> {
   List<Patient> patients = [];
   final TextEditingController _searchController = TextEditingController();
   List<Patient> _filteredPatients = [];
-  bool isTrashIconTapped = false;
 
   Patient? getPatient(int id) {
     return patients.firstWhere((patient) => patient.id == id);
@@ -40,7 +39,7 @@ class _PatientScreenState extends State<PatientScreen> {
         });
       }
     });
-
+    filterPatients();
     _searchController.addListener(() {
       filterPatients();
     });
@@ -282,11 +281,15 @@ class _PatientScreenState extends State<PatientScreen> {
                   itemBuilder: (context, i) {
                     return Slidable(
                       endActionPane: ActionPane(
-                        dismissible: DismissiblePane(onDismissed: () {}),
                         motion: const ScrollMotion(),
                         children: <Widget>[
                           SlidableAction(
-                            onPressed: deletePatient(i),
+                            onPressed: (context) => {
+                              removePatient(_filteredPatients[i].id),
+                              setState(() {
+                                filterPatients();
+                              })
+                            },
                             backgroundColor: Colors.red,
                             icon: Icons.delete,
                           ),
@@ -418,7 +421,7 @@ class _PatientScreenState extends State<PatientScreen> {
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => PatientFormScreen(
-                    patient: Patient.empty(),
+                    patient: Patient.empty(patients.length + 1),
                     caretakerList: caretakerList,
                     modifying: false,
                   )));
@@ -451,14 +454,11 @@ class _PatientScreenState extends State<PatientScreen> {
     removePatientFromDb(id);
   }
 
-  void onPressed() {
-    isTrashIconTapped = true;
-  }
-
   deletePatient(int i) {
-    setState(() {
-      removePatient(_filteredPatients[i].id);
-      filterPatients();
-    });
+    // setState(() {
+    //   removePatient(_filteredPatients[i].id);
+    //   filterPatients();
+    // });
+    print('delete');
   }
 }
