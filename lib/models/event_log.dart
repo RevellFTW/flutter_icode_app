@@ -1,4 +1,6 @@
 import 'package:intl/intl.dart';
+import 'package:todoapp/models/caretaker.dart';
+import 'package:todoapp/models/patient.dart';
 
 class EventLog {
   EventLog(
@@ -6,20 +8,20 @@ class EventLog {
       required this.name,
       required this.description,
       required this.date,
-      required this.caretakerId,
-      required this.patientId});
+      required this.caretaker,
+      required this.patient});
 
-  EventLog.empty(this.id)
+  EventLog.empty(this.id, Caretaker caretakerParam, Patient patientParam)
       : name = '',
         description = '',
         date = DateFormat('yyyy-MM-dd h:mm a').format(DateTime.now()),
-        caretakerId = '',
-        patientId = '';
+        caretaker = caretakerParam,
+        patient = patientParam;
 
   final int id;
   String name;
   String description;
   String date;
-  String? caretakerId;
-  String? patientId;
+  Caretaker caretaker;
+  Patient patient;
 }

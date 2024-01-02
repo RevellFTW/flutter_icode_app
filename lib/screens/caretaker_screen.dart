@@ -413,7 +413,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => CaretakerFormScreen(
-                    caretaker: Caretaker.empty(),
+                    caretaker: Caretaker.empty(caretakers.length + 1),
                     modifying: false,
                   )));
         },

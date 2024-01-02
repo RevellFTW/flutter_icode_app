@@ -111,7 +111,6 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                               await loadEventLogsFromFirestore(
                                                   widget.caretaker.id,
                                                   Caller.caretaker);
-                                          // ignore: use_build_context_synchronously
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>

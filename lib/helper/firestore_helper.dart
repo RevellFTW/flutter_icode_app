@@ -56,7 +56,6 @@ void updateRelative(Relative relative, String documentID) {
   Map<String, dynamic> relativeData = {
     'id': relative.id,
     'name': relative.name,
-    'userName': relative.userName,
     'password': relative.password,
     'email': relative.email,
     'phoneNumber': relative.phoneNumber,
@@ -69,13 +68,12 @@ Future<Relative> getRelativeFromDb(int id) async {
   String docID = await getDocumentID(id, 'relatives');
   var snapshot = await db.collection('relatives').doc(docID).get();
   Relative relative = Relative(
-    id: snapshot.data()!['id'],
-    name: snapshot.data()!['name'],
-    userName: snapshot.data()!['userName'],
-    password: snapshot.data()!['password'],
-    email: snapshot.data()!['email'],
-    phoneNumber: snapshot.data()!['phoneNumber'],
-    wantsToBeNotified: snapshot.data()!['wantsToBeNotified'],
+    id: snapshot['id'],
+    name: snapshot['name'],
+    password: snapshot['password'],
+    email: snapshot['email'],
+    phoneNumber: snapshot['phoneNumber'],
+    wantsToBeNotified: snapshot['wantsToBeNotified'],
   );
   return relative;
 }
@@ -85,11 +83,11 @@ void updateEventLog(EventLog eventLog, String documentID) {
       FirebaseFirestore.instance.collection('patientTasks').doc(documentID);
   Map<String, dynamic> eventLogData = {
     'id': eventLog.id,
-    'patientId': eventLog.patientId,
+    'patientId': eventLog.patient.id,
     'name': eventLog.name,
     'description': eventLog.description,
     'date': eventLog.date,
-    'caretakerId': eventLog.caretakerId,
+    'caretakerId': eventLog.caretaker.id,
   };
   documentReference.set(eventLogData, SetOptions(merge: true));
 }
@@ -112,11 +110,11 @@ void modifyCaretakerInDb(Caretaker caretaker) async {
 void addEventLogInDb(EventLog eventLog) async {
   Map<String, dynamic> eventLogData = {
     'id': eventLog.id,
-    'patientId': eventLog.patientId,
+    'patientId': eventLog.patient.id,
     'name': eventLog.name,
     'description': eventLog.description,
     'date': eventLog.date,
-    'caretakerId': eventLog.caretakerId,
+    'caretakerId': eventLog.caretaker.id,
   };
   addDocumentToCollection('patientTasks', eventLogData);
 }
@@ -130,7 +128,6 @@ void addRelativeToDb(Relative relative) {
   Map<String, dynamic> relativeData = {
     'id': relative.id,
     'name': relative.name,
-    'userName': relative.userName,
     'password': relative.password,
     'email': relative.email,
     'phoneNumber': relative.phoneNumber,
@@ -255,7 +252,6 @@ Future<List<Relative>> loadRelativesFromFirestore() async {
     relatives.add(Relative(
       id: doc['id'],
       name: doc['name'],
-      userName: doc['userName'],
       password: doc['password'],
       email: doc['email'], // Add the missing identifier here
       phoneNumber: doc['phoneNumber'], // Add the missing parameter here
@@ -285,11 +281,90 @@ Future<List<EventLog>> loadEventLogsFromFirestore(int id, Caller caller) async {
         name: doc['name'],
         description: doc['description'],
         date: doc['date'],
-        caretakerId: doc['caretakerId'],
-        patientId: doc['patientId']));
+        caretaker: await getCaretakerFromDb(doc['caretakerId'].toString()),
+        patient: await getPatientFromDb(doc['patientId'].toString())));
   }
 
   return tasks;
+}
+
+Future<Caretaker> getCaretakerFromDb(String id) async {
+  String docID = await getDocumentID(int.parse(id), 'caretakers');
+  var snapshot = await db.collection('caretakers').doc(docID).get();
+  Caretaker caretaker = Caretaker(
+    id: snapshot['id'],
+    name: snapshot['name'],
+    email: snapshot['email'],
+    workTypes: snapshot['workTypes'],
+    availability: snapshot['availability'],
+    dateOfBirth: snapshot['dateOfBirth'].toDate(),
+    startDate: snapshot['startDate'].toDate(),
+  );
+  return caretaker;
+}
+
+Future<Patient> getPatientFromDb(String id) async {
+  String docID = await getDocumentID(int.parse(id), 'patients');
+  var doc = await db.collection('patients').doc(docID).get();
+
+  var careTasksCollection = doc['careTasks'];
+  List<CareTask> careTasks = [];
+  List<Relative> relatives = [];
+  for (var map in careTasksCollection) {
+    String date = DateTime.now().toString();
+    Frequency frequency = Frequency.weekly;
+    String taskName = 'default';
+    map.forEach((key, value) {
+      switch (key) {
+        case 'date':
+          {
+            date = value;
+          }
+          break;
+        case 'frequency':
+          {
+            frequency = Frequency.values.byName(value);
+          }
+          break;
+        case 'task':
+          {
+            taskName = value;
+          }
+          break;
+      }
+    });
+    careTasks.add(
+        CareTask(taskName: taskName, taskFrequency: frequency, date: date));
+  }
+
+  if (doc['relativeIDs'] != null) {
+    for (var value in doc['relativeIDs']) {
+      var relative = await getRelativeFromDb(value);
+      relatives.add(relative);
+    }
+  }
+
+  List<Caretaker> caretakers = doc['assignedCaretakers'] != null
+      ? await loadCaretakersFromFirestore()
+      : [];
+  List<Caretaker> assignedCaretakers = caretakers
+      .where((element) => doc['assignedCaretakers'].contains(element.id))
+      .toList();
+
+  Patient patient = Patient(
+    id: doc['id'],
+    name: doc['name'],
+    startDate: doc['startDate'].toDate(),
+    dateOfBirth: doc['dateOfBirth'].toDate(),
+    medicalState: doc['medicalState'],
+    dailyHours: doc['dailyHours'],
+    takenMedicines: doc['takenMedicines'],
+    allergies: doc['allergies'],
+    assignedCaretakers: assignedCaretakers,
+    careTasks: careTasks,
+    relatives: relatives,
+  );
+  return patient;
 }
 
 void deleteEventLogFromFireStore(EventLog eventLog) async {

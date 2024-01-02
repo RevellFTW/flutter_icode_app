@@ -30,13 +30,11 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   late TextEditingController _nameController;
-  late TextEditingController _userNameController;
   late TextEditingController _passwordController;
   late TextEditingController _emailController;
   late TextEditingController _phoneNumberController;
 
   String currentNameTextFormFieldValue = '';
-  String currentUserNameTextFormFieldValue = '';
   String currentPasswordTextFormFieldValue = '';
   String currentEmailTextFormFieldValue = '';
   String currentPhoneNumberTextFormFieldValue = '';
@@ -47,14 +45,12 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _userNameController = TextEditingController();
     _passwordController = TextEditingController();
     _emailController = TextEditingController();
     _phoneNumberController = TextEditingController();
     if (widget.modifying) {
       setState(() {
         _nameController.text = widget.relative.name;
-        _userNameController.text = widget.relative.userName;
         _passwordController.text = widget.relative.password;
         _emailController.text = widget.relative.email;
         _phoneNumberController.text = widget.relative.phoneNumber;
@@ -174,68 +170,6 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                               widget.relative.name = value;
                             }, () {
                               _nameController.text = widget.relative.name;
-                            });
-                          },
-                        ),
-                        TextFormField(
-                          controller: _userNameController,
-                          autofocus: true,
-                          obscureText: false,
-                          decoration: InputDecoration(
-                            labelText: 'User Name',
-                            labelStyle:
-                                FlutterFlowTheme.of(context).labelMedium,
-                            hintStyle: FlutterFlowTheme.of(context).labelMedium,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).primary,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).error,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).error,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          style: FlutterFlowTheme.of(context).bodyMedium,
-                          onChanged: (String newValue) {
-                            setState(() {
-                              currentUserNameTextFormFieldValue = newValue;
-                            });
-                          },
-                          onTapOutside: (newValue) {
-                            saveTextValue(currentUserNameTextFormFieldValue,
-                                _userNameController, (value) {
-                              widget.relative.userName = value;
-                            }, () {
-                              _nameController.text = widget.relative.userName;
-                            });
-                            FocusScope.of(context).unfocus();
-                          },
-                          onFieldSubmitted: (String newValue) {
-                            saveTextValue(currentUserNameTextFormFieldValue,
-                                _userNameController, (value) {
-                              widget.relative.userName = value;
-                            }, () {
-                              _nameController.text = widget.relative.userName;
                             });
                           },
                         ),

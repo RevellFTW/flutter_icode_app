@@ -1,7 +1,6 @@
 class Relative {
   int id = 0;
   String name = '';
-  String userName = '';
   String password = '';
   String email = '';
   String phoneNumber = '';
@@ -10,7 +9,6 @@ class Relative {
   Relative({
     required this.id,
     required this.name,
-    required this.userName,
     required this.password,
     required this.email,
     required this.phoneNumber,
@@ -21,7 +19,6 @@ class Relative {
     id = idParam;
     name = '';
     password = '';
-    email = '';
     email = '';
     phoneNumber = '';
     wantsToBeNotified = true;

@@ -44,8 +44,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
   DateTime _selectedDate = DateTime.now();
 
   String _editKey = '';
-  String? selectedCaretakerId;
-  String? selectedPatientId;
+  late Caretaker selectedCaretaker;
+  late Patient selectedPatient;
 
   ValueNotifier<DateTime> selectedDay = ValueNotifier<DateTime>(DateTime.now());
   ValueNotifier<DateTime> focusedDay = ValueNotifier<DateTime>(DateTime.now());
@@ -73,7 +73,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
       _loadCaretakerData().then((value) {
         setState(() {
           caretakerList = value;
-          selectedCaretakerId = caretakerList.first.id.toString();
+          selectedCaretaker = caretakerList.first;
         });
       });
     } else {
@@ -81,7 +81,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
         setState(() {
           patientList = value;
 
-          selectedPatientId = patientList.first.id.toString();
+          selectedPatient = patientList.first;
         });
         for (var patientElement in patientList) {
           _loadData(patientElement.id.toString()).then((value) {
@@ -390,9 +390,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                     Caller.caretaker
                                                 ? patientList
                                                     .where((element) =>
-                                                        element.id.toString() ==
+                                                        element.id ==
                                                         _filteredEventLogs[i]
-                                                            .patientId)
+                                                            .patient
+                                                            .id)
                                                     .first
                                                 : widget.patient!;
                                             Navigator.of(context).push(
@@ -442,11 +443,11 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                           Caller.caretaker
                                                       ? patientList
                                                           .where((element) =>
-                                                              element.id
-                                                                  .toString() ==
+                                                              element.id ==
                                                               _filteredEventLogs[
                                                                       i]
-                                                                  .patientId)
+                                                                  .patient
+                                                                  .id)
                                                           .first
                                                       : widget.patient!;
                                                   Navigator.of(context).push(
@@ -497,8 +498,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                               .fromSTEB(12, 0, 0, 8),
                                           child: Text(
                                             widget.caller == Caller.patient
-                                                ? 'Assigned to ${caretakerList.where((element) => element.id.toString() == _filteredEventLogs[i].caretakerId).first.name}'
-                                                : 'Assigned to ${patientList.where((element) => element.id.toString() == _filteredEventLogs[i].patientId).first.name}',
+                                                ? 'Assigned to ${_filteredEventLogs[i].caretaker.name}'
+                                                : 'Assigned to ${_filteredEventLogs[i].patient.name}',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -527,7 +528,12 @@ class _EventLogScreenState extends State<EventLogScreen> {
             widget.caller == Caller.patient
                 ? Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => EventLogFormScreen(
-                        eventLog: EventLog.empty(widget.eventLogs.length + 1),
+                        eventLog: EventLog.empty(
+                            widget.eventLogs.length + 1,
+                            widget.caretaker ??
+                                Caretaker.empty(caretakerList.length + 1),
+                            widget.patient ??
+                                Patient.empty(patientList.length + 1)),
                         caller: Caller.patient,
                         modifying: false,
                         careTaskList: list,
@@ -544,18 +550,15 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             description: '',
                             date: DateFormat('yyyy-MM-dd h:mm a')
                                 .format(DateTime.now()),
-                            patientId: selectedPatientId,
-                            caretakerId: widget.caretaker!.id.toString()),
+                            patient: selectedPatient,
+                            caretaker: widget.caretaker!),
                         caller: Caller.caretaker,
                         modifying: false,
                         careTaskList: list,
                         individualCareTaskslistMap: individualCareTaskslistMap,
                         patientList: patientList,
                         caretakerList: caretakerList,
-                        patient: patientList
-                            .where((element) =>
-                                element.id.toString() == selectedPatientId)
-                            .first,
+                        patient: selectedPatient,
                         caretaker: widget.caretaker)));
           },
           child: const Icon(Icons.add),
@@ -604,10 +607,10 @@ class _EventLogScreenState extends State<EventLogScreen> {
   }
 
   void stateSetter(
-      {String? selectedPatientId, Map<String, List<String>>? newMap}) {
+      {Patient? selectedPatient, Map<String, List<String>>? newMap}) {
     setState(() {
-      if (selectedPatientId != null) {
-        this.selectedPatientId = selectedPatientId;
+      if (selectedPatient != null) {
+        this.selectedPatient = selectedPatient;
       }
       if (newMap != null) {
         individualCareTaskslistMap = newMap;

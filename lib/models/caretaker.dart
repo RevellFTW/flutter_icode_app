@@ -21,9 +21,9 @@ class Caretaker {
     this.patients = const [],
   });
 
-  static Caretaker empty() {
+  static Caretaker empty(int idParam) {
     return Caretaker(
-        id: 0,
+        id: idParam,
         name: '',
         startDate: DateTime.now(),
         dateOfBirth: DateTime.now(),

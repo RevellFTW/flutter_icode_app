@@ -84,11 +84,11 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
     if (widget.caller == Caller.patient) {
       backToText = "Back to ${widget.patient!.name} Patient's Log";
       title = "${widget.patient!.name} Patient's Log";
-      widget.eventLog.patientId = widget.patient!.id.toString();
+      widget.eventLog.patient = widget.patient!;
     } else if (widget.caller == Caller.caretaker) {
       backToText = "Back to ${widget.caretaker!.name} Caretaker's Log";
       title = "${widget.caretaker!.name} Caretaker's Log";
-      widget.eventLog.caretakerId = widget.caretaker!.id.toString();
+      widget.eventLog.caretaker = widget.caretaker!;
     }
   }
 
@@ -277,9 +277,13 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           onChanged: (value) {
                             setState(() {
                               if (widget.caller == Caller.patient) {
-                                widget.eventLog.caretakerId = value.toString();
+                                widget.eventLog.caretaker = widget.caretakerList
+                                    .firstWhere((element) =>
+                                        element.id.toString() == value);
                               } else {
-                                widget.eventLog.patientId = value.toString();
+                                widget.eventLog.patient = widget.patientList
+                                    .firstWhere((element) =>
+                                        element.id.toString() == value);
                                 taskNames = getTaskNameDropdownEntries(
                                     index: value.toString());
                                 widget.eventLog.name = taskNames.first.value!;
@@ -417,10 +421,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           setState(() async {
                             if (!widget.modifying) {
                               widget.caller == Caller.caretaker
-                                  ? widget.eventLog.caretakerId =
-                                      widget.caretaker!.id.toString()
-                                  : widget.eventLog.patientId =
-                                      widget.patient!.id.toString();
+                                  ? widget.eventLog.caretaker =
+                                      widget.caretaker!
+                                  : widget.eventLog.patient = widget.patient!;
                               if (widget.eventLog.name == 'Other' &&
                                   widget.eventLog.description.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
