@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -297,15 +298,24 @@ class _EventLogScreenState extends State<EventLogScreen> {
                 child: ListView.builder(
                     itemCount: _filteredEventLogs.length,
                     itemBuilder: (context, i) {
-                      return Dismissible(
-                        key: ValueKey<int>(_filteredEventLogs[i].id),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          child: const Icon(Icons.delete, color: Colors.white),
+                      return Slidable(
+                        endActionPane: ActionPane(
+                          motion: const ScrollMotion(),
+                          children: <Widget>[
+                            SlidableAction(
+                              onPressed: (context) => {
+                                setState(() {
+                                  deleteEventLogFromFireStore(
+                                      _filteredEventLogs[i]);
+                                  _filteredEventLogs.removeAt(i);
+                                })
+                              },
+                              backgroundColor: Colors.red,
+                              icon: Icons.delete,
+                            ),
+                          ],
                         ),
+                        key: ValueKey<int>(_filteredEventLogs[i].id),
                         child: Padding(
                           padding:
                               const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
@@ -319,7 +329,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                   blurRadius: 0,
                                   color: Color(0xFFE0E3E7),
                                   offset: Offset(0, 1),
-                                )
+                                ),
                               ],
                               borderRadius: BorderRadius.circular(0),
                               shape: BoxShape.rectangle,
@@ -459,12 +469,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             ),
                           ),
                         ),
-                        onDismissed: (direction) {
-                          setState(() {
-                            deleteEventLogFromFireStore(_filteredEventLogs[i]);
-                            _filteredEventLogs.removeAt(i);
-                          });
-                        },
                       );
                     }),
               ),

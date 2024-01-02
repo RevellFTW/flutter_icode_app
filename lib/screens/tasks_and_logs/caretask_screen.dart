@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
@@ -76,15 +77,23 @@ class _CareTasksPageState extends State<CareTasksPage> {
               child: ListView.builder(
                   itemCount: widget.patient.careTasks.length,
                   itemBuilder: (context, i) {
-                    return Dismissible(
-                      key: ValueKey<int>(i),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20),
-                        child: const Icon(Icons.delete, color: Colors.white),
+                    return Slidable(
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: <Widget>[
+                          SlidableAction(
+                            onPressed: (context) => {
+                              setState(() {
+                                widget.patient.careTasks.removeAt(i);
+                              }),
+                              saveToDb()
+                            },
+                            backgroundColor: Colors.red,
+                            icon: Icons.delete,
+                          ),
+                        ],
                       ),
+                      key: ValueKey<int>(i),
                       child: Padding(
                         padding:
                             const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
@@ -98,7 +107,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                 blurRadius: 0,
                                 color: Color(0xFFE0E3E7),
                                 offset: Offset(0, 1),
-                              )
+                              ),
                             ],
                             borderRadius: BorderRadius.circular(0),
                             shape: BoxShape.rectangle,
@@ -123,7 +132,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                         const EdgeInsetsDirectional.fromSTEB(
                                             12, 0, 0, 0),
                                     child: Text(
-                                      widget.patient.careTasks[i].taskName,
+                                      widget.patient.careTasks[i].taskName[i],
                                       style: FlutterFlowTheme.of(context)
                                           .bodyLarge,
                                     ),
@@ -133,7 +142,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       12, 0, 15, 0),
                                   child: Text(
-                                    (widget.patient.careTasks[i].date),
+                                    widget.patient.careTasks[i].date,
                                     style: FlutterFlowTheme.of(context)
                                         .labelMedium,
                                   ),
@@ -196,12 +205,6 @@ class _CareTasksPageState extends State<CareTasksPage> {
                           ),
                         ),
                       ),
-                      onDismissed: (direction) {
-                        setState(() {
-                          widget.patient.careTasks.removeAt(i);
-                        });
-                        saveToDb();
-                      },
                     );
                   }),
             ),

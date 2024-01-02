@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/models/relative.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
@@ -268,15 +269,23 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
               child: ListView.builder(
                   itemCount: _filteredCaretakers.length,
                   itemBuilder: (context, i) {
-                    return Dismissible(
-                      key: ValueKey<int>(_filteredCaretakers[i].id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20),
-                        child: const Icon(Icons.delete, color: Colors.white),
+                    return Slidable(
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: <Widget>[
+                          SlidableAction(
+                            onPressed: (context) => {
+                              removeCaretaker(_filteredCaretakers[i].id),
+                              setState(() {
+                                filterCaretakers();
+                              })
+                            },
+                            backgroundColor: Colors.red,
+                            icon: Icons.delete,
+                          ),
+                        ],
                       ),
+                      key: ValueKey<int>(_filteredCaretakers[i].id),
                       child: Padding(
                         padding:
                             const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
@@ -290,7 +299,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                 blurRadius: 0,
                                 color: Color(0xFFE0E3E7),
                                 offset: Offset(0, 1),
-                              )
+                              ),
                             ],
                             borderRadius: BorderRadius.circular(0),
                             shape: BoxShape.rectangle,
@@ -338,12 +347,14 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                   highlightColor: Colors.transparent,
                                   onTap: () async {
                                     Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                CaretakerFormScreen(
-                                                  caretaker:
-                                                      _filteredCaretakers[i],
-                                                )));
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            CaretakerFormScreen(
+                                          caretaker: _filteredCaretakers[i],
+                                          modifying: true,
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: Card(
                                     clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -364,13 +375,15 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                         highlightColor: Colors.transparent,
                                         onTap: () async {
                                           Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      CaretakerFormScreen(
-                                                        caretaker:
-                                                            _filteredCaretakers[
-                                                                i],
-                                                      )));
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CaretakerFormScreen(
+                                                caretaker:
+                                                    _filteredCaretakers[i],
+                                                modifying: true,
+                                              ),
+                                            ),
+                                          );
                                         },
                                         child: Icon(
                                           Icons.keyboard_arrow_right_rounded,
@@ -387,12 +400,6 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                           ),
                         ),
                       ),
-                      onDismissed: (direction) {
-                        setState(() {
-                          removeCaretaker(_filteredCaretakers[i].id);
-                          filterCaretakers();
-                        });
-                      },
                     );
                   }),
             ),
