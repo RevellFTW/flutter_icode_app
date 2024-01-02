@@ -132,7 +132,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                         const EdgeInsetsDirectional.fromSTEB(
                                             12, 0, 0, 0),
                                     child: Text(
-                                      widget.patient.careTasks[i].taskName[i],
+                                      widget.patient.careTasks[i].taskName,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyLarge,
                                     ),

@@ -320,105 +320,67 @@ class _EventLogScreenState extends State<EventLogScreen> {
                           padding:
                               const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
                           child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              boxShadow: const [
-                                BoxShadow(
-                                  blurRadius: 0,
-                                  color: Color(0xFFE0E3E7),
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(0),
-                              shape: BoxShape.rectangle,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  8, 8, 8, 8),
-                              child: Row(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                boxShadow: const [
+                                  BoxShadow(
+                                    blurRadius: 0,
+                                    color: Color(0xFFE0E3E7),
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(0),
+                                shape: BoxShape.rectangle,
+                              ),
+                              child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  Container(
-                                    width: 4,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              12, 0, 0, 0),
-                                      child: Text(
-                                        _filteredEventLogs[i].name,
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyLarge,
-                                      ),
-                                    ),
-                                  ),
                                   Padding(
                                     padding:
                                         const EdgeInsetsDirectional.fromSTEB(
-                                            12, 0, 15, 0),
-                                    child: Text(
-                                      DateFormat.yMMMd().format(
-                                          yMHTAStringToDateTime(
-                                              _filteredEventLogs[i].date)),
-                                      style: FlutterFlowTheme.of(context)
-                                          .labelMedium,
-                                    ),
-                                  ),
-                                  InkWell(
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () async {
-                                      Patient patient =
-                                          widget.caller == Caller.caretaker
-                                              ? patientList
-                                                  .where((element) =>
-                                                      element.id.toString() ==
-                                                      _filteredEventLogs[i]
-                                                          .patientId)
-                                                  .first
-                                              : widget.patient!;
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                EventLogFormScreen(
-                                                    eventLog:
-                                                        _filteredEventLogs[i],
-                                                    caller: widget.caller,
-                                                    modifying: true,
-                                                    careTaskList: list,
-                                                    individualCareTaskslistMap:
-                                                        individualCareTaskslistMap,
-                                                    patientList: patientList,
-                                                    caretakerList:
-                                                        caretakerList,
-                                                    patient: patient,
-                                                    caretaker:
-                                                        widget.caretaker)),
-                                      );
-                                    },
-                                    child: Card(
-                                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryBackground,
-                                      elevation: 1,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(40),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(4, 4, 4, 4),
-                                        child: InkWell(
+                                            8, 8, 8, 8),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Container(
+                                          width: 4,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: FlutterFlowTheme.of(context)
+                                                .primary,
+                                            borderRadius:
+                                                BorderRadius.circular(2),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(12, 0, 0, 0),
+                                            child: Text(
+                                              _filteredEventLogs[i].name == ''
+                                                  ? 'Other'
+                                                  : _filteredEventLogs[i].name,
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyLarge,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 0, 15, 0),
+                                          child: Text(
+                                            DateFormat.yMMMd().format(
+                                                yMHTAStringToDateTime(
+                                                    _filteredEventLogs[i]
+                                                        .date)),
+                                            style: FlutterFlowTheme.of(context)
+                                                .labelMedium,
+                                          ),
+                                        ),
+                                        InkWell(
                                           splashColor: Colors.transparent,
                                           focusColor: Colors.transparent,
                                           hoverColor: Colors.transparent,
@@ -454,20 +416,104 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                               .caretaker)),
                                             );
                                           },
-                                          child: Icon(
-                                            Icons.keyboard_arrow_right_rounded,
+                                          child: Card(
+                                            clipBehavior:
+                                                Clip.antiAliasWithSaveLayer,
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            size: 24,
+                                                .primaryBackground,
+                                            elevation: 1,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(40),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(4, 4, 4, 4),
+                                              child: InkWell(
+                                                splashColor: Colors.transparent,
+                                                focusColor: Colors.transparent,
+                                                hoverColor: Colors.transparent,
+                                                highlightColor:
+                                                    Colors.transparent,
+                                                onTap: () async {
+                                                  Patient patient = widget
+                                                              .caller ==
+                                                          Caller.caretaker
+                                                      ? patientList
+                                                          .where((element) =>
+                                                              element.id
+                                                                  .toString() ==
+                                                              _filteredEventLogs[
+                                                                      i]
+                                                                  .patientId)
+                                                          .first
+                                                      : widget.patient!;
+                                                  Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            EventLogFormScreen(
+                                                                eventLog:
+                                                                    _filteredEventLogs[
+                                                                        i],
+                                                                caller: widget
+                                                                    .caller,
+                                                                modifying: true,
+                                                                careTaskList:
+                                                                    list,
+                                                                individualCareTaskslistMap:
+                                                                    individualCareTaskslistMap,
+                                                                patientList:
+                                                                    patientList,
+                                                                caretakerList:
+                                                                    caretakerList,
+                                                                patient:
+                                                                    patient,
+                                                                caretaker: widget
+                                                                    .caretaker)),
+                                                  );
+                                                },
+                                                child: Icon(
+                                                  Icons
+                                                      .keyboard_arrow_right_rounded,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .secondaryText,
+                                                  size: 24,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 0, 0, 8),
+                                          child: Text(
+                                            widget.caller == Caller.patient
+                                                ? 'Assigned to ${caretakerList.where((element) => element.id.toString() == _filteredEventLogs[i].caretakerId).first.name}'
+                                                : 'Assigned to ${patientList.where((element) => element.id.toString() == _filteredEventLogs[i].patientId).first.name}',
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge
+                                                .override(
+                                                  fontFamily: 'Readex Pro',
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .secondaryText,
+                                                ),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ],
-                              ),
-                            ),
-                          ),
+                              )),
                         ),
                       );
                     }),

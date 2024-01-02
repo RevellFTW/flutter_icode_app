@@ -79,6 +79,8 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
         : getTaskNameDropdownEntries(index: widget.patient!.id.toString());
     people = getPersonTypeDropdownEntries();
 
+    widget.eventLog.name = taskNames.first.value!;
+
     if (widget.caller == Caller.patient) {
       backToText = "Back to ${widget.patient!.name} Patient's Log";
       title = "${widget.patient!.name} Patient's Log";
@@ -414,11 +416,17 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                         onPressed: () {
                           setState(() async {
                             if (!widget.modifying) {
-                              if (widget.eventLog.name.isEmpty) {
+                              widget.caller == Caller.caretaker
+                                  ? widget.eventLog.caretakerId =
+                                      widget.caretaker!.id.toString()
+                                  : widget.eventLog.patientId =
+                                      widget.patient!.id.toString();
+                              if (widget.eventLog.name == 'Other' &&
+                                  widget.eventLog.description.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                        'Please select a task name for the event log'),
+                                        'Please enter a description for the task.'),
                                   ),
                                 );
                                 return;

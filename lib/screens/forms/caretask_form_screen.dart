@@ -562,7 +562,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                                 return;
                               }
                               widget.patient.careTasks.add(CareTask(
-                                  taskName: _nameController.text,
+                                  taskName: currentNameTextFormFieldValue,
                                   taskFrequency: Frequency.values
                                       .byName(dropdownValue.toString()),
                                   date: selectedDateTimeWhenAdding));
