@@ -354,6 +354,7 @@ Future<Patient> getPatientFromDb(String id) async {
   Patient patient = Patient(
     id: doc['id'],
     name: doc['name'],
+    email: doc['email'],
     startDate: doc['startDate'].toDate(),
     dateOfBirth: doc['dateOfBirth'].toDate(),
     medicalState: doc['medicalState'],
@@ -424,6 +425,7 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
     patients.add(Patient(
         id: doc['id'],
         name: doc['name'],
+        email: doc['email'],
         startDate: doc['startDate'].toDate(),
         dateOfBirth: doc['dateOfBirth'].toDate(),
         medicalState: doc['medicalState'],

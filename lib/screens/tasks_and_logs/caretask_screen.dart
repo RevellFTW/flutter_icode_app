@@ -229,29 +229,6 @@ class _CareTasksPageState extends State<CareTasksPage> {
     );
   }
 
-  void addPatient(String string) {
-    Patient patient = Patient(
-      id: patients.length + 1,
-      startDate: DateTime.now(),
-      dateOfBirth: DateTime.now(),
-      medicalState: 'default',
-      allergies: 'default',
-      dailyHours: 0,
-      takenMedicines: '',
-      assignedCaretakers: [],
-      name: string,
-      careTasks: [],
-      relatives: [],
-    );
-    patients.add(patient);
-    addPatientToDb(patient);
-  }
-
-  void removePatient(int id) {
-    patients.removeWhere((patient) => patient.id == id);
-    removePatientFromDb(id);
-  }
-
   saveToDb() {
     getDocumentID(widget.patient.id, 'patients').then((docID) {
       updatePatient(widget.patient, docID);

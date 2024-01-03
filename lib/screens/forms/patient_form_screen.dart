@@ -41,11 +41,17 @@ class PatientFormScreen extends StatefulWidget {
 class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  late TextEditingController _passwordController1;
+  late TextEditingController _passwordController2;
   late TextEditingController _medicalStateController;
   late TextEditingController _takenMedicinesController;
   late TextEditingController _allergiesController;
   final _dateController = MaskedTextController(mask: '00/00/0000');
   String currentNameTextFormFieldValue = '';
+  String currentEmailTextFormFieldValue = '';
+  String currentPasswordTextFormFieldValue = '';
   String currentMedicalStateTextFormFieldValue = '';
   String currentTakenMedicinesTextFormFieldValue = '';
   String currentAllergiesTextFormFieldValue = '';
@@ -71,6 +77,10 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
 
       updatedDateTime = widget.patient.startDate;
       _nameController = TextEditingController(text: widget.patient.name);
+      _emailController = TextEditingController(text: widget.patient.email);
+      _passwordController = TextEditingController(text: widget.patient.email);
+      _passwordController1 = TextEditingController(text: '');
+      _passwordController2 = TextEditingController(text: '');
       _dateController.text =
           "${widget.patient.dateOfBirth.day.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.month.toString().padLeft(2, '0')}/${widget.patient.dateOfBirth.year}";
       _medicalStateController =
@@ -87,6 +97,10 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
           .setSelectedOptions(selectedCaretakerValueItems);
     } else {
       _nameController = TextEditingController(text: '');
+      _emailController = TextEditingController(text: '');
+      _passwordController = TextEditingController(text: '');
+      _passwordController1 = TextEditingController(text: '');
+      _passwordController2 = TextEditingController(text: '');
       _dateController.text = '';
       _medicalStateController = TextEditingController(text: '');
       _takenMedicinesController = TextEditingController(text: '');
@@ -316,6 +330,165 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         },
                         style: FlutterFlowTheme.of(context).bodyMedium,
                       ),
+                      TextFormField(
+                        controller: _emailController,
+                        focusNode: _model.textFieldFocusNode6,
+                        autofocus: true,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          labelStyle: FlutterFlowTheme.of(context).labelMedium,
+                          hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).error,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            currentEmailTextFormFieldValue = newValue;
+                          });
+                        },
+                        onTapOutside: (newValue) {
+                          if (currentEmailTextFormFieldValue.isNotEmpty) {
+                            setState(() {
+                              widget.patient.email =
+                                  currentEmailTextFormFieldValue;
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
+                            });
+                          } else {
+                            setState(() {
+                              _emailController.text = widget.patient.email;
+                            });
+                          }
+                          _model.textFieldFocusNode6!.unfocus();
+                        },
+                        onFieldSubmitted: (String newValue) {
+                          setState(() {
+                            if (currentEmailTextFormFieldValue.isNotEmpty) {
+                              widget.patient.email =
+                                  currentEmailTextFormFieldValue;
+                              if (widget.modifying)
+                                modifyPatientInDb(widget.patient);
+                            } else {
+                              _emailController.text = widget.patient.email;
+                            }
+                          });
+                        },
+                        style: FlutterFlowTheme.of(context).bodyMedium,
+                      ),
+                      widget.modifying
+                          ? ElevatedButton(
+                              onPressed: _showPasswordDialog,
+                              child: const Text('Change Password'),
+                            )
+                          : TextFormField(
+                              controller: _passwordController,
+                              focusNode: _model.textFieldFocusNode7,
+                              autofocus: true,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle:
+                                    FlutterFlowTheme.of(context).labelMedium,
+                                hintStyle:
+                                    FlutterFlowTheme.of(context).labelMedium,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).error,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).error,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  if (_passwordController.text.isNotEmpty) {
+                                    currentPasswordTextFormFieldValue =
+                                        newValue;
+                                  }
+                                  _passwordController.text = newValue;
+                                });
+                              },
+                              onTapOutside: (newValue) {
+                                if (_passwordController.text.isNotEmpty) {
+                                  //show a dialog to confirm password change
+                                  //if confirmed, change password
+                                  //if not, do nothing
+                                  if (!widget.modifying) {
+                                    currentPasswordTextFormFieldValue =
+                                        _passwordController.text;
+                                  }
+                                } else {
+                                  setState(() {
+                                    _passwordController.text =
+                                        currentPasswordTextFormFieldValue;
+                                  });
+                                }
+                                _model.textFieldFocusNode7!.unfocus();
+                              },
+                              onFieldSubmitted: (String newValue) {
+                                setState(() {
+                                  if (currentPasswordTextFormFieldValue
+                                      .isNotEmpty) {
+                                    currentPasswordTextFormFieldValue =
+                                        _passwordController.text;
+                                    if (!widget.modifying) {
+                                      _passwordController.text =
+                                          currentPasswordTextFormFieldValue;
+                                    }
+                                  }
+                                });
+                              },
+                              style: FlutterFlowTheme.of(context).bodyMedium,
+                            ),
                       TextFormField(
                         onTap: () =>
                             updateStartDate(widget.patient.dateOfBirth),
@@ -865,6 +1038,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     return;
                                   }
                                   addPatientToDb(widget.patient);
+                                  print('create patients authentication');
                                 } else {
                                   removePatientFromDb(widget.patient.id);
                                 }
@@ -911,6 +1085,66 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         ),
       ),
     );
+  }
+
+  void _showPasswordDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Change password"),
+            content: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  TextFormField(
+                    controller: _passwordController1,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'New Password',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter password';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _passwordController2,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Confirm New Password',
+                    ),
+                    validator: (value) {
+                      if (value != _passwordController1.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text("Cancel"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text("Change"),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    print('modify password');
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          );
+        });
   }
 
   List<ValueItem<String>> caretakerListToValueItemList(

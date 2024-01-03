@@ -6,6 +6,7 @@ import 'care_task.dart';
 class Patient {
   int id;
   String name;
+  String email;
   DateTime startDate;
   DateTime dateOfBirth;
   String medicalState;
@@ -19,6 +20,7 @@ class Patient {
   Patient(
       {required this.id,
       required this.name,
+      required this.email,
       required this.startDate,
       required this.dateOfBirth,
       required this.medicalState,
@@ -33,6 +35,7 @@ class Patient {
     return Patient(
         id: id,
         name: '',
+        email: '',
         startDate: DateTime.now(),
         dateOfBirth: DateTime.now(),
         medicalState: '',

@@ -431,34 +431,8 @@ class _PatientScreenState extends State<PatientScreen> {
     );
   }
 
-  void addPatient(String string) {
-    Patient patient = Patient(
-      id: patients.length + 1,
-      startDate: DateTime.now(),
-      dateOfBirth: DateTime.now(),
-      medicalState: 'default',
-      allergies: 'default',
-      dailyHours: 0,
-      takenMedicines: '',
-      assignedCaretakers: [],
-      name: string,
-      careTasks: [],
-      relatives: [],
-    );
-    patients.add(patient);
-    addPatientToDb(patient);
-  }
-
   void removePatient(int id) {
     patients.removeWhere((patient) => patient.id == id);
     removePatientFromDb(id);
-  }
-
-  deletePatient(int i) {
-    // setState(() {
-    //   removePatient(_filteredPatients[i].id);
-    //   filterPatients();
-    // });
-    print('delete');
   }
 }
