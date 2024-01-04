@@ -454,7 +454,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     currentPasswordTextFormFieldValue =
                                         newValue;
                                   }
-                                  _passwordController.text = newValue;
                                 });
                               },
                               onTapOutside: (newValue) {
@@ -484,6 +483,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                       _passwordController.text =
                                           currentPasswordTextFormFieldValue;
                                     }
+                                  } else {
+                                    _passwordController.text =
+                                        currentPasswordTextFormFieldValue;
                                   }
                                 });
                               },
@@ -938,7 +940,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsetsDirectional
-                                                            .fromSTEB(
+                                                                .fromSTEB(
                                                             12, 0, 0, 0),
                                                     child: Text(
                                                       relatives[i].name,
