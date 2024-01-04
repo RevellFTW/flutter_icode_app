@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
@@ -1025,6 +1027,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               setState(() {
                                 if (!widget.modifying) {
                                   if (widget.patient.name.isEmpty ||
+                                      widget.patient.email.isEmpty ||
                                       widget.patient.medicalState.isEmpty ||
                                       widget.patient.assignedCaretakers!
                                           .isEmpty ||
@@ -1039,9 +1042,21 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     );
                                     return;
                                   }
-                                  addPatientToDb(widget.patient);
-                                  print('create patients authentication');
+                                  setState(() async {
+                                    UserCredential result = await register(
+                                        widget.patient.email,
+                                        currentPasswordTextFormFieldValue);
+                                    User user = result.user!;
+                                    addPatientUserInDb(
+                                        widget.patient, user.uid);
+                                    addPatientToDb(widget.patient);
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const PatientScreen()));
+                                  });
                                 } else {
+                                  print('todo remove patient from auth users');
                                   removePatientFromDb(widget.patient.id);
                                 }
                                 Navigator.of(context).push(MaterialPageRoute(
@@ -1189,5 +1204,15 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         if (widget.modifying) modifyPatientInDb(widget.patient);
       }
     }
+  }
+
+  static Future<UserCredential> register(String email, String password) async {
+    FirebaseApp app = await Firebase.initializeApp(
+        name: 'Secondary', options: Firebase.app().options);
+    UserCredential userCredential = await FirebaseAuth.instanceFor(app: app)
+        .createUserWithEmailAndPassword(email: email, password: password);
+
+    await app.delete();
+    return Future.sync(() => userCredential);
   }
 }

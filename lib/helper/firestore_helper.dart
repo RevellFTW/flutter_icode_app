@@ -107,6 +107,28 @@ void modifyCaretakerInDb(Caretaker caretaker) async {
   updateCaretaker(caretaker, docID);
 }
 
+void addPatientUserInDb(Patient patient, String uid) {
+  Map<String, dynamic> userData = {
+    'approved': 'false',
+    'email': patient.email,
+    'id': uid,
+    'role': 'patient',
+    'roleId': patient.id,
+  };
+  addDocumentToCollection('users', userData);
+}
+
+void addCaretakerUserInDb(Caretaker caretaker, String uid) {
+  Map<String, dynamic> userData = {
+    'approved': 'false',
+    'email': caretaker.email,
+    'id': uid,
+    'role': 'caretaker',
+    'roleId': caretaker.id,
+  };
+  addDocumentToCollection('users', userData);
+}
+
 void addEventLogInDb(EventLog eventLog) async {
   Map<String, dynamic> eventLogData = {
     'id': eventLog.id,
@@ -140,6 +162,7 @@ void addPatientToDb(Patient patient) {
   Map<String, dynamic> patientData = {
     'id': patient.id,
     'name': patient.name,
+    'email': patient.email,
     'startDate': patient.startDate,
     'careTasks':
         patient.careTasks.map((careTask) => careTask.toJson()).toList(),

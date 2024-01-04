@@ -50,6 +50,8 @@ class PatientFormModel extends FlutterFlowModel<PatientFormScreen> {
     textFieldFocusNode3 = FocusNode();
     textFieldFocusNode4 = FocusNode();
     textFieldFocusNode5 = FocusNode();
+    textFieldFocusNode6 = FocusNode();
+    textFieldFocusNode7 = FocusNode();
   }
 
   void dispose() {
@@ -68,6 +70,12 @@ class PatientFormModel extends FlutterFlowModel<PatientFormScreen> {
 
     textFieldFocusNode5?.dispose();
     textFieldController5?.dispose();
+
+    textFieldFocusNode6?.dispose();
+    textFieldController6?.dispose();
+
+    textFieldFocusNode7?.dispose();
+    textFieldController7?.dispose();
   }
 
   /// Action blocks are added here.
