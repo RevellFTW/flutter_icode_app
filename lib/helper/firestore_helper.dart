@@ -195,6 +195,18 @@ void addCaretakerToDb(Caretaker caretaker) {
 void removePatientFromDb(int id) async {
   String docID = await getDocumentID(id, 'patients');
   await db.collection('patients').doc(docID).delete();
+  var tasks =
+      db.collection('patientTasks').where('patientId', isEqualTo: id).get();
+  tasks.then((value) => value.docs.forEach((element) {
+        element.reference.delete();
+      }));
+  await db
+      .collection('users')
+      .where('roleId', isEqualTo: id)
+      .get()
+      .then((value) => value.docs.forEach((element) {
+            element.reference.delete();
+          }));
 }
 
 void removeRelativeFromDb(int id) async {
