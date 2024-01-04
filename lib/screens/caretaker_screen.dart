@@ -166,7 +166,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                   borderWidth: 1,
                                   buttonSize: 50,
                                   icon: const Icon(
-                                    Icons.dehaze_sharp,
+                                    Icons.settings_rounded,
                                     color: Colors.white,
                                     size: 30,
                                   ),

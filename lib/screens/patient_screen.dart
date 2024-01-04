@@ -176,7 +176,7 @@ class _PatientScreenState extends State<PatientScreen> {
                                   borderWidth: 1,
                                   buttonSize: 50,
                                   icon: const Icon(
-                                    Icons.dehaze_sharp,
+                                    Icons.settings_rounded,
                                     color: Colors.white,
                                     size: 30,
                                   ),
