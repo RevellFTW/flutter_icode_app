@@ -177,9 +177,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
               child: Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(10, 15, 0, 0),
                 child: Text(
-                  widget.caller == Caller.patient
-                      ? '${widget.patient!.name}\'s event log'
-                      : '${widget.caretaker!.name}\'s event log',
+                  widget.eventLogName,
                   style: FlutterFlowTheme.of(context).headlineMedium.override(
                         fontFamily: 'Outfit',
                         color: FlutterFlowTheme.of(context).primaryText,

@@ -109,7 +109,7 @@ void modifyCaretakerInDb(Caretaker caretaker) async {
 
 void addPatientUserInDb(Patient patient, String uid) {
   Map<String, dynamic> userData = {
-    'approved': 'false',
+    'approved': false,
     'email': patient.email,
     'id': uid,
     'role': 'patient',
@@ -338,8 +338,7 @@ Future<Caretaker> getCaretakerFromDb(String id) async {
   return caretaker;
 }
 
-Future<Patient> getPatientFromDb(String id) async {
-  String docID = await getDocumentID(int.parse(id), 'patients');
+Future<Patient> getPatientBydocID(String docID) async {
   var doc = await db.collection('patients').doc(docID).get();
 
   var careTasksCollection = doc['careTasks'];
@@ -401,6 +400,11 @@ Future<Patient> getPatientFromDb(String id) async {
     relatives: relatives,
   );
   return patient;
+}
+
+Future<Patient> getPatientFromDb(String id) async {
+  String docID = await getDocumentID(int.parse(id), 'patients');
+  return getPatientBydocID(docID);
 }
 
 void deleteEventLogFromFireStore(EventLog eventLog) async {

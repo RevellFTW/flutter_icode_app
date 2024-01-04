@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:todoapp/auth_screens/new_login_screen.dart';
+import 'package:todoapp/helper/firestore_helper.dart';
+import 'package:todoapp/models/event_log.dart';
+import 'package:todoapp/models/patient.dart';
+import 'package:todoapp/screens/tasks_and_logs/event_log_screen.dart';
 import '../global/variables.dart';
 import '../screens/home_page.dart';
 
@@ -43,7 +47,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(back_office ? appName : 'Under construction'),
+        //todo add one more if we implement caretakers
+        title: Text(back_office ? appName : 'Event tasks'),
         backgroundColor: appBackgroundColor,
         foregroundColor: appForegroundColor,
       ),
@@ -63,7 +68,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   Future<void> checkUserType(BuildContext context) async {
     bool isBackOffice = false;
-
+    bool isPatient = false;
     final user = auth.currentUser;
     if (user != null) {
       final userData = await db.collection('users').doc(user.uid).get();
@@ -72,6 +77,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         final data = userData.data() as Map<String, dynamic>;
         if (data['approved'] == true && data['role'] == 'back-office') {
           isBackOffice = true;
+        }
+        if (data['approved'] == true && data['role'] == 'patient') {
+          isPatient = true;
         }
       }
     } else {
@@ -83,6 +91,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } else if (isPatient) {
+      String uid = auth.currentUser!.uid;
+      Patient patient = await getPatientBydocID(uid);
+      List<EventLog> eventLogs =
+          await loadEventLogsFromFirestore(patient.id, Caller.patient);
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EventLogScreen(
+                  eventLogs: eventLogs,
+                  patient: patient,
+                  eventLogName: "${patient.name} Patient's Log ",
+                  caller: Caller.patient,
+                )),
       );
     } else {
       // Display your message here
