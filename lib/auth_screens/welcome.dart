@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:todoapp/auth_screens/new_login_screen.dart';
@@ -70,16 +71,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     bool isBackOffice = false;
     bool isPatient = false;
     final user = auth.currentUser;
+    DocumentSnapshot<Map<String, dynamic>>? userData;
+    Map<String, dynamic>? data;
     if (user != null) {
-      final userData = await db.collection('users').doc(user.uid).get();
+      userData = await db.collection('users').doc(user.uid).get();
 
       if (userData.exists) {
-        final data = userData.data() as Map<String, dynamic>;
+        data = userData.data() as Map<String, dynamic>;
         if (data['approved'] == true && data['role'] == 'back-office') {
           isBackOffice = true;
+          isPatient = false;
         }
         if (data['approved'] == true && data['role'] == 'patient') {
           isPatient = true;
+          isBackOffice = false;
         }
       }
     } else {
@@ -92,13 +97,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
       );
-    } else if (isPatient) {
-      String uid = auth.currentUser!.uid;
-      Patient patient = await getPatientBydocID(uid);
+    }
+    if (isPatient) {
+      Patient patient = await getPatientFromDb(data!['roleId'].toString());
       List<EventLog> eventLogs =
           await loadEventLogsFromFirestore(patient.id, Caller.patient);
       // ignore: use_build_context_synchronously
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => EventLogScreen(
@@ -107,12 +112,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   eventLogName: "${patient.name} Patient's Log ",
                   caller: Caller.patient,
                 )),
-      );
-    } else {
-      // Display your message here
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You are not a back office user')),
       );
     }
     setState(() {

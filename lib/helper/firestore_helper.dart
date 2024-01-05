@@ -115,7 +115,8 @@ void addPatientUserInDb(Patient patient, String uid) {
     'role': 'patient',
     'roleId': patient.id,
   };
-  addDocumentToCollection('users', userData);
+
+  db.collection('users').doc(uid).set(userData);
 }
 
 void addCaretakerUserInDb(Caretaker caretaker, String uid) {
