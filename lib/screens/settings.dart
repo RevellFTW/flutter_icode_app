@@ -9,8 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen(this.caller, this.backToText, {Key? key})
+      : super(key: key);
   static const String id = 'settings_screen';
+  final Caller caller;
+  final String backToText;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -19,10 +22,24 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
+  late String appName;
   @override
   void initState() {
     super.initState();
+    switch (widget.caller) {
+      case Caller.backOfficePatient:
+        appName = 'Back Office Application';
+        break;
+      case Caller.backOfficeCaretaker:
+        appName = 'Back Office Application';
+        break;
+      case Caller.patient:
+        appName = 'Patient Application';
+        break;
+      case Caller.caretaker:
+        appName = 'Caretaker Application';
+        break;
+    }
   }
 
   @override
@@ -114,7 +131,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 4, 0, 0, 0),
                             child: Text(
-                              'Back to Curamus Back-Office',
+                              "Back to ${widget.backToText}",
                               style: FlutterFlowTheme.of(context)
                                   .headlineMedium
                                   .override(
@@ -185,7 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(23, 30, 0, 0),
             child: Text(
-              'Back Office Application',
+              appName,
               style: FlutterFlowTheme.of(context).titleLarge,
             ),
           ),
@@ -228,8 +245,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-          const Spacer(),
-        ].addToEnd(const SizedBox(height: 64)),
+          widget.caller == Caller.patient
+              ? Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(16, 30, 0, 0),
+                      child: Text(
+                        'Settings ',
+                        style: FlutterFlowTheme.of(context).headlineSmall,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(16, 4, 0, 0),
+                      child: Text(
+                        'Please evaluate your options below.',
+                        style: FlutterFlowTheme.of(context).labelMedium,
+                      ),
+                    ),
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        //todo
+                      },
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        children: [
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                //todo
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(),
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      //todo
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'View patient data',
+                                          style: FlutterFlowTheme.of(context)
+                                              .titleLarge,
+                                        ),
+                                        InkWell(
+                                          splashColor: Colors.transparent,
+                                          focusColor: Colors.transparent,
+                                          hoverColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: () async {
+                                            //todo
+                                          },
+                                          child: Icon(
+                                            Icons.chevron_right_rounded,
+                                            color: FlutterFlowTheme.of(context)
+                                                .secondaryText,
+                                            size: 24,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                  ].addToEnd(const SizedBox(height: 64)),
+                )
+              : const SizedBox(height: 64),
+        ],
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/models/relative.dart';
+import 'package:todoapp/screens/home_page.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
 import '../helper/flutter_flow/flutter_flow_theme.dart';
 import '../global/variables.dart';
@@ -174,7 +175,9 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const SettingsScreen()));
+                                                const SettingsScreen(
+                                                    Caller.backOfficeCaretaker,
+                                                    'Curamus Back-Office')));
                                   },
                                 ),
                               ),

@@ -30,4 +30,4 @@ class HomePage extends StatelessWidget {
   }
 }
 
-enum Caller { patient, caretaker }
+enum Caller { backOfficePatient, backOfficeCaretaker, patient, caretaker }

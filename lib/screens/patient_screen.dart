@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/models/relative.dart';
+import 'package:todoapp/screens/home_page.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
 import '../helper/flutter_flow/flutter_flow_theme.dart';
 import '../global/variables.dart';
@@ -184,7 +185,9 @@ class _PatientScreenState extends State<PatientScreen> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const SettingsScreen()));
+                                                const SettingsScreen(
+                                                    Caller.patient,
+                                                    'Curamus Back-Office')));
                                   },
                                 ),
                               ),

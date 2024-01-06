@@ -56,7 +56,6 @@ class _MyAppState extends State<MyApp> {
       routes: {
         AuthWidget.id: (context) => const AuthWidget(),
         WelcomeScreen.id: (context) => const WelcomeScreen(),
-        SettingsScreen.id: (context) => const SettingsScreen(),
       },
     );
   }

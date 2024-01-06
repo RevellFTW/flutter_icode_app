@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/datetime_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
@@ -10,13 +11,14 @@ import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/screens/forms/caretaker_form_screen.dart';
 import 'package:todoapp/screens/forms/event_log_form_screen.dart';
 import 'package:todoapp/screens/forms/patient_form_screen.dart';
+import 'package:todoapp/screens/settings.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 import '../../helper/firestore_helper.dart';
 import '../../models/event_log.dart';
 import '../../models/patient.dart';
 import '../home_page.dart';
 
-class EventLogScreen extends StatefulWidget {
+class EventLogScreen extends StatefulWidget implements PreferredSizeWidget {
   final List<EventLog> eventLogs;
 
   final String eventLogName;
@@ -34,6 +36,9 @@ class EventLogScreen extends StatefulWidget {
   @override
   // ignore: library_private_types_in_public_api
   _EventLogScreenState createState() => _EventLogScreenState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(100);
 }
 
 class _EventLogScreenState extends State<EventLogScreen> {
@@ -63,7 +68,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
   void initState() {
     super.initState();
 
-    if (widget.caller == Caller.patient) {
+    if (widget.caller == Caller.backOfficePatient) {
       _loadData(widget.patient!.id.toString()).then((value) {
         setState(() {
           list = value;
@@ -149,11 +154,11 @@ class _EventLogScreenState extends State<EventLogScreen> {
       child: Scaffold(
         appBar: CustomAppBar(
           //todo make patient name dynamic
-          title: widget.caller == Caller.patient
+          title: widget.caller == Caller.backOfficePatient
               ? 'Back to ${widget.patient!.name}\'s sheet'
               : 'Back to ${widget.caretaker!.name}\'s sheet',
           onBackPressed: () async {
-            widget.caller == Caller.patient
+            widget.caller == Caller.backOfficePatient
                 ? Navigator.of(context).pop(
                     MaterialPageRoute(
                         builder: (context) => PatientFormScreen(
@@ -168,6 +173,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             )),
                   );
           },
+          caller: widget.caller,
+          patient: widget.patient,
         ),
         body: Column(
           mainAxisSize: MainAxisSize.max,
@@ -188,7 +195,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
               ),
             ),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
               child: ValueListenableBuilder<DateTime>(
                   valueListenable: selectedDay,
                   builder: (context, value, child) {
@@ -227,7 +234,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                   }),
             ),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -238,12 +245,12 @@ class _EventLogScreenState extends State<EventLogScreen> {
               ),
             ),
             Align(
-              alignment: AlignmentDirectional(0.00, 0.00),
+              alignment: const AlignmentDirectional(0.00, 0.00),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
                     child: FlutterFlowIconButton(
                       borderRadius: 20,
                       borderWidth: 1,
@@ -262,14 +269,14 @@ class _EventLogScreenState extends State<EventLogScreen> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(10, 0, 10, 5),
+                    padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 5),
                     child: Text(
                       'Navigate Days',
                       style: FlutterFlowTheme.of(context).bodyMedium,
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
                     child: FlutterFlowIconButton(
                       borderRadius: 20,
                       borderWidth: 1,
@@ -385,7 +392,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
                                             Patient patient = widget.caller ==
-                                                    Caller.caretaker
+                                                    Caller.backOfficeCaretaker
                                                 ? patientList
                                                     .where((element) =>
                                                         element.id ==
@@ -438,7 +445,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                 onTap: () async {
                                                   Patient patient = widget
                                                               .caller ==
-                                                          Caller.caretaker
+                                                          Caller
+                                                              .backOfficeCaretaker
                                                       ? patientList
                                                           .where((element) =>
                                                               element.id ==
@@ -495,7 +503,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(12, 0, 0, 8),
                                           child: Text(
-                                            widget.caller == Caller.patient
+                                            widget.caller ==
+                                                    Caller.backOfficePatient
                                                 ? 'Assigned to ${_filteredEventLogs[i].caretaker.name}'
                                                 : 'Assigned to ${_filteredEventLogs[i].patient.name}',
                                             style: FlutterFlowTheme.of(context)
@@ -523,7 +532,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
         floatingActionButton: FloatingActionButton(
           heroTag: null,
           onPressed: () {
-            widget.caller == Caller.patient
+            widget.caller == Caller.backOfficePatient
                 ? Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => EventLogFormScreen(
                         eventLog: EventLog.empty(
@@ -532,7 +541,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 Caretaker.empty(caretakerList.length + 1),
                             widget.patient ??
                                 Patient.empty(patientList.length + 1)),
-                        caller: Caller.patient,
+                        caller: Caller.backOfficePatient,
                         modifying: false,
                         careTaskList: list,
                         individualCareTaskslistMap: individualCareTaskslistMap,
@@ -550,7 +559,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                 .format(DateTime.now()),
                             patient: selectedPatient,
                             caretaker: widget.caretaker!),
-                        caller: Caller.caretaker,
+                        caller: Caller.backOfficeCaretaker,
                         modifying: false,
                         careTaskList: list,
                         individualCareTaskslistMap: individualCareTaskslistMap,
@@ -563,38 +572,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
         ),
       ),
     );
-  }
-
-  void _selectDate(
-      BuildContext context, StateSetter setState, int index) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2015, 8),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null) {
-      // ignore: use_build_context_synchronously
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(picked),
-      );
-      if (pickedTime != null) {
-        setState(() {
-          _selectedDate = DateTime(
-            picked.year,
-            picked.month,
-            picked.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-        });
-        if (index != -1) {
-          widget.eventLogs[index].date =
-              DateFormat('yyyy-MM-dd h:mm a').format(_selectedDate);
-        }
-      }
-    }
   }
 
   void saveToDb(EventLog eventLog) async {
@@ -626,7 +603,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
   }
 
   List<DropdownMenuEntry<String>> getTaskNameDropdownEntries({String? index}) {
-    return widget.caller == Caller.patient
+    return widget.caller == Caller.backOfficePatient
         ? list.map<DropdownMenuEntry<String>>((String value) {
             return DropdownMenuEntry<String>(value: value, label: value);
           }).toList()
@@ -637,7 +614,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
   }
 
   List<DropdownMenuEntry<String>> getPersonTypeDropdownEntries() {
-    return widget.caller == Caller.patient
+    return widget.caller == Caller.backOfficePatient
         ? caretakerList.map<DropdownMenuEntry<String>>((Caretaker value) {
             return DropdownMenuEntry<String>(
                 value: value.id.toString(), label: value.name);
