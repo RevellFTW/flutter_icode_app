@@ -103,7 +103,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       List<EventLog> eventLogs =
           await loadEventLogsFromFirestore(patient.id, Caller.patient);
       // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EventLogScreen(

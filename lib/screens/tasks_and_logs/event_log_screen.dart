@@ -48,7 +48,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
 
   DateTime _selectedDate = DateTime.now();
 
-  String _editKey = '';
   late Caretaker selectedCaretaker;
   late Patient selectedPatient;
 
@@ -64,11 +63,14 @@ class _EventLogScreenState extends State<EventLogScreen> {
   late List<Caretaker> caretakerList = [];
   late List<Patient> patientList = [];
 
+  String titleName = '';
   @override
   void initState() {
     super.initState();
 
-    if (widget.caller == Caller.backOfficePatient) {
+    if (widget.caller == Caller.backOfficePatient ||
+        widget.caller == Caller.patient) {
+      titleName = widget.patient!.name;
       _loadData(widget.patient!.id.toString()).then((value) {
         setState(() {
           list = value;
@@ -82,6 +84,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
         });
       });
     } else {
+      titleName = widget.caretaker!.name;
       _loadPatientData().then((value) {
         setState(() {
           patientList = value;
@@ -143,433 +146,417 @@ class _EventLogScreenState extends State<EventLogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _editKey = '';
-          _focusNode.unfocus();
-          FocusScope.of(context).unfocus();
-        });
-      },
-      child: Scaffold(
-        appBar: CustomAppBar(
-          //todo make patient name dynamic
-          title: widget.caller == Caller.backOfficePatient
-              ? 'Back to ${widget.patient!.name}\'s sheet'
-              : 'Back to ${widget.caretaker!.name}\'s sheet',
-          onBackPressed: () async {
-            widget.caller == Caller.backOfficePatient
-                ? Navigator.of(context).pop(
-                    MaterialPageRoute(
-                        builder: (context) => PatientFormScreen(
-                              patient: widget.patient!,
-                              caretakerList: caretakerList,
-                            )),
-                  )
-                : Navigator.of(context).pop(
-                    MaterialPageRoute(
-                        builder: (context) => CaretakerFormScreen(
-                              caretaker: widget.caretaker!,
-                            )),
-                  );
-          },
-          caller: widget.caller,
-          patient: widget.patient,
-        ),
-        body: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Align(
-              alignment: const AlignmentDirectional(-1.00, 0.00),
-              child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(10, 15, 0, 0),
-                child: Text(
-                  widget.eventLogName,
-                  style: FlutterFlowTheme.of(context).headlineMedium.override(
-                        fontFamily: 'Outfit',
-                        color: FlutterFlowTheme.of(context).primaryText,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
+    return Scaffold(
+      appBar: CustomAppBar(
+        //todo make patient name dynamic
+        title: 'Back to $titleName\'s sheet',
+        onBackPressed: () async {
+          widget.caller == Caller.backOfficePatient
+              ? Navigator.of(context).pop(
+                  MaterialPageRoute(
+                      builder: (context) => PatientFormScreen(
+                            patient: widget.patient!,
+                            caretakerList: caretakerList,
+                          )),
+                )
+              : Navigator.of(context).pop(
+                  MaterialPageRoute(
+                      builder: (context) => CaretakerFormScreen(
+                            caretaker: widget.caretaker!,
+                          )),
+                );
+        },
+        caller: widget.caller,
+        patient: widget.patient,
+      ),
+      body: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Align(
+            alignment: const AlignmentDirectional(-1.00, 0.00),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(10, 15, 0, 0),
+              child: Text(
+                widget.eventLogName,
+                style: FlutterFlowTheme.of(context).headlineMedium.override(
+                      fontFamily: 'Outfit',
+                      color: FlutterFlowTheme.of(context).primaryText,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                    ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
-              child: ValueListenableBuilder<DateTime>(
-                  valueListenable: selectedDay,
-                  builder: (context, value, child) {
-                    return TableCalendar(
-                      firstDay: DateTime.utc(2020, 10, 16),
-                      lastDay: DateTime.utc(2030, 3, 14),
-                      focusedDay: focusedDay.value,
-                      onFormatChanged: (format) {
-                        if (calendarFormat != format) {
-                          setState(() {
-                            calendarFormat = format;
-                          });
-                        }
-                      },
-                      onPageChanged: (focusedDay) {
-                        this.focusedDay.value = focusedDay;
-                      },
-                      calendarFormat: calendarFormat,
-                      selectedDayPredicate: (day) {
-                        // Use `selectedDayPredicate` to determine which day is currently selected.
-                        // If this returns true, then `day` is currently selected.
-                        return isSameDay(value, day);
-                      },
-                      onDaySelected: (pSelectedDay, pFocusedDay) {
-                        // Handle your date selection logic here.
-                        // `selectedDay` is the day that was just selected.
-                        // `focusedDay` is the day that is currently focused (i.e. the day that the calendar is centered around).
-                        // If you update the `selectedDay` variable here, the calendar will automatically update to reflect the new selected day.
+          ),
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+            child: ValueListenableBuilder<DateTime>(
+                valueListenable: selectedDay,
+                builder: (context, value, child) {
+                  return TableCalendar(
+                    firstDay: DateTime.utc(2020, 10, 16),
+                    lastDay: DateTime.utc(2030, 3, 14),
+                    focusedDay: focusedDay.value,
+                    onFormatChanged: (format) {
+                      if (calendarFormat != format) {
                         setState(() {
-                          selectedDay.value = pSelectedDay;
-                          focusedDay.value = pFocusedDay;
-                          filterEventLogs(selectedDay.value);
+                          calendarFormat = format;
                         });
-                      },
-                    );
-                  }),
+                      }
+                    },
+                    onPageChanged: (focusedDay) {
+                      this.focusedDay.value = focusedDay;
+                    },
+                    calendarFormat: calendarFormat,
+                    selectedDayPredicate: (day) {
+                      // Use `selectedDayPredicate` to determine which day is currently selected.
+                      // If this returns true, then `day` is currently selected.
+                      return isSameDay(value, day);
+                    },
+                    onDaySelected: (pSelectedDay, pFocusedDay) {
+                      // Handle your date selection logic here.
+                      // `selectedDay` is the day that was just selected.
+                      // `focusedDay` is the day that is currently focused (i.e. the day that the calendar is centered around).
+                      // If you update the `selectedDay` variable here, the calendar will automatically update to reflect the new selected day.
+                      setState(() {
+                        selectedDay.value = pSelectedDay;
+                        focusedDay.value = pFocusedDay;
+                        filterEventLogs(selectedDay.value);
+                      });
+                    },
+                  );
+                }),
+          ),
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).primaryBackground,
+                borderRadius: BorderRadius.circular(0),
+                shape: BoxShape.rectangle,
+              ),
             ),
-            Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).primaryBackground,
-                  borderRadius: BorderRadius.circular(0),
-                  shape: BoxShape.rectangle,
+          ),
+          Align(
+            alignment: const AlignmentDirectional(0.00, 0.00),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
+                  child: FlutterFlowIconButton(
+                    borderRadius: 20,
+                    borderWidth: 1,
+                    buttonSize: 40,
+                    icon: FaIcon(
+                      FontAwesomeIcons.angleLeft,
+                      color: FlutterFlowTheme.of(context).primaryText,
+                      size: 24,
+                    ),
+                    onPressed: () {
+                      selectedDay.value =
+                          selectedDay.value.subtract(const Duration(days: 1));
+                      focusedDay.value = selectedDay.value;
+                      filterEventLogs(selectedDay.value);
+                    },
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 5),
+                  child: Text(
+                    'Navigate Days',
+                    style: FlutterFlowTheme.of(context).bodyMedium,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
+                  child: FlutterFlowIconButton(
+                    borderRadius: 20,
+                    borderWidth: 1,
+                    buttonSize: 40,
+                    icon: FaIcon(
+                      FontAwesomeIcons.angleRight,
+                      color: FlutterFlowTheme.of(context).primaryText,
+                      size: 24,
+                    ),
+                    onPressed: () {
+                      selectedDay.value =
+                          selectedDay.value.add(const Duration(days: 1));
+                      focusedDay.value = selectedDay.value;
+                      filterEventLogs(selectedDay.value);
+                    },
+                  ),
+                ),
+              ],
             ),
-            Align(
-              alignment: const AlignmentDirectional(0.00, 0.00),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
-                    child: FlutterFlowIconButton(
-                      borderRadius: 20,
-                      borderWidth: 1,
-                      buttonSize: 40,
-                      icon: FaIcon(
-                        FontAwesomeIcons.angleLeft,
-                        color: FlutterFlowTheme.of(context).primaryText,
-                        size: 24,
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 0),
+              child: ListView.builder(
+                  itemCount: _filteredEventLogs.length,
+                  itemBuilder: (context, i) {
+                    return Slidable(
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: <Widget>[
+                          SlidableAction(
+                            onPressed: (context) => {
+                              setState(() {
+                                deleteEventLogFromFireStore(
+                                    _filteredEventLogs[i]);
+                                _filteredEventLogs.removeAt(i);
+                              })
+                            },
+                            backgroundColor: Colors.red,
+                            icon: Icons.delete,
+                          ),
+                        ],
                       ),
-                      onPressed: () {
-                        selectedDay.value =
-                            selectedDay.value.subtract(const Duration(days: 1));
-                        focusedDay.value = selectedDay.value;
-                        filterEventLogs(selectedDay.value);
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 5),
-                    child: Text(
-                      'Navigate Days',
-                      style: FlutterFlowTheme.of(context).bodyMedium,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
-                    child: FlutterFlowIconButton(
-                      borderRadius: 20,
-                      borderWidth: 1,
-                      buttonSize: 40,
-                      icon: FaIcon(
-                        FontAwesomeIcons.angleRight,
-                        color: FlutterFlowTheme.of(context).primaryText,
-                        size: 24,
-                      ),
-                      onPressed: () {
-                        selectedDay.value =
-                            selectedDay.value.add(const Duration(days: 1));
-                        focusedDay.value = selectedDay.value;
-                        filterEventLogs(selectedDay.value);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 0),
-                child: ListView.builder(
-                    itemCount: _filteredEventLogs.length,
-                    itemBuilder: (context, i) {
-                      return Slidable(
-                        endActionPane: ActionPane(
-                          motion: const ScrollMotion(),
-                          children: <Widget>[
-                            SlidableAction(
-                              onPressed: (context) => {
-                                setState(() {
-                                  deleteEventLogFromFireStore(
-                                      _filteredEventLogs[i]);
-                                  _filteredEventLogs.removeAt(i);
-                                })
-                              },
-                              backgroundColor: Colors.red,
-                              icon: Icons.delete,
+                      key: ValueKey<int>(_filteredEventLogs[i].id),
+                      child: Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+                        child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context)
+                                  .secondaryBackground,
+                              boxShadow: const [
+                                BoxShadow(
+                                  blurRadius: 0,
+                                  color: Color(0xFFE0E3E7),
+                                  offset: Offset(0, 1),
+                                ),
+                              ],
+                              borderRadius: BorderRadius.circular(0),
+                              shape: BoxShape.rectangle,
                             ),
-                          ],
-                        ),
-                        key: ValueKey<int>(_filteredEventLogs[i].id),
-                        child: Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
-                          child: Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 0,
-                                    color: Color(0xFFE0E3E7),
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                                borderRadius: BorderRadius.circular(0),
-                                shape: BoxShape.rectangle,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            8, 8, 8, 8),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Container(
-                                          width: 4,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                            borderRadius:
-                                                BorderRadius.circular(2),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(12, 0, 0, 0),
-                                            child: Text(
-                                              _filteredEventLogs[i].name == ''
-                                                  ? 'Other'
-                                                  : _filteredEventLogs[i].name,
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLarge,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(12, 0, 15, 0),
-                                          child: Text(
-                                            DateFormat.yMMMd().format(
-                                                yMHTAStringToDateTime(
-                                                    _filteredEventLogs[i]
-                                                        .date)),
-                                            style: FlutterFlowTheme.of(context)
-                                                .labelMedium,
-                                          ),
-                                        ),
-                                        InkWell(
-                                          splashColor: Colors.transparent,
-                                          focusColor: Colors.transparent,
-                                          hoverColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          onTap: () async {
-                                            Patient patient = widget.caller ==
-                                                    Caller.backOfficeCaretaker
-                                                ? patientList
-                                                    .where((element) =>
-                                                        element.id ==
-                                                        _filteredEventLogs[i]
-                                                            .patient
-                                                            .id)
-                                                    .first
-                                                : widget.patient!;
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      EventLogFormScreen(
-                                                          eventLog:
-                                                              _filteredEventLogs[
-                                                                  i],
-                                                          caller: widget.caller,
-                                                          modifying: true,
-                                                          careTaskList: list,
-                                                          individualCareTaskslistMap:
-                                                              individualCareTaskslistMap,
-                                                          patientList:
-                                                              patientList,
-                                                          caretakerList:
-                                                              caretakerList,
-                                                          patient: patient,
-                                                          caretaker: widget
-                                                              .caretaker)),
-                                            );
-                                          },
-                                          child: Card(
-                                            clipBehavior:
-                                                Clip.antiAliasWithSaveLayer,
-                                            color: FlutterFlowTheme.of(context)
-                                                .primaryBackground,
-                                            elevation: 1,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(40),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(4, 4, 4, 4),
-                                              child: InkWell(
-                                                splashColor: Colors.transparent,
-                                                focusColor: Colors.transparent,
-                                                hoverColor: Colors.transparent,
-                                                highlightColor:
-                                                    Colors.transparent,
-                                                onTap: () async {
-                                                  Patient patient = widget
-                                                              .caller ==
-                                                          Caller
-                                                              .backOfficeCaretaker
-                                                      ? patientList
-                                                          .where((element) =>
-                                                              element.id ==
-                                                              _filteredEventLogs[
-                                                                      i]
-                                                                  .patient
-                                                                  .id)
-                                                          .first
-                                                      : widget.patient!;
-                                                  Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            EventLogFormScreen(
-                                                                eventLog:
-                                                                    _filteredEventLogs[
-                                                                        i],
-                                                                caller: widget
-                                                                    .caller,
-                                                                modifying: true,
-                                                                careTaskList:
-                                                                    list,
-                                                                individualCareTaskslistMap:
-                                                                    individualCareTaskslistMap,
-                                                                patientList:
-                                                                    patientList,
-                                                                caretakerList:
-                                                                    caretakerList,
-                                                                patient:
-                                                                    patient,
-                                                                caretaker: widget
-                                                                    .caretaker)),
-                                                  );
-                                                },
-                                                child: Icon(
-                                                  Icons
-                                                      .keyboard_arrow_right_rounded,
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryText,
-                                                  size: 24,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Row(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      8, 8, 8, 8),
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
+                                      Container(
+                                        width: 4,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          borderRadius:
+                                              BorderRadius.circular(2),
+                                        ),
+                                      ),
                                       Expanded(
                                         child: Padding(
                                           padding: const EdgeInsetsDirectional
-                                              .fromSTEB(12, 0, 0, 8),
+                                              .fromSTEB(12, 0, 0, 0),
                                           child: Text(
-                                            widget.caller ==
-                                                    Caller.backOfficePatient
-                                                ? 'Assigned to ${_filteredEventLogs[i].caretaker.name}'
-                                                : 'Assigned to ${_filteredEventLogs[i].patient.name}',
+                                            _filteredEventLogs[i].name == ''
+                                                ? 'Other'
+                                                : _filteredEventLogs[i].name,
                                             style: FlutterFlowTheme.of(context)
-                                                .bodyLarge
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryText,
-                                                ),
+                                                .bodyLarge,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(12, 0, 15, 0),
+                                        child: Text(
+                                          DateFormat.yMMMd().format(
+                                              yMHTAStringToDateTime(
+                                                  _filteredEventLogs[i].date)),
+                                          style: FlutterFlowTheme.of(context)
+                                              .labelMedium,
+                                        ),
+                                      ),
+                                      InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () async {
+                                          Patient patient = widget.caller ==
+                                                  Caller.backOfficeCaretaker
+                                              ? patientList
+                                                  .where((element) =>
+                                                      element.id ==
+                                                      _filteredEventLogs[i]
+                                                          .patient
+                                                          .id)
+                                                  .first
+                                              : widget.patient!;
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EventLogFormScreen(
+                                                        eventLog:
+                                                            _filteredEventLogs[
+                                                                i],
+                                                        caller: widget.caller,
+                                                        modifying: true,
+                                                        careTaskList: list,
+                                                        individualCareTaskslistMap:
+                                                            individualCareTaskslistMap,
+                                                        patientList:
+                                                            patientList,
+                                                        caretakerList:
+                                                            caretakerList,
+                                                        patient: patient,
+                                                        caretaker:
+                                                            widget.caretaker)),
+                                          );
+                                        },
+                                        child: Card(
+                                          clipBehavior:
+                                              Clip.antiAliasWithSaveLayer,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryBackground,
+                                          elevation: 1,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(40),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(4, 4, 4, 4),
+                                            child: InkWell(
+                                              splashColor: Colors.transparent,
+                                              focusColor: Colors.transparent,
+                                              hoverColor: Colors.transparent,
+                                              highlightColor:
+                                                  Colors.transparent,
+                                              onTap: () async {
+                                                Patient patient = widget
+                                                            .caller ==
+                                                        Caller
+                                                            .backOfficeCaretaker
+                                                    ? patientList
+                                                        .where((element) =>
+                                                            element.id ==
+                                                            _filteredEventLogs[
+                                                                    i]
+                                                                .patient
+                                                                .id)
+                                                        .first
+                                                    : widget.patient!;
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          EventLogFormScreen(
+                                                              eventLog:
+                                                                  _filteredEventLogs[
+                                                                      i],
+                                                              caller:
+                                                                  widget.caller,
+                                                              modifying: true,
+                                                              careTaskList:
+                                                                  list,
+                                                              individualCareTaskslistMap:
+                                                                  individualCareTaskslistMap,
+                                                              patientList:
+                                                                  patientList,
+                                                              caretakerList:
+                                                                  caretakerList,
+                                                              patient: patient,
+                                                              caretaker: widget
+                                                                  .caretaker)),
+                                                );
+                                              },
+                                              child: Icon(
+                                                Icons
+                                                    .keyboard_arrow_right_rounded,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText,
+                                                size: 24,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ],
-                              )),
-                        ),
-                      );
-                    }),
-              ),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(12, 0, 0, 8),
+                                        child: Text(
+                                          widget.caller ==
+                                                  Caller.backOfficePatient
+                                              ? 'Assigned to ${_filteredEventLogs[i].caretaker.name}'
+                                              : 'Assigned to ${_filteredEventLogs[i].patient.name}',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyLarge
+                                              .override(
+                                                fontFamily: 'Readex Pro',
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )),
+                      ),
+                    );
+                  }),
             ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          heroTag: null,
-          onPressed: () {
-            widget.caller == Caller.backOfficePatient
-                ? Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => EventLogFormScreen(
-                        eventLog: EventLog.empty(
-                            widget.eventLogs.length + 1,
-                            widget.caretaker ??
-                                Caretaker.empty(caretakerList.length + 1),
-                            widget.patient ??
-                                Patient.empty(patientList.length + 1)),
-                        caller: Caller.backOfficePatient,
-                        modifying: false,
-                        careTaskList: list,
-                        individualCareTaskslistMap: individualCareTaskslistMap,
-                        patientList: patientList,
-                        caretakerList: caretakerList,
-                        patient: widget.patient,
-                        caretaker: widget.caretaker)))
-                : Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => EventLogFormScreen(
-                        eventLog: EventLog(
-                            id: widget.eventLogs.length + 1,
-                            name: '',
-                            description: '',
-                            date: DateFormat('yyyy-MM-dd h:mm a')
-                                .format(DateTime.now()),
-                            patient: selectedPatient,
-                            caretaker: widget.caretaker!),
-                        caller: Caller.backOfficeCaretaker,
-                        modifying: false,
-                        careTaskList: list,
-                        individualCareTaskslistMap: individualCareTaskslistMap,
-                        patientList: patientList,
-                        caretakerList: caretakerList,
-                        patient: selectedPatient,
-                        caretaker: widget.caretaker)));
-          },
-          child: const Icon(Icons.add),
-        ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        onPressed: () {
+          widget.caller == Caller.backOfficePatient
+              ? Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EventLogFormScreen(
+                      eventLog: EventLog.empty(
+                          widget.eventLogs.length + 1,
+                          widget.caretaker ??
+                              Caretaker.empty(caretakerList.length + 1),
+                          widget.patient ??
+                              Patient.empty(patientList.length + 1)),
+                      caller: Caller.backOfficePatient,
+                      modifying: false,
+                      careTaskList: list,
+                      individualCareTaskslistMap: individualCareTaskslistMap,
+                      patientList: patientList,
+                      caretakerList: caretakerList,
+                      patient: widget.patient,
+                      caretaker: widget.caretaker)))
+              : Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EventLogFormScreen(
+                      eventLog: EventLog(
+                          id: widget.eventLogs.length + 1,
+                          name: '',
+                          description: '',
+                          date: DateFormat('yyyy-MM-dd h:mm a')
+                              .format(DateTime.now()),
+                          patient: selectedPatient,
+                          caretaker: widget.caretaker!),
+                      caller: Caller.backOfficeCaretaker,
+                      modifying: false,
+                      careTaskList: list,
+                      individualCareTaskslistMap: individualCareTaskslistMap,
+                      patientList: patientList,
+                      caretakerList: caretakerList,
+                      patient: selectedPatient,
+                      caretaker: widget.caretaker)));
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -591,15 +578,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
         individualCareTaskslistMap = newMap;
       }
     });
-  }
-
-  void setIndex(int index) {
-    _editKey = index.toString();
-  }
-
-  void setFormTexts() {
-    _descriptionController.text =
-        widget.eventLogs[int.parse(_editKey)].description;
   }
 
   List<DropdownMenuEntry<String>> getTaskNameDropdownEntries({String? index}) {

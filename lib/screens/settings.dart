@@ -158,45 +158,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 8),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment:
-                    CrossAxisAlignment.start, // Align texts to the start
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 0, 0),
-                    child: Text(
-                      'Logged In user:',
-                      style:
-                          FlutterFlowTheme.of(context).headlineMedium.override(
-                                fontFamily: 'Outfit',
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FontStyle.italic,
-                              ),
-                    ),
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Align texts to the start
+              children: [
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 0, 0),
+                  child: Text(
+                    'Logged In user:',
+                    style: FlutterFlowTheme.of(context).headlineMedium.override(
+                          fontFamily: 'Outfit',
+                          color: FlutterFlowTheme.of(context).primaryText,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
                   ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 10, 0),
-                    child: Text(
-                      //todo add user name
-                      auth.currentUser!.email.toString(),
-                      style:
-                          FlutterFlowTheme.of(context).headlineMedium.override(
-                                fontFamily: 'Outfit',
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w500,
-                                fontStyle: FontStyle.italic,
-                              ),
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 10, 0),
+                  child: Text(
+                    //todo add user name
+                    auth.currentUser!.email.toString(),
+                    style: FlutterFlowTheme.of(context).headlineMedium.override(
+                          fontFamily: 'Outfit',
+                          color: FlutterFlowTheme.of(context).primaryText,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                          fontStyle: FontStyle.italic,
+                        ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           Padding(
@@ -245,100 +241,97 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-          widget.caller == Caller.patient
-              ? Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(16, 30, 0, 0),
-                      child: Text(
-                        'Settings ',
-                        style: FlutterFlowTheme.of(context).headlineSmall,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(16, 4, 0, 0),
-                      child: Text(
-                        'Please evaluate your options below.',
-                        style: FlutterFlowTheme.of(context).labelMedium,
-                      ),
-                    ),
-                    InkWell(
-                      splashColor: Colors.transparent,
-                      focusColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      onTap: () async {
-                        //todo
-                      },
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        children: [
-                          Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                //todo
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(),
-                                child: Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: InkWell(
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () async {
-                                      //todo
-                                    },
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'View patient data',
-                                          style: FlutterFlowTheme.of(context)
-                                              .titleLarge,
-                                        ),
-                                        InkWell(
-                                          splashColor: Colors.transparent,
-                                          focusColor: Colors.transparent,
-                                          hoverColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          onTap: () async {
-                                            //todo
-                                          },
-                                          child: Icon(
-                                            Icons.chevron_right_rounded,
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            size: 24,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                  ].addToEnd(const SizedBox(height: 64)),
-                )
-              : const SizedBox(height: 64),
+          showSettings(context),
         ],
       ),
     );
+  }
+
+  Widget showSettings(BuildContext context) {
+    if (widget.caller == Caller.patient) {
+      return Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(16, 30, 0, 0),
+            child: Text(
+              'Settings ',
+              style: FlutterFlowTheme.of(context).headlineSmall,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(16, 4, 0, 0),
+            child: Text(
+              'Please evaluate your options below.',
+              style: FlutterFlowTheme.of(context).labelMedium,
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              children: [
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+                  child: InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      //todo
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(),
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            //todo
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'View patient data',
+                                style: FlutterFlowTheme.of(context).titleLarge,
+                              ),
+                              InkWell(
+                                splashColor: Colors.transparent,
+                                focusColor: Colors.transparent,
+                                hoverColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () async {
+                                  //todo
+                                },
+                                child: Icon(
+                                  Icons.chevron_right_rounded,
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryText,
+                                  size: 24,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Spacer(),
+        ].addToEnd(const SizedBox(height: 64)),
+      );
+    } else {
+      return Container();
+    }
   }
 }
