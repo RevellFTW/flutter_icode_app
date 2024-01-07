@@ -186,7 +186,7 @@ class _PatientScreenState extends State<PatientScreen> {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 const SettingsScreen(
-                                                    Caller.patient,
+                                                    Caller.backOfficePatient,
                                                     'Curamus Back-Office')));
                                   },
                                 ),
