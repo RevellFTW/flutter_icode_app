@@ -942,7 +942,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsetsDirectional
-                                                                .fromSTEB(
+                                                            .fromSTEB(
                                                             12, 0, 0, 0),
                                                     child: Text(
                                                       relatives[i].name,
@@ -1023,9 +1023,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               0, 34, 0, 12),
                           child: FFButtonWidget(
-                            onPressed: () {
-                              setState(() {
-                                if (!widget.modifying) {
+                            onPressed: () async {
+                              if (!widget.modifying) {
+                                setState(() {
                                   if (widget.patient.name.isEmpty ||
                                       widget.patient.email.isEmpty ||
                                       widget.patient.medicalState.isEmpty ||
@@ -1042,27 +1042,24 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     );
                                     return;
                                   }
-                                  setState(() async {
-                                    UserCredential result = await register(
-                                        widget.patient.email,
-                                        currentPasswordTextFormFieldValue);
-                                    User user = result.user!;
-                                    addPatientUserInDb(
-                                        widget.patient, user.uid);
-                                    addPatientToDb(widget.patient);
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const PatientScreen()));
-                                  });
-                                } else {
-                                  print('todo remove patient from auth users');
-                                  removePatientFromDb(widget.patient.id);
-                                }
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const PatientScreen()));
-                              });
+                                });
+                                UserCredential result = await register(
+                                    widget.patient.email,
+                                    currentPasswordTextFormFieldValue);
+                                setState(() {
+                                  User user = result.user!;
+                                  addPatientUserInDb(widget.patient, user.uid);
+                                  addPatientToDb(widget.patient);
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PatientScreen()));
+                                });
+                              } else {
+                                print('todo remove patient from auth users');
+                                removePatientFromDb(widget.patient.id);
+                              }
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const PatientScreen()));
                             },
                             text: widget.modifying ? 'DELETE' : 'ADD',
                             options: FFButtonOptions(
