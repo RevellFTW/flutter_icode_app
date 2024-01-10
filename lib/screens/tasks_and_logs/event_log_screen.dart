@@ -72,10 +72,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
         widget.caller == Caller.patient) {
       titleName = widget.patient!.name;
       _loadData(widget.patient!.id.toString()).then((value) {
-        setState(() {
-          list = value;
-          list.add('Other');
-        });
+        list = value;
+        list.add('Other');
       });
       _loadCaretakerData().then((value) {
         setState(() {

@@ -25,8 +25,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   void initState() {
-    super.initState();
     checkUserType(context);
+    super.initState();
   }
 
   @override
@@ -67,7 +67,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
-  Future<void> checkUserType(BuildContext context) async {
+  void checkUserType(BuildContext context) async {
     bool isBackOffice = false;
     bool isPatient = false;
     final user = auth.currentUser;
@@ -103,7 +103,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       List<EventLog> eventLogs =
           await loadEventLogsFromFirestore(patient.id, Caller.patient);
       // ignore: use_build_context_synchronously
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => EventLogScreen(
