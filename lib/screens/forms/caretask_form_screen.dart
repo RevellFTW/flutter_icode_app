@@ -18,6 +18,7 @@ class CareTasksForm extends StatefulWidget {
   final int caretaskIndex;
   final bool modifying;
   final bool isClickedDirectly;
+  final bool visibility;
 
   const CareTasksForm({
     super.key,
@@ -25,6 +26,7 @@ class CareTasksForm extends StatefulWidget {
     required this.caretaskIndex,
     required this.modifying,
     required this.isClickedDirectly,
+    required this.visibility,
   });
 
   @override
@@ -302,10 +304,12 @@ class _CareTasksFormState extends State<CareTasksForm> {
         appBar: CustomAppBar(
           //todo make patient name dynamic
           title: 'Back to ${widget.patient.name}\'s sheet',
+          visibility: widget.visibility,
           onBackPressed: () async {
             Navigator.of(context).pop(MaterialPageRoute(
                 builder: (context) => CareTasksPage(
                       patient: widget.patient,
+                      visibility: widget.visibility,
                     )));
           },
         ),
@@ -342,6 +346,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                           controller: _nameController,
                           autofocus: true,
                           obscureText: false,
+                          readOnly: !widget.visibility,
                           decoration: InputDecoration(
                             labelText: 'Care task Name',
                             labelStyle:
@@ -451,55 +456,64 @@ class _CareTasksFormState extends State<CareTasksForm> {
                               child: Text(value),
                             );
                           }).toList(),
-                          onChanged: (value) async {
-                            if (value != dropdownValue) {
-                              bool result = await isDatePicked(
-                                  context,
-                                  widget.patient.careTasks[widget.caretaskIndex]
-                                      .date,
-                                  Frequency.values.byName(value!),
-                                  widget.modifying,
-                                  widget.isClickedDirectly,
-                                  index: widget.caretaskIndex);
-                              if (result == true) {
-                                setState(() {
-                                  dropdownValue = value;
-                                  if (widget.modifying) {
-                                    widget
+                          onChanged: widget.visibility
+                              ? (String? value) async {
+                                  if (value != dropdownValue) {
+                                    bool result = await isDatePicked(
+                                        context,
+                                        widget
                                             .patient
                                             .careTasks[widget.caretaskIndex]
-                                            .taskFrequency =
-                                        Frequency.values.byName(value);
-                                    saveToDb();
+                                            .date,
+                                        Frequency.values.byName(value!),
+                                        widget.modifying,
+                                        widget.isClickedDirectly,
+                                        index: widget.caretaskIndex);
+                                    if (result == true) {
+                                      setState(() {
+                                        dropdownValue = value;
+                                        if (widget.modifying) {
+                                          widget
+                                                  .patient
+                                                  .careTasks[widget.caretaskIndex]
+                                                  .taskFrequency =
+                                              Frequency.values.byName(value);
+                                          saveToDb();
+                                        }
+                                      });
+                                    }
                                   }
-                                });
-                              }
-                            }
-                          },
+                                }
+                              : null,
                         ),
                         TextFormField(
-                          onTap: () => {
-                            widget.modifying
-                                ? isDatePicked(
-                                    context,
-                                    widget.patient
-                                        .careTasks[widget.caretaskIndex].date,
-                                    widget
-                                        .patient
-                                        .careTasks[widget.caretaskIndex]
-                                        .taskFrequency,
-                                    widget.modifying,
-                                    widget.isClickedDirectly,
-                                    index: widget.caretaskIndex)
-                                : isDatePicked(
-                                    context,
-                                    DateTime.now().toString(),
-                                    Frequency.values
-                                        .byName(dropdownValue.toString()),
-                                    widget.modifying,
-                                    widget.isClickedDirectly,
-                                    index: -1)
-                          },
+                          readOnly: !widget.visibility,
+                          onTap: widget.visibility
+                              ? () => {
+                                    widget.modifying
+                                        ? isDatePicked(
+                                            context,
+                                            widget
+                                                .patient
+                                                .careTasks[widget.caretaskIndex]
+                                                .date,
+                                            widget
+                                                .patient
+                                                .careTasks[widget.caretaskIndex]
+                                                .taskFrequency,
+                                            widget.modifying,
+                                            widget.isClickedDirectly,
+                                            index: widget.caretaskIndex)
+                                        : isDatePicked(
+                                            context,
+                                            DateTime.now().toString(),
+                                            Frequency.values.byName(
+                                                dropdownValue.toString()),
+                                            widget.modifying,
+                                            widget.isClickedDirectly,
+                                            index: -1)
+                                  }
+                              : null,
                           keyboardType: TextInputType.datetime,
                           controller: _dateController,
                           autofocus: true,
@@ -548,66 +562,72 @@ class _CareTasksFormState extends State<CareTasksForm> {
                     child: Padding(
                       padding:
                           const EdgeInsetsDirectional.fromSTEB(0, 34, 0, 12),
-                      child: FFButtonWidget(
-                        onPressed: () {
-                          setState(() async {
-                            if (!widget.modifying) {
-                              if (_nameController.text.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        'Please enter a name for the care task'),
-                                  ),
-                                );
-                                return;
-                              }
-                              widget.patient.careTasks.add(CareTask(
-                                  taskName: currentNameTextFormFieldValue,
-                                  taskFrequency: Frequency.values
-                                      .byName(dropdownValue.toString()),
-                                  date: selectedDateTimeWhenAdding));
-                              saveToDb();
-                            } else {
-                              widget.patient.careTasks
-                                  .removeAt(widget.caretaskIndex);
-                              saveToDb();
-                            }
-                            List<EventLog> tasks =
-                                await loadEventLogsFromFirestore(
-                                    widget.patient.id, Caller.patient);
-                            // ignore: use_build_context_synchronously
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => CareTasksPage(
-                                      patient: widget.patient,
-                                    )));
-                          });
-                        },
-                        text: widget.modifying ? 'DELETE' : 'ADD',
-                        options: FFButtonOptions(
-                          width: 600,
-                          height: 48,
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          iconPadding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          color: widget.modifying
-                              ? const Color(0xFFEFEFEF)
-                              : FlutterFlowTheme.of(context).primary,
-                          textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.override(
-                                    fontFamily: 'Readex Pro',
-                                    color: widget.modifying
-                                        ? const Color(0xFFFF0800)
-                                        : Colors.white,
-                                  ),
-                          elevation: 4,
-                          borderSide: const BorderSide(
-                            color: Colors.transparent,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(60),
-                        ),
-                      ),
+                      child: widget.visibility
+                          ? FFButtonWidget(
+                              onPressed: () {
+                                setState(() async {
+                                  if (!widget.modifying) {
+                                    if (_nameController.text.isEmpty) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Please enter a name for the care task'),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    widget.patient.careTasks.add(CareTask(
+                                        taskName: currentNameTextFormFieldValue,
+                                        taskFrequency: Frequency.values
+                                            .byName(dropdownValue.toString()),
+                                        date: selectedDateTimeWhenAdding));
+                                    saveToDb();
+                                  } else {
+                                    widget.patient.careTasks
+                                        .removeAt(widget.caretaskIndex);
+                                    saveToDb();
+                                  }
+                                  List<EventLog> tasks =
+                                      await loadEventLogsFromFirestore(
+                                          widget.patient.id, Caller.patient);
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => CareTasksPage(
+                                            patient: widget.patient,
+                                            visibility: widget.visibility,
+                                          )));
+                                });
+                              },
+                              text: widget.modifying ? 'DELETE' : 'ADD',
+                              options: FFButtonOptions(
+                                width: 600,
+                                height: 48,
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 0, 0, 0),
+                                iconPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        0, 0, 0, 0),
+                                color: widget.modifying
+                                    ? const Color(0xFFEFEFEF)
+                                    : FlutterFlowTheme.of(context).primary,
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleSmall
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      color: widget.modifying
+                                          ? const Color(0xFFFF0800)
+                                          : Colors.white,
+                                    ),
+                                elevation: 4,
+                                borderSide: const BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(60),
+                              ),
+                            )
+                          : Container(),
                     ),
                   ),
                 ],

@@ -55,6 +55,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
+        visibility: true,
         title: 'Back to Curamus Back-Office',
         onBackPressed: () async {
           Navigator.of(context).pop(

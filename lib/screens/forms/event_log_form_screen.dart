@@ -20,6 +20,7 @@ class EventLogFormScreen extends StatefulWidget {
   final Map<String, List<String>> individualCareTaskslistMap;
   final List<Caretaker> caretakerList;
   final List<Patient> patientList;
+  final bool visible;
   final Patient? patient;
   final Caretaker? caretaker;
 
@@ -32,6 +33,7 @@ class EventLogFormScreen extends StatefulWidget {
       required this.individualCareTaskslistMap,
       required this.caretakerList,
       required this.patientList,
+      required this.visible,
       this.patient,
       this.caretaker});
 
@@ -57,6 +59,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
   List<DropdownMenuItem<String>> people = [];
 
   String backToText = '';
+  String eventLogTitle = '';
   String title = '';
 
   @override
@@ -81,14 +84,20 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
 
     widget.eventLog.name = taskNames.first.value!;
 
-    if (widget.caller == Caller.patient) {
+    if (widget.caller == Caller.patient ||
+        widget.caller == Caller.backOfficePatient) {
       backToText = "Back to ${widget.patient!.name} Patient's Log";
-      title = "${widget.patient!.name} Patient's Log";
+      eventLogTitle = "${widget.patient!.name} Patient's Log";
       widget.eventLog.patient = widget.patient!;
     } else if (widget.caller == Caller.caretaker) {
       backToText = "Back to ${widget.caretaker!.name} Caretaker's Log";
-      title = "${widget.caretaker!.name} Caretaker's Log";
+      eventLogTitle = "${widget.caretaker!.name} Caretaker's Log";
       widget.eventLog.caretaker = widget.caretaker!;
+    }
+
+    title = "${widget.eventLog.patient.name}'s Log";
+    if (widget.modifying) {
+      title = "Modify ${widget.eventLog.patient.name}'s Log";
     }
   }
 
@@ -128,6 +137,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         appBar: CustomAppBar(
+          visibility: widget.visible,
           title: backToText,
           onBackPressed: () async {
             if (widget.caller == Caller.patient) {
@@ -136,7 +146,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
               Navigator.of(context).pop(MaterialPageRoute(
                   builder: (context) => EventLogScreen(
                         eventLogs: eventLogs,
-                        eventLogName: "${widget.patient!.name} Patient's Log",
+                        eventLogName: eventLogTitle,
                         caller: Caller.patient,
                         patient: widget.patient,
                         caretaker: widget.caretaker,
@@ -147,8 +157,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
               Navigator.of(context).pop(MaterialPageRoute(
                   builder: (context) => EventLogScreen(
                         eventLogs: eventLogs,
-                        eventLogName:
-                            "${widget.caretaker!.name} Caretaker's Log",
+                        eventLogName: eventLogTitle,
                         caller: Caller.caretaker,
                         patient: widget.patient,
                         caretaker: widget.caretaker,
@@ -173,7 +182,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                         Align(
                           alignment: const AlignmentDirectional(-1.00, 0.00),
                           child: Text(
-                            'Add new eventLog',
+                            title,
                             style: FlutterFlowTheme.of(context)
                                 .headlineMedium
                                 .override(
@@ -224,14 +233,16 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           style: FlutterFlowTheme.of(context).bodyMedium,
                           value: taskNames.first.value,
                           items: taskNames,
-                          onChanged: (value) {
-                            setState(() {
-                              widget.eventLog.name = value.toString();
-                              if (widget.modifying) {
-                                modifyEventLogInDb(widget.eventLog);
-                              }
-                            });
-                          },
+                          onChanged: widget.visible
+                              ? (value) {
+                                  setState(() {
+                                    widget.eventLog.name = value.toString();
+                                    if (widget.modifying) {
+                                      modifyEventLogInDb(widget.eventLog);
+                                    }
+                                  });
+                                }
+                              : null,
                         ),
                         DropdownButtonFormField(
                           autofocus: true,
@@ -274,29 +285,35 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           style: FlutterFlowTheme.of(context).bodyMedium,
                           value: people.first.value,
                           items: people,
-                          onChanged: (value) {
-                            setState(() {
-                              if (widget.caller == Caller.patient) {
-                                widget.eventLog.caretaker = widget.caretakerList
-                                    .firstWhere((element) =>
-                                        element.id.toString() == value);
-                              } else {
-                                widget.eventLog.patient = widget.patientList
-                                    .firstWhere((element) =>
-                                        element.id.toString() == value);
-                                taskNames = getTaskNameDropdownEntries(
-                                    index: value.toString());
-                                widget.eventLog.name = taskNames.first.value!;
-                              }
-                              if (widget.modifying) {
-                                modifyEventLogInDb(widget.eventLog);
-                              }
-                            });
-                          },
+                          onChanged: widget.visible
+                              ? (value) {
+                                  setState(() {
+                                    if (widget.caller == Caller.patient) {
+                                      widget.eventLog.caretaker = widget
+                                          .caretakerList
+                                          .firstWhere((element) =>
+                                              element.id.toString() == value);
+                                    } else {
+                                      widget.eventLog.patient = widget
+                                          .patientList
+                                          .firstWhere((element) =>
+                                              element.id.toString() == value);
+                                      taskNames = getTaskNameDropdownEntries(
+                                          index: value.toString());
+                                      widget.eventLog.name =
+                                          taskNames.first.value!;
+                                    }
+                                    if (widget.modifying) {
+                                      modifyEventLogInDb(widget.eventLog);
+                                    }
+                                  });
+                                }
+                              : null,
                         ),
                         TextFormField(
                           controller: _descriptionController,
                           autofocus: true,
+                          readOnly: !widget.visible,
                           obscureText: false,
                           decoration: InputDecoration(
                             labelText: 'Description',
@@ -360,14 +377,17 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                         ),
                         TextFormField(
                           key: Key(_dateController.text),
-                          onTap: () async {
-                            if (widget.modifying) {
-                              await updateStartDate(
-                                  yMHTAStringToDateTime(widget.eventLog.date));
-                            } else {
-                              await isDateUpdated(updatedDateTime);
-                            }
-                          },
+                          onTap: widget.visible
+                              ? () async {
+                                  if (widget.modifying) {
+                                    await updateStartDate(yMHTAStringToDateTime(
+                                        widget.eventLog.date));
+                                  } else {
+                                    await isDateUpdated(updatedDateTime);
+                                  }
+                                }
+                              : null,
+                          readOnly: !widget.visible,
                           keyboardType: TextInputType.datetime,
                           controller: _dateController,
                           autofocus: true,
@@ -416,74 +436,81 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                     child: Padding(
                       padding:
                           const EdgeInsetsDirectional.fromSTEB(0, 34, 0, 12),
-                      child: FFButtonWidget(
-                        onPressed: () {
-                          setState(() async {
-                            if (!widget.modifying) {
-                              widget.caller == Caller.caretaker
-                                  ? widget.eventLog.caretaker =
-                                      widget.caretaker!
-                                  : widget.eventLog.patient = widget.patient!;
-                              if (widget.eventLog.name == 'Other' &&
-                                  widget.eventLog.description.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        'Please enter a description for the task.'),
-                                  ),
-                                );
-                                return;
-                              }
-                              addEventLogInDb(widget.eventLog);
-                            } else {
-                              deleteEventLogFromFireStore(widget.eventLog);
-                            }
-                            List<EventLog> tasks =
-                                widget.caller == Caller.patient
-                                    ? await loadEventLogsFromFirestore(
-                                        widget.patient!.id, widget.caller)
-                                    : await loadEventLogsFromFirestore(
-                                        widget.caretaker!.id, widget.caller);
-                            // ignore: use_build_context_synchronously
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => EventLogScreen(
-                                      eventLogs: tasks,
-                                      eventLogName: widget.caller ==
-                                              Caller.patient
-                                          ? "${widget.patient!.name} Patient's Log"
-                                          : "${widget.caretaker!.name} Caretaker's Log",
-                                      caller: Caller.patient,
-                                      patient: widget.patient,
-                                      caretaker: widget.caretaker,
-                                    )));
-                          });
-                        },
-                        text: widget.modifying ? 'DELETE' : 'ADD',
-                        options: FFButtonOptions(
-                          width: 600,
-                          height: 48,
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          iconPadding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          color: widget.modifying
-                              ? const Color(0xFFEFEFEF)
-                              : FlutterFlowTheme.of(context).primary,
-                          textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.override(
-                                    fontFamily: 'Readex Pro',
-                                    color: widget.modifying
-                                        ? const Color(0xFFFF0800)
-                                        : Colors.white,
-                                  ),
-                          elevation: 4,
-                          borderSide: const BorderSide(
-                            color: Colors.transparent,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(60),
-                        ),
-                      ),
+                      child: widget.visible
+                          ? FFButtonWidget(
+                              onPressed: () {
+                                setState(() async {
+                                  if (!widget.modifying) {
+                                    widget.caller == Caller.caretaker
+                                        ? widget.eventLog.caretaker =
+                                            widget.caretaker!
+                                        : widget.eventLog.patient =
+                                            widget.patient!;
+                                    if (widget.eventLog.name == 'Other' &&
+                                        widget.eventLog.description.isEmpty) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Please enter a description for the task.'),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    addEventLogInDb(widget.eventLog);
+                                  } else {
+                                    deleteEventLogFromFireStore(
+                                        widget.eventLog);
+                                  }
+                                  List<EventLog> tasks = widget.caller ==
+                                          Caller.patient
+                                      ? await loadEventLogsFromFirestore(
+                                          widget.patient!.id, widget.caller)
+                                      : await loadEventLogsFromFirestore(
+                                          widget.caretaker!.id, widget.caller);
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => EventLogScreen(
+                                            eventLogs: tasks,
+                                            eventLogName: widget.caller ==
+                                                    Caller.patient
+                                                ? "${widget.patient!.name} Patient's Log"
+                                                : "${widget.caretaker!.name} Caretaker's Log",
+                                            caller: Caller.patient,
+                                            patient: widget.patient,
+                                            caretaker: widget.caretaker,
+                                          )));
+                                });
+                              },
+                              text: widget.modifying ? 'DELETE' : 'ADD',
+                              options: FFButtonOptions(
+                                width: 600,
+                                height: 48,
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 0, 0, 0),
+                                iconPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        0, 0, 0, 0),
+                                color: widget.modifying
+                                    ? const Color(0xFFEFEFEF)
+                                    : FlutterFlowTheme.of(context).primary,
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleSmall
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      color: widget.modifying
+                                          ? const Color(0xFFFF0800)
+                                          : Colors.white,
+                                    ),
+                                elevation: 4,
+                                borderSide: const BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(60),
+                              ),
+                            )
+                          : null,
                     ),
                   ),
                 ],

@@ -175,9 +175,10 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const SettingsScreen(
+                                                SettingsScreen(
                                                     Caller.backOfficeCaretaker,
-                                                    'Curamus Back-Office')));
+                                                    'Curamus Back-Office',
+                                                    null, [])));
                                   },
                                 ),
                               ),

@@ -28,11 +28,13 @@ export '../../models/patient_form_model.dart';
 class PatientFormScreen extends StatefulWidget {
   final Patient patient;
   final List<Caretaker> caretakerList;
+  final bool visibility;
   final bool modifying;
   const PatientFormScreen(
       {super.key,
       required this.patient,
       required this.caretakerList,
+      required this.visibility,
       this.modifying = true});
 
   @override
@@ -115,6 +117,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Back to Curamus Back-Office',
+        visibility: widget.visibility,
         onBackPressed: () async {
           Navigator.of(context).pop(
               MaterialPageRoute(builder: (context) => const PatientScreen()));
@@ -169,8 +172,10 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     CareTasksPage(
-                                                        patient:
-                                                            widget.patient)));
+                                                      patient: widget.patient,
+                                                      visibility:
+                                                          widget.visibility,
+                                                    )));
                                       },
                                       text: 'Care Tasks',
                                       options: FFButtonOptions(
@@ -265,6 +270,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         focusNode: _model.textFieldFocusNode1,
                         autofocus: true,
                         obscureText: false,
+                        readOnly: !widget.visibility,
                         decoration: InputDecoration(
                           labelText: 'Name',
                           labelStyle: FlutterFlowTheme.of(context).labelMedium,
@@ -335,6 +341,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       TextFormField(
                         controller: _emailController,
                         focusNode: _model.textFieldFocusNode6,
+                        readOnly: !widget.visibility,
                         autofocus: true,
                         obscureText: false,
                         decoration: InputDecoration(
@@ -413,6 +420,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               controller: _passwordController,
                               focusNode: _model.textFieldFocusNode7,
                               autofocus: true,
+                              readOnly: !widget.visibility,
                               obscureText: true,
                               decoration: InputDecoration(
                                 labelText: 'Password',
@@ -494,10 +502,11 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               style: FlutterFlowTheme.of(context).bodyMedium,
                             ),
                       TextFormField(
-                        onTap: () =>
-                            updateStartDate(widget.patient.dateOfBirth),
-                        //enabled: false,
+                        onTap: widget.visibility
+                            ? () => updateStartDate(widget.patient.dateOfBirth)
+                            : null,
                         keyboardType: TextInputType.datetime,
+                        readOnly: !widget.visibility,
                         controller: _dateController,
                         focusNode: _model.textFieldFocusNode2,
                         autofocus: true,
@@ -550,6 +559,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         controller: _medicalStateController,
                         focusNode: _model.textFieldFocusNode3,
                         autofocus: true,
+                        readOnly: !widget.visibility,
                         obscureText: false,
                         decoration: InputDecoration(
                           labelText: 'Medical State',
@@ -639,54 +649,71 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             child: Align(
                               alignment: const AlignmentDirectional(1.00, 0.00),
                               child: Container(
-                                width: 160,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  borderRadius: BorderRadius.circular(8),
-                                  shape: BoxShape.rectangle,
-                                  border: Border.all(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    width: 2,
+                                  width: 160,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                    borderRadius: BorderRadius.circular(8),
+                                    shape: BoxShape.rectangle,
+                                    border: Border.all(
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 2,
+                                    ),
                                   ),
-                                ),
-                                child: FlutterFlowCountController(
-                                  decrementIconBuilder: (enabled) => FaIcon(
-                                    FontAwesomeIcons.minus,
-                                    color: enabled
-                                        ? FlutterFlowTheme.of(context)
-                                            .secondaryText
-                                        : FlutterFlowTheme.of(context)
-                                            .alternate,
-                                    size: 20,
-                                  ),
-                                  incrementIconBuilder: (enabled) => FaIcon(
-                                    FontAwesomeIcons.plus,
-                                    color: enabled
-                                        ? FlutterFlowTheme.of(context).primary
-                                        : FlutterFlowTheme.of(context)
-                                            .alternate,
-                                    size: 20,
-                                  ),
-                                  countBuilder: (count) => Text(
-                                    count.toString(),
-                                    style:
-                                        FlutterFlowTheme.of(context).titleLarge,
-                                  ),
-                                  count: widget.patient.dailyHours ??= 0,
-                                  updateCount: (count) => {
-                                    setState(() =>
-                                        widget.patient.dailyHours = count),
-                                    if (widget.modifying)
-                                      modifyPatientInDb(widget.patient)
-                                  },
-                                  stepSize: 1,
-                                  minimum: 1,
-                                  maximum: 12,
-                                ),
-                              ),
+                                  child: widget.visibility
+                                      ? FlutterFlowCountController(
+                                          decrementIconBuilder: (enabled) =>
+                                              FaIcon(
+                                            FontAwesomeIcons.minus,
+                                            color: enabled
+                                                ? FlutterFlowTheme.of(context)
+                                                    .secondaryText
+                                                : FlutterFlowTheme.of(context)
+                                                    .alternate,
+                                            size: 20,
+                                          ),
+                                          incrementIconBuilder: (enabled) =>
+                                              FaIcon(
+                                            FontAwesomeIcons.plus,
+                                            color: enabled
+                                                ? FlutterFlowTheme.of(context)
+                                                    .primary
+                                                : FlutterFlowTheme.of(context)
+                                                    .alternate,
+                                            size: 20,
+                                          ),
+                                          countBuilder: (count) => Text(
+                                            count.toString(),
+                                            style: FlutterFlowTheme.of(context)
+                                                .titleLarge,
+                                          ),
+                                          count: widget.patient.dailyHours ??=
+                                              0,
+                                          updateCount: (count) => {
+                                            setState(() => widget
+                                                .patient.dailyHours = count),
+                                            if (widget.modifying)
+                                              modifyPatientInDb(widget.patient)
+                                          },
+                                          stepSize: 1,
+                                          minimum: 1,
+                                          maximum: 12,
+                                        )
+                                      : Text(
+                                          widget.patient.dailyHours.toString(),
+                                          style: FlutterFlowTheme.of(context)
+                                              .titleLarge
+                                              .override(
+                                                fontFamily: 'Poppins',
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryText,
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                        )),
                             ),
                           ),
                         ],
@@ -694,6 +721,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       TextFormField(
                         controller: _takenMedicinesController,
                         focusNode: _model.textFieldFocusNode4,
+                        readOnly: !widget.visibility,
                         autofocus: true,
                         obscureText: false,
                         decoration: InputDecoration(
@@ -770,6 +798,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       TextFormField(
                         controller: _allergiesController,
                         focusNode: _model.textFieldFocusNode5,
+                        readOnly: !widget.visibility,
                         autofocus: true,
                         obscureText: false,
                         decoration: InputDecoration(
@@ -845,18 +874,20 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         alignment: const AlignmentDirectional(0.00, 0.00),
                         child: MultiSelectDropDown<String>(
                           controller: multiSelectDropdownController,
-                          onOptionSelected: (List<ValueItem> selectedOptions) {
-                            var selectedItems = selectedOptions
-                                .map((option) => option.value)
-                                .toList();
-                            widget.patient.assignedCaretakers = widget
-                                .caretakerList
-                                .where((element) => selectedItems
-                                    .contains(element.id.toString()))
-                                .toList();
-                            if (widget.modifying)
-                              modifyPatientInDb(widget.patient);
-                          },
+                          onOptionSelected: widget.visibility
+                              ? (List<ValueItem> selectedOptions) {
+                                  var selectedItems = selectedOptions
+                                      .map((option) => option.value)
+                                      .toList();
+                                  widget.patient.assignedCaretakers = widget
+                                      .caretakerList
+                                      .where((element) => selectedItems
+                                          .contains(element.id.toString()))
+                                      .toList();
+                                  if (widget.modifying)
+                                    modifyPatientInDb(widget.patient);
+                                }
+                              : null,
                           options: caretakerListToValueItemList(
                               widget.caretakerList),
                           selectionType: SelectionType.multi,
@@ -910,11 +941,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       RelativeFormScreen(
-                                                          modifying: true,
-                                                          relative:
-                                                              relatives[i],
-                                                          patient:
-                                                              widget.patient)));
+                                                        modifying: true,
+                                                        relative: relatives[i],
+                                                        patient: widget.patient,
+                                                        visibility:
+                                                            widget.visibility,
+                                                      )));
                                         },
                                         child: Container(
                                           width: double.infinity,
@@ -961,135 +993,156 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     );
                                   },
                                 ),
-                                Align(
-                                  alignment:
-                                      const AlignmentDirectional(-1.00, 0.00),
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0, 0, 0, 12),
-                                    child: FFButtonWidget(
-                                      onPressed: () async {
-                                        // context.pushNamed('AddRelative');
-                                        final int relativesCount =
-                                            await getRelativesCountFromFirestore();
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    RelativeFormScreen(
-                                                        relative:
-                                                            Relative.justID(
-                                                                relativesCount +
-                                                                    1),
-                                                        modifying: false,
-                                                        patient:
-                                                            widget.patient),
-                                                maintainState: false));
-                                      },
-                                      text: 'Add Relative',
-                                      options: FFButtonOptions(
-                                        width: 150,
-                                        height: 48,
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(0, 0, 0, 0),
-                                        iconPadding: const EdgeInsetsDirectional
-                                            .fromSTEB(0, 0, 0, 0),
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
-                                        textStyle: FlutterFlowTheme.of(context)
-                                            .titleSmall
-                                            .override(
-                                              fontFamily: 'Readex Pro',
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal,
+                                widget.visibility
+                                    ? Align(
+                                        alignment: const AlignmentDirectional(
+                                            -1.00, 0.00),
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(0, 0, 0, 12),
+                                          child: FFButtonWidget(
+                                            onPressed: () async {
+                                              // context.pushNamed('AddRelative');
+                                              final int relativesCount =
+                                                  await getRelativesCountFromFirestore();
+                                              // ignore: use_build_context_synchronously
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          RelativeFormScreen(
+                                                              relative: Relative
+                                                                  .justID(
+                                                                      relativesCount +
+                                                                          1),
+                                                              modifying: false,
+                                                              visibility: widget
+                                                                  .visibility,
+                                                              patient: widget
+                                                                  .patient),
+                                                      maintainState: false));
+                                            },
+                                            text: 'Add Relative',
+                                            options: FFButtonOptions(
+                                              width: 150,
+                                              height: 48,
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(0, 0, 0, 0),
+                                              iconPadding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(0, 0, 0, 0),
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                              textStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .titleSmall
+                                                      .override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                      ),
+                                              elevation: 4,
+                                              borderSide: const BorderSide(
+                                                color: Colors.transparent,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(60),
                                             ),
-                                        elevation: 4,
-                                        borderSide: const BorderSide(
-                                          color: Colors.transparent,
-                                          width: 1,
+                                          ),
                                         ),
-                                        borderRadius: BorderRadius.circular(60),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                      )
+                                    : Container(),
                               ],
                             )
                           : Container(),
-                      Align(
-                        alignment: const AlignmentDirectional(0.00, 0.00),
-                        child: Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0, 34, 0, 12),
-                          child: FFButtonWidget(
-                            onPressed: () async {
-                              if (!widget.modifying) {
-                                setState(() {
-                                  if (widget.patient.name.isEmpty ||
-                                      widget.patient.email.isEmpty ||
-                                      widget.patient.medicalState.isEmpty ||
-                                      widget.patient.assignedCaretakers!
-                                          .isEmpty ||
-                                      widget.patient.dailyHours < 1) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Please fill name, medical state, daily hours and assign at least one caretaker",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                });
-                                UserCredential result = await register(
-                                    widget.patient.email,
-                                    currentPasswordTextFormFieldValue);
-                                setState(() {
-                                  User user = result.user!;
-                                  addPatientUserInDb(widget.patient, user.uid);
-                                  addPatientToDb(widget.patient);
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PatientScreen()));
-                                });
-                              } else {
-                                print('todo remove patient from auth users');
-                                removePatientFromDb(widget.patient.id);
-                              }
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const PatientScreen()));
-                            },
-                            text: widget.modifying ? 'DELETE' : 'ADD',
-                            options: FFButtonOptions(
-                              width: 600,
-                              height: 48,
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 0, 0),
-                              iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 0, 0),
-                              color: widget.modifying
-                                  ? const Color(0xFFEFEFEF)
-                                  : FlutterFlowTheme.of(context).primary,
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .titleSmall
-                                  .override(
-                                    fontFamily: 'Readex Pro',
+                      widget.visibility
+                          ? Align(
+                              alignment: const AlignmentDirectional(0.00, 0.00),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 34, 0, 12),
+                                child: FFButtonWidget(
+                                  onPressed: () async {
+                                    if (!widget.modifying) {
+                                      setState(() {
+                                        if (widget.patient.name.isEmpty ||
+                                            widget.patient.email.isEmpty ||
+                                            widget
+                                                .patient.medicalState.isEmpty ||
+                                            widget.patient.assignedCaretakers!
+                                                .isEmpty ||
+                                            widget.patient.dailyHours < 1) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                "Please fill name, medical state, daily hours and assign at least one caretaker",
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          );
+                                          return;
+                                        }
+                                      });
+                                      UserCredential result = await register(
+                                          widget.patient.email,
+                                          currentPasswordTextFormFieldValue);
+                                      setState(() {
+                                        User user = result.user!;
+                                        addPatientUserInDb(
+                                            widget.patient, user.uid);
+                                        addPatientToDb(widget.patient);
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const PatientScreen()));
+                                      });
+                                    } else {
+                                      print(
+                                          'todo remove patient from auth users');
+                                      removePatientFromDb(widget.patient.id);
+                                    }
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const PatientScreen()));
+                                  },
+                                  text: widget.modifying ? 'DELETE' : 'ADD',
+                                  options: FFButtonOptions(
+                                    width: 600,
+                                    height: 48,
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 0),
+                                    iconPadding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 0),
                                     color: widget.modifying
-                                        ? const Color(0xFFFF0800)
-                                        : Colors.white,
+                                        ? const Color(0xFFEFEFEF)
+                                        : FlutterFlowTheme.of(context).primary,
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: widget.modifying
+                                              ? const Color(0xFFFF0800)
+                                              : Colors.white,
+                                        ),
+                                    elevation: 4,
+                                    borderSide: const BorderSide(
+                                      color: Colors.transparent,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(60),
                                   ),
-                              elevation: 4,
-                              borderSide: const BorderSide(
-                                color: Colors.transparent,
-                                width: 1,
+                                ),
                               ),
-                              borderRadius: BorderRadius.circular(60),
-                            ),
-                          ),
-                        ),
-                      ),
+                            )
+                          : Container(),
                     ].divide(const SizedBox(height: 12)),
                   ),
                 ),

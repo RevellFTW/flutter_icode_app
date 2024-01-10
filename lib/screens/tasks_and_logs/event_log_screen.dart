@@ -63,11 +63,14 @@ class _EventLogScreenState extends State<EventLogScreen> {
   late List<Caretaker> caretakerList = [];
   late List<Patient> patientList = [];
 
+//editable/visible, to show/hide items if logged in as patient or else
+  bool visible = true;
+
   String titleName = '';
   @override
   void initState() {
     super.initState();
-
+    if (widget.caller == Caller.patient) visible = false;
     if (widget.caller == Caller.backOfficePatient ||
         widget.caller == Caller.patient) {
       titleName = widget.patient!.name;
@@ -148,6 +151,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
       appBar: CustomAppBar(
         //todo make patient name dynamic
         title: 'Back to $titleName\'s sheet',
+        visibility: visible,
         onBackPressed: () async {
           widget.caller == Caller.backOfficePatient
               ? Navigator.of(context).pop(
@@ -155,6 +159,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                       builder: (context) => PatientFormScreen(
                             patient: widget.patient!,
                             caretakerList: caretakerList,
+                            visibility: visible,
                           )),
                 )
               : Navigator.of(context).pop(
@@ -166,6 +171,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
         },
         caller: widget.caller,
         patient: widget.patient,
+        caretakers: caretakerList,
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -399,6 +405,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                         caller: widget.caller,
                                                         modifying: true,
                                                         careTaskList: list,
+                                                        visible: visible,
                                                         individualCareTaskslistMap:
                                                             individualCareTaskslistMap,
                                                         patientList:
@@ -455,6 +462,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                               modifying: true,
                                                               careTaskList:
                                                                   list,
+                                                              visible: visible,
                                                               individualCareTaskslistMap:
                                                                   individualCareTaskslistMap,
                                                               patientList:
@@ -515,47 +523,53 @@ class _EventLogScreenState extends State<EventLogScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () {
-          widget.caller == Caller.backOfficePatient
-              ? Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EventLogFormScreen(
-                      eventLog: EventLog.empty(
-                          widget.eventLogs.length + 1,
-                          widget.caretaker ??
-                              Caretaker.empty(caretakerList.length + 1),
-                          widget.patient ??
-                              Patient.empty(patientList.length + 1)),
-                      caller: Caller.backOfficePatient,
-                      modifying: false,
-                      careTaskList: list,
-                      individualCareTaskslistMap: individualCareTaskslistMap,
-                      patientList: patientList,
-                      caretakerList: caretakerList,
-                      patient: widget.patient,
-                      caretaker: widget.caretaker)))
-              : Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EventLogFormScreen(
-                      eventLog: EventLog(
-                          id: widget.eventLogs.length + 1,
-                          name: '',
-                          description: '',
-                          date: DateFormat('yyyy-MM-dd h:mm a')
-                              .format(DateTime.now()),
-                          patient: selectedPatient,
-                          caretaker: widget.caretaker!),
-                      caller: Caller.backOfficeCaretaker,
-                      modifying: false,
-                      careTaskList: list,
-                      individualCareTaskslistMap: individualCareTaskslistMap,
-                      patientList: patientList,
-                      caretakerList: caretakerList,
-                      patient: selectedPatient,
-                      caretaker: widget.caretaker)));
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: visible
+          ? FloatingActionButton(
+              heroTag: null,
+              onPressed: () {
+                widget.caller == Caller.backOfficePatient
+                    ? Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => EventLogFormScreen(
+                            eventLog: EventLog.empty(
+                                widget.eventLogs.length + 1,
+                                widget.caretaker ??
+                                    Caretaker.empty(caretakerList.length + 1),
+                                widget.patient ??
+                                    Patient.empty(patientList.length + 1)),
+                            caller: Caller.backOfficePatient,
+                            modifying: false,
+                            careTaskList: list,
+                            visible: visible,
+                            individualCareTaskslistMap:
+                                individualCareTaskslistMap,
+                            patientList: patientList,
+                            caretakerList: caretakerList,
+                            patient: widget.patient,
+                            caretaker: widget.caretaker)))
+                    : Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => EventLogFormScreen(
+                            eventLog: EventLog(
+                                id: widget.eventLogs.length + 1,
+                                name: '',
+                                description: '',
+                                date: DateFormat('yyyy-MM-dd h:mm a')
+                                    .format(DateTime.now()),
+                                patient: selectedPatient,
+                                caretaker: widget.caretaker!),
+                            caller: Caller.backOfficeCaretaker,
+                            modifying: false,
+                            careTaskList: list,
+                            visible: visible,
+                            individualCareTaskslistMap:
+                                individualCareTaskslistMap,
+                            patientList: patientList,
+                            caretakerList: caretakerList,
+                            patient: selectedPatient,
+                            caretaker: widget.caretaker)));
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 

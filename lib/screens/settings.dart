@@ -1,5 +1,8 @@
 import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/main.dart';
+import 'package:todoapp/models/caretaker.dart';
+import 'package:todoapp/models/patient.dart';
+import 'package:todoapp/screens/forms/patient_form_screen.dart';
 import 'package:todoapp/screens/home_page.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
 import '../helper/flutter_flow/flutter_flow_theme.dart';
@@ -9,11 +12,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen(this.caller, this.backToText, {Key? key})
+  const SettingsScreen(
+      this.caller, this.backToText, this.patient, this.caretakers,
+      {Key? key})
       : super(key: key);
   static const String id = 'settings_screen';
   final Caller caller;
   final String backToText;
+  final Patient? patient;
+  final List<Caretaker>? caretakers;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -253,14 +260,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(16, 30, 0, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 30, 0, 0),
             child: Text(
               'Settings ',
               style: FlutterFlowTheme.of(context).headlineSmall,
             ),
           ),
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(16, 4, 0, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 0, 0),
             child: Text(
               'Please evaluate your options below.',
               style: FlutterFlowTheme.of(context).labelMedium,
@@ -273,35 +280,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
               scrollDirection: Axis.vertical,
               children: [
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'View patient data',
-                            style: FlutterFlowTheme.of(context).titleLarge,
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+                  child: InkWell(
+                    onTap: () async {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PatientFormScreen(
+                            patient: widget.patient!,
+                            caretakerList: caretakerList,
+                            visibility: false,
+                            modifying: false,
                           ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              //todo
-                            },
-                            child: Icon(
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'View patient data',
+                              style: FlutterFlowTheme.of(context).titleLarge,
+                            ),
+                            Icon(
                               Icons.chevron_right_rounded,
                               color: FlutterFlowTheme.of(context).secondaryText,
                               size: 24,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

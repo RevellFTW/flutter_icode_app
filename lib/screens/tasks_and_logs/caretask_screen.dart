@@ -13,7 +13,9 @@ import 'package:todoapp/widget/custom_app_bar.dart';
 
 class CareTasksPage extends StatefulWidget {
   final Patient patient;
-  const CareTasksPage({super.key, required this.patient});
+  final bool visibility;
+  const CareTasksPage(
+      {super.key, required this.patient, required this.visibility});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -46,12 +48,14 @@ class _CareTasksPageState extends State<CareTasksPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
+        visibility: widget.visibility,
         title: 'Back to ${widget.patient.name}\'s sheet',
         onBackPressed: () {
           Navigator.of(context).pop(MaterialPageRoute(
               builder: (context) => PatientFormScreen(
                     patient: widget.patient,
                     caretakerList: caretakerList,
+                    visibility: widget.visibility,
                   )));
         },
         //todo handle different callers here
@@ -163,6 +167,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                                   modifying: true,
                                                   caretaskIndex: i,
                                                   isClickedDirectly: true,
+                                                  visibility: widget.visibility,
                                                 )));
                                   },
                                   child: Card(
@@ -191,6 +196,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                                         modifying: true,
                                                         caretaskIndex: i,
                                                         isClickedDirectly: true,
+                                                        visibility:
+                                                            widget.visibility,
                                                       )));
                                         },
                                         child: Icon(
@@ -225,6 +232,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                     modifying: false,
                     caretaskIndex: -1,
                     isClickedDirectly: false,
+                    visibility: widget.visibility,
                   )));
         },
         child: const Icon(Icons.add),

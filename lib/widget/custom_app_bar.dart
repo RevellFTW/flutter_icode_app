@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
+import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/screens/home_page.dart';
 import 'package:todoapp/screens/settings.dart';
@@ -11,12 +12,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Function onBackPressed;
   final Caller caller;
+  final bool visibility;
   final Patient? patient;
+  final List<Caretaker>? caretakers;
 
-  const CustomAppBar({
+  CustomAppBar({
     super.key,
     required this.title,
     required this.onBackPressed,
+    required this.visibility,
+    this.caretakers,
     this.caller = Caller.backOfficePatient,
     this.patient,
   });
@@ -210,7 +215,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                         Navigator.of(context).push(MaterialPageRoute(
                                             builder: (context) => SettingsScreen(
                                                 Caller.patient,
-                                                "${patient!.name}'s event logs")));
+                                                "${patient!.name}'s event logs",
+                                                visibility ? null : patient,
+                                                visibility ? [] : caretakers)));
                                       },
                                     ),
                                   ),

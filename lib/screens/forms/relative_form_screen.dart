@@ -13,12 +13,14 @@ import 'package:todoapp/widget/custom_app_bar.dart';
 class RelativeFormScreen extends StatefulWidget {
   final Relative relative;
   final bool modifying;
+  final bool visibility;
   final Patient? patient;
 
   const RelativeFormScreen(
       {super.key,
       required this.relative,
       required this.modifying,
+      required this.visibility,
       this.patient});
 
   @override
@@ -71,12 +73,14 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         appBar: CustomAppBar(
           //todo make patient name dynamic
+          visibility: widget.visibility,
           title: 'Back to Patient Doe\'s sheet',
           onBackPressed: () async {
             Navigator.of(context).pop(MaterialPageRoute(
                 builder: (context) => PatientFormScreen(
                       patient: widget.patient!,
                       caretakerList: caretakerList,
+                      visibility: widget.visibility,
                     )));
           },
         ),
@@ -113,6 +117,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                           controller: _nameController,
                           autofocus: true,
                           obscureText: false,
+                          readOnly: !widget.visibility,
                           decoration: InputDecoration(
                             labelText: 'Name',
                             labelStyle:
@@ -176,6 +181,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                         TextFormField(
                           controller: _passwordController,
                           autofocus: true,
+                          readOnly: !widget.visibility,
                           obscureText: !passwordFieldVisibility,
                           decoration: InputDecoration(
                             labelText: 'Password',
@@ -254,6 +260,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                           controller: _emailController,
                           autofocus: true,
                           obscureText: false,
+                          readOnly: !widget.visibility,
                           decoration: InputDecoration(
                             labelText: 'Email',
                             labelStyle:
@@ -316,6 +323,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                           controller: _phoneNumberController,
                           autofocus: true,
                           obscureText: false,
+                          readOnly: !widget.visibility,
                           decoration: InputDecoration(
                             labelText: 'Phone number',
                             labelStyle:
@@ -387,6 +395,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                 FlutterFlowTheme.of(context).secondaryText,
                           ),
                           child: CheckboxListTile(
+                            enabled: widget.visibility,
                             value: widget.relative.wantsToBeNotified,
                             onChanged: (newValue) async {
                               setState(() => widget.relative.wantsToBeNotified =
@@ -414,59 +423,66 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                       ].divide(const SizedBox(height: 12)),
                     ),
                   ),
-                  Align(
-                    alignment: const AlignmentDirectional(0.00, 0.00),
-                    child: Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0, 34, 0, 12),
-                      child: FFButtonWidget(
-                        onPressed: () {
-                          setState(() {
-                            if (!widget.modifying) {
-                              widget.patient!.relatives.add(widget.relative);
-                              modifyPatientInDb(widget.patient!);
-                              addRelativeToDb(widget.relative);
-                            } else {
-                              removeRelativeFromDb(widget.relative.id);
-                              widget.patient!.relatives.remove(widget.relative);
-                              modifyPatientInDb(widget.patient!);
-                              //redirect
-                            }
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => PatientFormScreen(
-                                      patient: widget.patient!,
-                                      caretakerList: caretakerList,
-                                    )));
-                          });
-                        },
-                        text: widget.modifying ? 'DELETE' : 'ADD',
-                        options: FFButtonOptions(
-                          width: 600,
-                          height: 48,
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          iconPadding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          color: widget.modifying
-                              ? const Color(0xFFEFEFEF)
-                              : FlutterFlowTheme.of(context).primary,
-                          textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.override(
-                                    fontFamily: 'Readex Pro',
-                                    color: widget.modifying
-                                        ? const Color(0xFFFF0800)
-                                        : Colors.white,
-                                  ),
-                          elevation: 4,
-                          borderSide: const BorderSide(
-                            color: Colors.transparent,
-                            width: 1,
+                  widget.visibility
+                      ? Align(
+                          alignment: const AlignmentDirectional(0.00, 0.00),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 34, 0, 12),
+                            child: FFButtonWidget(
+                              onPressed: () {
+                                setState(() {
+                                  if (!widget.modifying) {
+                                    widget.patient!.relatives
+                                        .add(widget.relative);
+                                    modifyPatientInDb(widget.patient!);
+                                    addRelativeToDb(widget.relative);
+                                  } else {
+                                    removeRelativeFromDb(widget.relative.id);
+                                    widget.patient!.relatives
+                                        .remove(widget.relative);
+                                    modifyPatientInDb(widget.patient!);
+                                    //redirect
+                                  }
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => PatientFormScreen(
+                                            patient: widget.patient!,
+                                            caretakerList: caretakerList,
+                                            visibility: widget.visibility,
+                                          )));
+                                });
+                              },
+                              text: widget.modifying ? 'DELETE' : 'ADD',
+                              options: FFButtonOptions(
+                                width: 600,
+                                height: 48,
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 0, 0, 0),
+                                iconPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        0, 0, 0, 0),
+                                color: widget.modifying
+                                    ? const Color(0xFFEFEFEF)
+                                    : FlutterFlowTheme.of(context).primary,
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleSmall
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      color: widget.modifying
+                                          ? const Color(0xFFFF0800)
+                                          : Colors.white,
+                                    ),
+                                elevation: 4,
+                                borderSide: const BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(60),
+                              ),
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(60),
-                        ),
-                      ),
-                    ),
-                  ),
+                        )
+                      : Container(),
                 ],
               ),
             ),
