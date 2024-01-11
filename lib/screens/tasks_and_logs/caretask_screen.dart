@@ -221,22 +221,24 @@ class _CareTasksPageState extends State<CareTasksPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        backgroundColor: appBackgroundColor,
-        foregroundColor: appForegroundColor,
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => CareTasksForm(
-                    patient: widget.patient,
-                    modifying: false,
-                    caretaskIndex: -1,
-                    isClickedDirectly: false,
-                    visibility: widget.visibility,
-                  )));
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: widget.visibility
+          ? FloatingActionButton(
+              heroTag: null,
+              backgroundColor: appBackgroundColor,
+              foregroundColor: appForegroundColor,
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => CareTasksForm(
+                          patient: widget.patient,
+                          modifying: false,
+                          caretaskIndex: -1,
+                          isClickedDirectly: false,
+                          visibility: widget.visibility,
+                        )));
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 

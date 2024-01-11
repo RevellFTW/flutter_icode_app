@@ -119,8 +119,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         title: 'Back to Curamus Back-Office',
         visibility: widget.visibility,
         onBackPressed: () async {
-          Navigator.of(context).pop(
-              MaterialPageRoute(builder: (context) => const PatientScreen()));
+          Navigator.of(context).popAndPushNamed(PatientScreen.id);
         },
       ),
       body: SafeArea(
@@ -204,64 +203,70 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     ),
                                   ),
                                 ),
-                                Flexible(
-                                  child: Align(
-                                    alignment:
-                                        const AlignmentDirectional(1.00, 0.00),
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              0, 0, 0, 12),
-                                      child: FFButtonWidget(
-                                        onPressed: () async {
-                                          List<EventLog> tasks =
-                                              await loadEventLogsFromFirestore(
-                                                  widget.patient.id,
-                                                  Caller.patient);
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      EventLogScreen(
-                                                        eventLogs: tasks,
-                                                        eventLogName:
-                                                            "${widget.patient.name} Patient's Log",
-                                                        caller: Caller.patient,
-                                                        patient: widget.patient,
-                                                      )));
-                                        },
-                                        text: 'Event Logs',
-                                        options: FFButtonOptions(
-                                          width: 150,
-                                          height: 48,
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(0, 0, 0, 0),
-                                          iconPadding:
-                                              const EdgeInsetsDirectional
-                                                  .fromSTEB(0, 0, 0, 0),
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          textStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .titleSmall
-                                                  .override(
-                                                    fontFamily: 'Readex Pro',
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                  ),
-                                          elevation: 4,
-                                          borderSide: const BorderSide(
-                                            color: Colors.transparent,
-                                            width: 1,
+                                widget.visibility
+                                    ? Flexible(
+                                        child: Align(
+                                          alignment: const AlignmentDirectional(
+                                              1.00, 0.00),
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(0, 0, 0, 12),
+                                            child: FFButtonWidget(
+                                              onPressed: () async {
+                                                List<EventLog> tasks =
+                                                    await loadEventLogsFromFirestore(
+                                                        widget.patient.id,
+                                                        Caller.patient);
+                                                // ignore: use_build_context_synchronously
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            EventLogScreen(
+                                                              eventLogs: tasks,
+                                                              eventLogName:
+                                                                  "${widget.patient.name} Patient's Log",
+                                                              caller: Caller
+                                                                  .patient,
+                                                              patient: widget
+                                                                  .patient,
+                                                            )));
+                                              },
+                                              text: 'Event Logs',
+                                              options: FFButtonOptions(
+                                                width: 150,
+                                                height: 48,
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(0, 0, 0, 0),
+                                                iconPadding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(0, 0, 0, 0),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                textStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                        ),
+                                                elevation: 4,
+                                                borderSide: const BorderSide(
+                                                  color: Colors.transparent,
+                                                  width: 1,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(60),
+                                              ),
+                                            ),
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(60),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                      )
+                                    : Container(),
                               ],
                             )
                           : Container(),
@@ -799,33 +804,37 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       ),
                       Align(
                         alignment: const AlignmentDirectional(0.00, 0.00),
-                        child: MultiSelectDropDown<String>(
-                          controller: multiSelectDropdownController,
-                          onOptionSelected: widget.visibility
-                              ? (List<ValueItem> selectedOptions) {
-                                  var selectedItems = selectedOptions
-                                      .map((option) => option.value)
-                                      .toList();
-                                  widget.patient.assignedCaretakers = widget
-                                      .caretakerList
-                                      .where((element) => selectedItems
-                                          .contains(element.id.toString()))
-                                      .toList();
-                                  if (widget.modifying)
-                                    modifyPatientInDb(widget.patient);
-                                }
-                              : null,
-                          options: caretakerListToValueItemList(
-                              widget.caretakerList),
-                          selectionType: SelectionType.multi,
-                          chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-                          dropdownHeight: 140,
-                          optionTextStyle:
-                              FlutterFlowTheme.of(context).bodyMedium,
-                          selectedOptionIcon: const Icon(Icons.check_circle),
-                          borderColor: FlutterFlowTheme.of(context).alternate,
-                          borderWidth: 2,
-                          borderRadius: 8,
+                        child: IgnorePointer(
+                          ignoring: !widget.visibility,
+                          child: MultiSelectDropDown<String>(
+                            controller: multiSelectDropdownController,
+                            onOptionSelected: widget.visibility
+                                ? (List<ValueItem> selectedOptions) {
+                                    var selectedItems = selectedOptions
+                                        .map((option) => option.value)
+                                        .toList();
+                                    widget.patient.assignedCaretakers = widget
+                                        .caretakerList
+                                        .where((element) => selectedItems
+                                            .contains(element.id.toString()))
+                                        .toList();
+                                    if (widget.modifying)
+                                      modifyPatientInDb(widget.patient);
+                                  }
+                                : null,
+                            options: caretakerListToValueItemList(
+                                widget.caretakerList),
+                            selectionType: SelectionType.multi,
+                            chipConfig:
+                                const ChipConfig(wrapType: WrapType.wrap),
+                            dropdownHeight: 140,
+                            optionTextStyle:
+                                FlutterFlowTheme.of(context).bodyMedium,
+                            selectedOptionIcon: const Icon(Icons.check_circle),
+                            borderColor: FlutterFlowTheme.of(context).alternate,
+                            borderWidth: 2,
+                            borderRadius: 8,
+                          ),
                         ),
                       ),
                       widget.modifying

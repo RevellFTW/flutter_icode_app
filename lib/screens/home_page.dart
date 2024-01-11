@@ -6,6 +6,7 @@ import 'patient_screen.dart';
 class HomePage extends StatelessWidget {
   final _tab1navigatorKey = GlobalKey<NavigatorState>();
   final _tab2navigatorKey = GlobalKey<NavigatorState>();
+  static const String id = 'home_page';
 
   HomePage({super.key});
 

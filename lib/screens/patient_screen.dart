@@ -14,6 +14,7 @@ import 'settings.dart';
 
 class PatientScreen extends StatefulWidget {
   const PatientScreen({super.key});
+  static const String id = 'patient_screen';
 
   @override
   // ignore: library_private_types_in_public_api
