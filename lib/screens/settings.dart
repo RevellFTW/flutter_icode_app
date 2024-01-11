@@ -289,7 +289,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             patient: widget.patient!,
                             caretakerList: caretakerList,
                             visibility: false,
-                            modifying: false,
+                            modifying: true,
                           ),
                         ),
                       );
@@ -305,6 +305,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: [
                             Text(
                               'View patient data',
+                              style: FlutterFlowTheme.of(context).titleLarge,
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: FlutterFlowTheme.of(context).secondaryText,
+                              size: 24,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
+                  child: InkWell(
+                    onTap: () async {
+                      //show confirm dialog where user has to input email, if it matches, send email and display success message
+                      String email = '';
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Reset Password'),
+                            content: const Text(
+                                'Please enter your email address to reset your password.'),
+                            actions: <Widget>[
+                              TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: 'Email',
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    email = value;
+                                  });
+                                },
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  if (email == widget.patient!.email) {
+                                    await auth.sendPasswordResetEmail(
+                                        email: email);
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content: Text(
+                                          'Password reset email sent successfully.'),
+                                      duration: Duration(seconds: 3),
+                                    ));
+                                  } else {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content: Text('Email does not match.'),
+                                      duration: Duration(seconds: 3),
+                                    ));
+                                  }
+                                },
+                                child: const Text('Send'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Reset Password',
                               style: FlutterFlowTheme.of(context).titleLarge,
                             ),
                             Icon(

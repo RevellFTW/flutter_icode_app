@@ -411,96 +411,23 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         },
                         style: FlutterFlowTheme.of(context).bodyMedium,
                       ),
-                      widget.modifying
+                      widget.visibility
                           ? ElevatedButton(
-                              onPressed: _showPasswordDialog,
+                              onPressed: () async {
+                                await auth.sendPasswordResetEmail(
+                                    email: widget.patient.email);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Password reset email sent",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                );
+                              },
                               child: const Text('Change Password'),
                             )
-                          : TextFormField(
-                              controller: _passwordController,
-                              focusNode: _model.textFieldFocusNode7,
-                              autofocus: true,
-                              readOnly: !widget.visibility,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                labelText: 'Password',
-                                labelStyle:
-                                    FlutterFlowTheme.of(context).labelMedium,
-                                hintStyle:
-                                    FlutterFlowTheme.of(context).labelMedium,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).error,
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).error,
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onChanged: (String newValue) {
-                                setState(() {
-                                  if (_passwordController.text.isNotEmpty) {
-                                    currentPasswordTextFormFieldValue =
-                                        newValue;
-                                  }
-                                });
-                              },
-                              onTapOutside: (newValue) {
-                                if (_passwordController.text.isNotEmpty) {
-                                  //show a dialog to confirm password change
-                                  //if confirmed, change password
-                                  //if not, do nothing
-                                  if (!widget.modifying) {
-                                    currentPasswordTextFormFieldValue =
-                                        _passwordController.text;
-                                  }
-                                } else {
-                                  setState(() {
-                                    _passwordController.text =
-                                        currentPasswordTextFormFieldValue;
-                                  });
-                                }
-                                _model.textFieldFocusNode7!.unfocus();
-                              },
-                              onFieldSubmitted: (String newValue) {
-                                setState(() {
-                                  if (currentPasswordTextFormFieldValue
-                                      .isNotEmpty) {
-                                    currentPasswordTextFormFieldValue =
-                                        _passwordController.text;
-                                    if (!widget.modifying) {
-                                      _passwordController.text =
-                                          currentPasswordTextFormFieldValue;
-                                    }
-                                  } else {
-                                    _passwordController.text =
-                                        currentPasswordTextFormFieldValue;
-                                  }
-                                });
-                              },
-                              style: FlutterFlowTheme.of(context).bodyMedium,
-                            ),
+                          : Container(),
                       TextFormField(
                         onTap: widget.visibility
                             ? () => updateStartDate(widget.patient.dateOfBirth)
@@ -1205,6 +1132,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     print('modify password');
+                    auth.currentUser!.updatePassword(_passwordController1.text);
                     Navigator.of(context).pop();
                   }
                 },
