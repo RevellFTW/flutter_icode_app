@@ -301,22 +301,24 @@ class _EventLogScreenState extends State<EventLogScreen> {
                   itemCount: _filteredEventLogs.length,
                   itemBuilder: (context, i) {
                     return Slidable(
-                      endActionPane: ActionPane(
-                        motion: const ScrollMotion(),
-                        children: <Widget>[
-                          SlidableAction(
-                            onPressed: (context) => {
-                              setState(() {
-                                deleteEventLogFromFireStore(
-                                    _filteredEventLogs[i]);
-                                _filteredEventLogs.removeAt(i);
-                              })
-                            },
-                            backgroundColor: Colors.red,
-                            icon: Icons.delete,
-                          ),
-                        ],
-                      ),
+                      endActionPane: visible
+                          ? ActionPane(
+                              motion: const ScrollMotion(),
+                              children: <Widget>[
+                                SlidableAction(
+                                  onPressed: (context) => {
+                                    setState(() {
+                                      deleteEventLogFromFireStore(
+                                          _filteredEventLogs[i]);
+                                      _filteredEventLogs.removeAt(i);
+                                    })
+                                  },
+                                  backgroundColor: Colors.red,
+                                  icon: Icons.delete,
+                                ),
+                              ],
+                            )
+                          : null,
                       key: ValueKey<int>(_filteredEventLogs[i].id),
                       child: Padding(
                         padding:
