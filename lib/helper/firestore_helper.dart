@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/screens/home_page.dart';
 import '../global/variables.dart';
@@ -114,6 +116,18 @@ void addPatientUserInDb(Patient patient, String uid) {
     'id': uid,
     'role': 'patient',
     'roleId': patient.id,
+  };
+
+  db.collection('users').doc(uid).set(userData);
+}
+
+void addRelativeUserInDb(Relative relative, String uid) {
+  Map<String, dynamic> userData = {
+    'approved': false,
+    'email': relative.email,
+    'id': uid,
+    'role': 'relative',
+    'roleId': relative.id,
   };
 
   db.collection('users').doc(uid).set(userData);
@@ -478,4 +492,14 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
   }
 
   return patients;
+}
+
+Future<UserCredential> register(String email, String password) async {
+  FirebaseApp app = await Firebase.initializeApp(
+      name: 'Secondary', options: Firebase.app().options);
+  UserCredential userCredential = await FirebaseAuth.instanceFor(app: app)
+      .createUserWithEmailAndPassword(email: email, password: password);
+
+  await app.delete();
+  return Future.sync(() => userCredential);
 }

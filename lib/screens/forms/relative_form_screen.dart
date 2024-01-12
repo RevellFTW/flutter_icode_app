@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
@@ -431,12 +432,21 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                 0, 34, 0, 12),
                             child: FFButtonWidget(
                               onPressed: () {
-                                setState(() {
+                                setState(() async {
                                   if (!widget.modifying) {
                                     widget.patient!.relatives
                                         .add(widget.relative);
                                     modifyPatientInDb(widget.patient!);
                                     addRelativeToDb(widget.relative);
+
+                                    UserCredential result = await register(
+                                        widget.relative.email,
+                                        currentPasswordTextFormFieldValue);
+                                    setState(() {
+                                      User user = result.user!;
+                                      addRelativeUserInDb(
+                                          widget.relative, user.uid);
+                                    });
                                   } else {
                                     removeRelativeFromDb(widget.relative.id);
                                     widget.patient!.relatives

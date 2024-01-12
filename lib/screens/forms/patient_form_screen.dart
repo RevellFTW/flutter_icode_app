@@ -1192,14 +1192,4 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
       }
     }
   }
-
-  static Future<UserCredential> register(String email, String password) async {
-    FirebaseApp app = await Firebase.initializeApp(
-        name: 'Secondary', options: Firebase.app().options);
-    UserCredential userCredential = await FirebaseAuth.instanceFor(app: app)
-        .createUserWithEmailAndPassword(email: email, password: password);
-
-    await app.delete();
-    return Future.sync(() => userCredential);
-  }
 }
