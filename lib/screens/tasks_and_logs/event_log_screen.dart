@@ -33,6 +33,8 @@ class EventLogScreen extends StatefulWidget implements PreferredSizeWidget {
       this.patient,
       this.caretaker});
 
+  static const id = 'event_log_screen';
+
   @override
   // ignore: library_private_types_in_public_api
   _EventLogScreenState createState() => _EventLogScreenState();

@@ -119,7 +119,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         title: 'Back to Curamus Back-Office',
         visibility: widget.visibility,
         onBackPressed: () async {
-          Navigator.of(context).popAndPushNamed(PatientScreen.id);
+          Navigator.of(context).popUntil((route) => route.isFirst);
         },
       ),
       body: SafeArea(
@@ -910,7 +910,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsetsDirectional
-                                                            .fromSTEB(
+                                                                .fromSTEB(
                                                             12, 0, 0, 0),
                                                     child: Text(
                                                       relatives[i].name,
