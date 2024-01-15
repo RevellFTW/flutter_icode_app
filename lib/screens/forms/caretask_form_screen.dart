@@ -465,14 +465,18 @@ class _CareTasksFormState extends State<CareTasksForm> {
                                   if (value != dropdownValue) {
                                     bool result = await isDatePicked(
                                         context,
-                                        widget
-                                            .patient
-                                            .careTasks[widget.caretaskIndex]
-                                            .date,
+                                        widget.modifying
+                                            ? widget
+                                                .patient
+                                                .careTasks[widget.caretaskIndex]
+                                                .date
+                                            : DateTime.now().toString(),
                                         Frequency.values.byName(value!),
                                         widget.modifying,
                                         widget.isClickedDirectly,
-                                        index: widget.caretaskIndex);
+                                        index: widget.modifying
+                                            ? widget.caretaskIndex
+                                            : -1);
                                     if (result == true) {
                                       setState(() {
                                         dropdownValue = value;
