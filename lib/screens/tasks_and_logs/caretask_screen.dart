@@ -14,8 +14,12 @@ import 'package:todoapp/widget/custom_app_bar.dart';
 class CareTasksPage extends StatefulWidget {
   final Patient patient;
   final bool visibility;
+  final bool isRelative;
   const CareTasksPage(
-      {super.key, required this.patient, required this.visibility});
+      {super.key,
+      required this.patient,
+      required this.visibility,
+      required this.isRelative});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -56,10 +60,12 @@ class _CareTasksPageState extends State<CareTasksPage> {
                     patient: widget.patient,
                     caretakerList: caretakerList,
                     visibility: widget.visibility,
+                    isRelative: widget.isRelative,
                   )));
         },
         //todo handle different callers here
         caller: Caller.backOfficePatient,
+        isRelative: widget.isRelative,
       ),
       body: Column(
         children: [
@@ -167,7 +173,10 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                                   modifying: true,
                                                   caretaskIndex: i,
                                                   isClickedDirectly: true,
-                                                  visibility: widget.visibility,
+                                                  visibility: widget.isRelative
+                                                      ? true
+                                                      : widget.visibility,
+                                                  isRelative: widget.isRelative,
                                                 )));
                                   },
                                   child: Card(
@@ -198,6 +207,8 @@ class _CareTasksPageState extends State<CareTasksPage> {
                                                         isClickedDirectly: true,
                                                         visibility:
                                                             widget.visibility,
+                                                        isRelative:
+                                                            widget.isRelative,
                                                       )));
                                         },
                                         child: Icon(
@@ -234,6 +245,7 @@ class _CareTasksPageState extends State<CareTasksPage> {
                           caretaskIndex: -1,
                           isClickedDirectly: false,
                           visibility: widget.visibility,
+                          isRelative: widget.isRelative,
                         )));
               },
               child: const Icon(Icons.add),

@@ -66,8 +66,8 @@ void updateRelative(Relative relative, String documentID) {
   documentReference.set(relativeData, SetOptions(merge: true));
 }
 
-Future<Relative> getRelativeFromDb(int id) async {
-  String docID = await getDocumentID(id, 'relatives');
+Future<Relative> getRelativeFromDb(String id) async {
+  String docID = await getDocumentID(int.parse(id), 'relatives');
   var snapshot = await db.collection('relatives').doc(docID).get();
   Relative relative = Relative(
     id: snapshot['id'],
@@ -76,6 +76,7 @@ Future<Relative> getRelativeFromDb(int id) async {
     email: snapshot['email'],
     phoneNumber: snapshot['phoneNumber'],
     wantsToBeNotified: snapshot['wantsToBeNotified'],
+    patientId: snapshot['patientId'],
   );
   return relative;
 }
@@ -128,6 +129,7 @@ void addRelativeUserInDb(Relative relative, String uid) {
     'id': uid,
     'role': 'relative',
     'roleId': relative.id,
+    'patientId': relative.patientId
   };
 
   db.collection('users').doc(uid).set(userData);
@@ -305,6 +307,7 @@ Future<List<Relative>> loadRelativesFromFirestore() async {
       password: doc['password'],
       email: doc['email'], // Add the missing identifier here
       phoneNumber: doc['phoneNumber'], // Add the missing parameter here
+      patientId: doc['patientId'], // Add the missing parameter here
       wantsToBeNotified:
           doc['wantsToBeNotified'], // Add the missing parameter here
     ));
@@ -388,7 +391,7 @@ Future<Patient> getPatientBydocID(String docID) async {
 
   if (doc['relativeIDs'] != null) {
     for (var value in doc['relativeIDs']) {
-      var relative = await getRelativeFromDb(value);
+      var relative = await getRelativeFromDb(value.toString());
       relatives.add(relative);
     }
   }
@@ -464,7 +467,7 @@ Future<List<Patient>> loadPatientsFromFirestore() async {
 
     if (doc['relativeIDs'] != null) {
       for (var value in doc['relativeIDs']) {
-        var relative = await getRelativeFromDb(value);
+        var relative = await getRelativeFromDb(value.toString());
         relatives.add(relative);
       }
     }

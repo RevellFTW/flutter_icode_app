@@ -61,6 +61,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
           Navigator.of(context).pop(
               MaterialPageRoute(builder: (context) => const CaretakerScreen()));
         },
+        isRelative: false,
       ),
       body: SafeArea(
         top: true,
@@ -123,6 +124,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                                             Caller.caretaker,
                                                         caretaker:
                                                             widget.caretaker,
+                                                        isRelative: false,
                                                       )));
                                         },
                                         text: 'Event Logs',

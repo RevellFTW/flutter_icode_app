@@ -25,11 +25,13 @@ class EventLogScreen extends StatefulWidget implements PreferredSizeWidget {
   final Caller caller;
   final Patient? patient;
   final Caretaker? caretaker;
+  final bool isRelative;
   const EventLogScreen(
       {super.key,
       required this.eventLogs,
       required this.eventLogName,
       required this.caller,
+      required this.isRelative,
       this.patient,
       this.caretaker});
 
@@ -162,6 +164,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             patient: widget.patient!,
                             caretakerList: caretakerList,
                             visibility: visible,
+                            isRelative: widget.isRelative,
                           )),
                 )
               : Navigator.of(context).pop(
@@ -174,6 +177,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
         caller: widget.caller,
         patient: widget.patient,
         caretakers: caretakerList,
+        isRelative: widget.isRelative,
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -417,6 +421,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                         caretakerList:
                                                             caretakerList,
                                                         patient: patient,
+                                                        isRelative:
+                                                            widget.isRelative,
                                                         caretaker:
                                                             widget.caretaker)),
                                           );
@@ -474,6 +480,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
                                                               caretakerList:
                                                                   caretakerList,
                                                               patient: patient,
+                                                              isRelative: widget
+                                                                  .isRelative,
                                                               caretaker: widget
                                                                   .caretaker)),
                                                 );
@@ -549,6 +557,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             patientList: patientList,
                             caretakerList: caretakerList,
                             patient: widget.patient,
+                            isRelative: widget.isRelative,
                             caretaker: widget.caretaker)))
                     : Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => EventLogFormScreen(
@@ -569,6 +578,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             patientList: patientList,
                             caretakerList: caretakerList,
                             patient: selectedPatient,
+                            isRelative: widget.isRelative,
                             caretaker: widget.caretaker)));
               },
               child: const Icon(Icons.add),

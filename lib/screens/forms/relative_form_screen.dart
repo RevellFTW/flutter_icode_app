@@ -82,8 +82,10 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                       patient: widget.patient!,
                       caretakerList: caretakerList,
                       visibility: widget.visibility,
+                      isRelative: false,
                     )));
           },
+          isRelative: false,
         ),
         body: SafeArea(
           top: true,
@@ -434,6 +436,8 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                               onPressed: () {
                                 setState(() async {
                                   if (!widget.modifying) {
+                                    widget.relative.patientId =
+                                        widget.patient!.id.toString();
                                     widget.patient!.relatives
                                         .add(widget.relative);
                                     modifyPatientInDb(widget.patient!);
@@ -454,11 +458,13 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                     modifyPatientInDb(widget.patient!);
                                     //redirect
                                   }
+                                  Navigator.of(context).pop();
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => PatientFormScreen(
                                             patient: widget.patient!,
                                             caretakerList: caretakerList,
                                             visibility: widget.visibility,
+                                            isRelative: false,
                                           )));
                                 });
                               },

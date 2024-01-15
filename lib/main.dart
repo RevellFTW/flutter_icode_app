@@ -3,10 +3,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
 import 'package:todoapp/auth_screens/new_login_screen.dart';
-import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/screens/home_page.dart';
 import 'package:todoapp/screens/patient_screen.dart';
-import 'package:todoapp/screens/settings.dart';
 import 'auth_screens/welcome.dart';
 import 'firebase_options.dart';
 import 'global/variables.dart';
@@ -59,7 +57,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         AuthWidget.id: (context) => const AuthWidget(),
         WelcomeScreen.id: (context) => const WelcomeScreen(),
-        HomePage.id: (context) => HomePage()
+        HomePage.id: (context) => HomePage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == PatientScreen.id) {

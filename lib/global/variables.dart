@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/helper/firestore_helper.dart';
 import 'package:todoapp/models/caretaker.dart';
+import '../models/relative.dart';
 import '../models/user.dart';
 
 final db = FirebaseFirestore.instance;
+Relative? relative;
 int androidSdkVersion = 0;
 String appName = "Caretaker App";
 String selectedDateTime = DateTime.now().toString();

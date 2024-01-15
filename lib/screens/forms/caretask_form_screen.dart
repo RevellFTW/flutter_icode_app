@@ -19,6 +19,7 @@ class CareTasksForm extends StatefulWidget {
   final bool modifying;
   final bool isClickedDirectly;
   final bool visibility;
+  final bool isRelative;
 
   const CareTasksForm({
     super.key,
@@ -27,6 +28,7 @@ class CareTasksForm extends StatefulWidget {
     required this.modifying,
     required this.isClickedDirectly,
     required this.visibility,
+    required this.isRelative,
   });
 
   @override
@@ -310,8 +312,10 @@ class _CareTasksFormState extends State<CareTasksForm> {
                 builder: (context) => CareTasksPage(
                       patient: widget.patient,
                       visibility: widget.visibility,
+                      isRelative: widget.isRelative,
                     )));
           },
+          isRelative: widget.isRelative,
         ),
         body: SafeArea(
           top: true,
@@ -596,6 +600,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                                       builder: (context) => CareTasksPage(
                                             patient: widget.patient,
                                             visibility: widget.visibility,
+                                            isRelative: widget.isRelative,
                                           )));
                                 });
                               },

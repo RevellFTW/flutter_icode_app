@@ -68,8 +68,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   void checkUserType(BuildContext context) async {
+    relative = null;
     bool isBackOffice = false;
     bool isPatient = false;
+    bool isRelative = false;
     final user = auth.currentUser;
     DocumentSnapshot<Map<String, dynamic>>? userData;
     Map<String, dynamic>? data;
@@ -78,44 +80,67 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
       if (userData.exists) {
         data = userData.data() as Map<String, dynamic>;
-        if (data['approved'] == true && data['role'] == 'back-office') {
-          isBackOffice = true;
-          isPatient = false;
+        if (data['approved'] == true) {
+          switch (data['role']) {
+            case 'back-office':
+              {
+                isBackOffice = true;
+                break;
+              }
+            case 'patient':
+              {
+                isPatient = true;
+              }
+            case 'relative':
+              {
+                isRelative = true;
+              }
+          }
         }
-        if (data['approved'] == true && data['role'] == 'patient') {
-          isPatient = true;
-          isBackOffice = false;
-        }
+      } else {
+        Navigator.pushNamed(context, AuthWidget.id);
       }
-    } else {
-      Navigator.pushNamed(context, AuthWidget.id);
+      if (isBackOffice) {
+        back_office = true;
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
+      if (isRelative) {
+        relative = await getRelativeFromDb(data!['roleId'].toString());
+      }
+      if (isPatient || isRelative) {
+        Patient patient = isRelative
+            ? await getPatientFromDb(data!['patientId'].toString())
+            : await getPatientFromDb(data!['roleId'].toString());
+        List<EventLog> eventLogs =
+            await loadEventLogsFromFirestore(patient.id, Caller.patient);
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EventLogScreen(
+                    eventLogs: eventLogs,
+                    patient: patient,
+                    eventLogName: "${patient.name} Patient's Log ",
+                    caller: Caller.patient,
+                    isRelative: isRelative,
+                  )),
+        );
+      }
+      setState(() {
+        loading = false;
+      });
     }
-    if (isBackOffice) {
-      back_office = true;
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-    }
-    if (isPatient) {
-      Patient patient = await getPatientFromDb(data!['roleId'].toString());
-      List<EventLog> eventLogs =
-          await loadEventLogsFromFirestore(patient.id, Caller.patient);
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => EventLogScreen(
-                  eventLogs: eventLogs,
-                  patient: patient,
-                  eventLogName: "${patient.name} Patient's Log ",
-                  caller: Caller.patient,
-                )),
-      );
-    }
-    setState(() {
-      loading = false;
-    });
+  }
+
+  Future<List<Patient>> _loadPatientData() async {
+    // Load the data asynchronously
+    final data = await loadPatientsFromFirestore();
+
+    // Return the loaded data
+    return data;
   }
 }

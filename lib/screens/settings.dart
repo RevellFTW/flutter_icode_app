@@ -4,6 +4,7 @@ import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/screens/forms/patient_form_screen.dart';
 import 'package:todoapp/screens/home_page.dart';
+import '../helper/firestore_helper.dart';
 import '../helper/flutter_flow/flutter_flow_icon_button.dart';
 import '../helper/flutter_flow/flutter_flow_theme.dart';
 import '../helper/flutter_flow/flutter_flow_util.dart';
@@ -12,8 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen(
-      this.caller, this.backToText, this.patient, this.caretakers,
+  const SettingsScreen(this.caller, this.backToText, this.patient,
+      this.caretakers, this.isRelative,
       {Key? key})
       : super(key: key);
   static const String id = 'settings_screen';
@@ -21,6 +22,7 @@ class SettingsScreen extends StatefulWidget {
   final String backToText;
   final Patient? patient;
   final List<Caretaker>? caretakers;
+  final bool isRelative;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -189,7 +191,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 10, 0),
                   child: Text(
                     //todo add user name
-                    auth.currentUser!.email.toString(),
+                    widget.isRelative
+                        ? relative!.email
+                        : auth.currentUser!.email.toString(),
                     style: FlutterFlowTheme.of(context).headlineMedium.override(
                           fontFamily: 'Outfit',
                           color: FlutterFlowTheme.of(context).primaryText,
@@ -290,6 +294,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             caretakerList: caretakerList,
                             visibility: false,
                             modifying: true,
+                            isRelative: widget.isRelative,
                           ),
                         ),
                       );
@@ -318,6 +323,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
+                widget.isRelative
+                    ? Theme(
+                        data: ThemeData(
+                          checkboxTheme: const CheckboxThemeData(
+                            visualDensity: VisualDensity.compact,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          unselectedWidgetColor:
+                              FlutterFlowTheme.of(context).secondaryText,
+                        ),
+                        child: CheckboxListTile(
+                          enabled: true,
+                          value: relative!.wantsToBeNotified,
+                          onChanged: (newValue) async {
+                            setState(
+                                () => relative!.wantsToBeNotified = newValue!);
+
+                            modifyRelativeInDb(relative!);
+                          },
+                          title: Text(
+                            'Notifications',
+                            style: FlutterFlowTheme.of(context).titleLarge,
+                          ),
+                          subtitle: Text(
+                            'wants to be notified about patient updates',
+                            style: FlutterFlowTheme.of(context).labelMedium,
+                          ),
+                          tileColor:
+                              FlutterFlowTheme.of(context).secondaryBackground,
+                          activeColor: FlutterFlowTheme.of(context).primary,
+                          checkColor: FlutterFlowTheme.of(context).info,
+                          dense: false,
+                          controlAffinity: ListTileControlAffinity.trailing,
+                        ),
+                      )
+                    : Container(),
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
                   child: InkWell(
@@ -333,36 +375,109 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 'Please enter your email address to reset your password.'),
                             actions: <Widget>[
                               TextFormField(
-                                decoration: const InputDecoration(
+                                autofocus: true,
+                                obscureText: false,
+                                decoration: InputDecoration(
                                   labelText: 'Email',
+                                  labelStyle:
+                                      FlutterFlowTheme.of(context).labelMedium,
+                                  hintStyle:
+                                      FlutterFlowTheme.of(context).labelMedium,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context).error,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context).error,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
+                                style: FlutterFlowTheme.of(context).bodyMedium,
                                 onChanged: (value) {
                                   setState(() {
                                     email = value;
                                   });
                                 },
                               ),
-                              TextButton(
-                                onPressed: () async {
-                                  if (email == widget.patient!.email) {
-                                    await auth.sendPasswordResetEmail(
-                                        email: email);
-                                    Navigator.of(context).pop();
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                      content: Text(
-                                          'Password reset email sent successfully.'),
-                                      duration: Duration(seconds: 3),
-                                    ));
-                                  } else {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                      content: Text('Email does not match.'),
-                                      duration: Duration(seconds: 3),
-                                    ));
-                                  }
-                                },
-                                child: const Text('Send'),
+                              Align(
+                                alignment:
+                                    const AlignmentDirectional(0.00, 0.00),
+                                child: Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 34, 0, 12),
+                                  child: FFButtonWidget(
+                                    onPressed: () async {
+                                      String userEmail = widget.isRelative
+                                          ? relative!.email
+                                          : widget.patient!.email;
+                                      if (email == userEmail) {
+                                        await auth.sendPasswordResetEmail(
+                                            email: email);
+                                        Navigator.of(context).pop();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content: Text(
+                                              'Password reset email sent successfully.'),
+                                          duration: Duration(seconds: 3),
+                                        ));
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content:
+                                              Text('Email does not match.'),
+                                          duration: Duration(seconds: 3),
+                                        ));
+                                      }
+                                    },
+                                    text: 'SEND',
+                                    options: FFButtonOptions(
+                                      width: 150,
+                                      height: 48,
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0, 0, 0, 0),
+                                      iconPadding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0, 0, 0, 0),
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      textStyle: FlutterFlowTheme.of(context)
+                                          .titleSmall
+                                          .override(
+                                            fontFamily: 'Readex Pro',
+                                            color: Colors.white,
+                                          ),
+                                      elevation: 4,
+                                      borderSide: const BorderSide(
+                                        color: Colors.transparent,
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(60),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           );

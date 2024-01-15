@@ -4,6 +4,7 @@ class Relative {
   String password = '';
   String email = '';
   String phoneNumber = '';
+  String patientId = '';
   bool wantsToBeNotified = true;
 
   Relative({
@@ -13,6 +14,7 @@ class Relative {
     required this.email,
     required this.phoneNumber,
     required this.wantsToBeNotified,
+    required this.patientId,
   });
   //initialize without values
   Relative.justID(int idParam) {
@@ -21,6 +23,7 @@ class Relative {
     password = '';
     email = '';
     phoneNumber = '';
+    patientId = '';
     wantsToBeNotified = true;
   }
 

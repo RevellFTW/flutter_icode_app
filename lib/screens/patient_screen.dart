@@ -186,10 +186,12 @@ class _PatientScreenState extends State<PatientScreen> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                SettingsScreen(
+                                                const SettingsScreen(
                                                     Caller.backOfficePatient,
                                                     'Curamus Back-Office',
-                                                    null, [])));
+                                                    null,
+                                                    [],
+                                                    false)));
                                   },
                                 ),
                               ),
@@ -367,6 +369,7 @@ class _PatientScreenState extends State<PatientScreen> {
                                           patient: _filteredPatients[i],
                                           caretakerList: caretakerList,
                                           visibility: true,
+                                          isRelative: false,
                                         ),
                                       ),
                                     );
@@ -396,6 +399,7 @@ class _PatientScreenState extends State<PatientScreen> {
                                                 patient: _filteredPatients[i],
                                                 caretakerList: caretakerList,
                                                 visibility: true,
+                                                isRelative: false,
                                               ),
                                             ),
                                           );
@@ -432,6 +436,7 @@ class _PatientScreenState extends State<PatientScreen> {
                     caretakerList: caretakerList,
                     modifying: false,
                     visibility: true,
+                    isRelative: false,
                   )));
         },
         child: const Icon(Icons.add),

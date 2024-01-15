@@ -23,6 +23,7 @@ class EventLogFormScreen extends StatefulWidget {
   final bool visible;
   final Patient? patient;
   final Caretaker? caretaker;
+  final bool isRelative;
 
   const EventLogFormScreen(
       {super.key,
@@ -34,6 +35,7 @@ class EventLogFormScreen extends StatefulWidget {
       required this.caretakerList,
       required this.patientList,
       required this.visible,
+      required this.isRelative,
       this.patient,
       this.caretaker});
 
@@ -99,6 +101,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
     if (widget.modifying) {
       title = "Modify ${widget.eventLog.patient.name}'s Log";
     }
+    if (widget.isRelative) {
+      title = "View ${widget.eventLog.patient.name}'s Log";
+    }
   }
 
   Future<List<Patient>> _loadPatientData() async {
@@ -140,7 +145,8 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
           visibility: widget.visible,
           title: backToText,
           onBackPressed: () async {
-            if (widget.caller == Caller.patient) {
+            if (widget.caller == Caller.patient ||
+                widget.caller == Caller.backOfficePatient) {
               List<EventLog> eventLogs = await loadEventLogsFromFirestore(
                   widget.patient!.id, widget.caller);
               Navigator.of(context).pop(MaterialPageRoute(
@@ -150,6 +156,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                         caller: Caller.patient,
                         patient: widget.patient,
                         caretaker: widget.caretaker,
+                        isRelative: widget.isRelative,
                       )));
             } else {
               List<EventLog> eventLogs = await loadEventLogsFromFirestore(
@@ -161,9 +168,11 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                         caller: Caller.caretaker,
                         patient: widget.patient,
                         caretaker: widget.caretaker,
+                        isRelative: widget.isRelative,
                       )));
             }
           },
+          isRelative: false,
         ),
         body: SafeArea(
           top: true,
@@ -479,6 +488,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                                             caller: Caller.patient,
                                             patient: widget.patient,
                                             caretaker: widget.caretaker,
+                                            isRelative: widget.isRelative,
                                           )));
                                 });
                               },

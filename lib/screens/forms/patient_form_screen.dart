@@ -29,13 +29,16 @@ class PatientFormScreen extends StatefulWidget {
   final Patient patient;
   final List<Caretaker> caretakerList;
   final bool visibility;
+  final bool isRelative;
   final bool modifying;
   const PatientFormScreen(
       {super.key,
       required this.patient,
       required this.caretakerList,
       required this.visibility,
+      required this.isRelative,
       this.modifying = true});
+  static const id = 'patient_form_screen';
 
   @override
   // ignore: library_private_types_in_public_api
@@ -119,8 +122,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         title: 'Back to Curamus Back-Office',
         visibility: widget.visibility,
         onBackPressed: () async {
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          Navigator.of(context).pop();
         },
+        isRelative: widget.isRelative,
       ),
       body: SafeArea(
         top: true,
@@ -172,8 +176,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                 builder: (context) =>
                                                     CareTasksPage(
                                                       patient: widget.patient,
-                                                      visibility:
-                                                          widget.visibility,
+                                                      visibility: widget
+                                                              .isRelative
+                                                          ? true
+                                                          : widget.visibility,
+                                                      isRelative:
+                                                          widget.isRelative,
                                                     )));
                                       },
                                       text: 'Care Tasks',
@@ -229,6 +237,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                                   .patient,
                                                               patient: widget
                                                                   .patient,
+                                                              isRelative: widget
+                                                                  .isRelative,
                                                             )));
                                               },
                                               text: 'Event Logs',
@@ -416,23 +426,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         },
                         style: FlutterFlowTheme.of(context).bodyMedium,
                       ),
-                      widget.visibility
-                          ? ElevatedButton(
-                              onPressed: () async {
-                                await auth.sendPasswordResetEmail(
-                                    email: widget.patient.email);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      "Password reset email sent",
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text('Change Password'),
-                            )
-                          : Container(),
                       TextFormField(
                         onTap: widget.visibility
                             ? () => updateStartDate(widget.patient.dateOfBirth)
@@ -825,12 +818,17 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             options: caretakerListToValueItemList(
                                 widget.caretakerList),
                             selectionType: SelectionType.multi,
-                            chipConfig:
-                                const ChipConfig(wrapType: WrapType.wrap),
+                            chipConfig: ChipConfig(
+                                wrapType: WrapType.wrap,
+                                backgroundColor:
+                                    FlutterFlowTheme.of(context).primary),
                             dropdownHeight: 140,
                             optionTextStyle:
                                 FlutterFlowTheme.of(context).bodyMedium,
-                            selectedOptionIcon: const Icon(Icons.check_circle),
+                            selectedOptionIcon: Icon(
+                              Icons.check_circle,
+                              color: FlutterFlowTheme.of(context).primary,
+                            ),
                             borderColor: FlutterFlowTheme.of(context).alternate,
                             borderWidth: 2,
                             borderRadius: 8,
@@ -873,16 +871,22 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                         highlightColor: Colors.transparent,
                                         onTap: () async {
                                           //goto edit relative
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      RelativeFormScreen(
-                                                        modifying: true,
-                                                        relative: relatives[i],
-                                                        patient: widget.patient,
-                                                        visibility:
-                                                            widget.visibility,
-                                                      )));
+                                          //if not a relative and not a patient => edit relative
+                                          if (!widget.isRelative &&
+                                              widget.visibility) {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        RelativeFormScreen(
+                                                          modifying: true,
+                                                          relative:
+                                                              relatives[i],
+                                                          patient:
+                                                              widget.patient,
+                                                          visibility:
+                                                              widget.visibility,
+                                                        )));
+                                          }
                                         },
                                         child: Container(
                                           width: double.infinity,
@@ -935,7 +939,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                             -1.00, 0.00),
                                         child: Padding(
                                           padding: const EdgeInsetsDirectional
-                                              .fromSTEB(0, 0, 0, 12),
+                                              .fromSTEB(0, 10, 0, 12),
                                           child: FFButtonWidget(
                                             onPressed: () async {
                                               // context.pushNamed('AddRelative');
@@ -1000,7 +1004,195 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               alignment: const AlignmentDirectional(0.00, 0.00),
                               child: Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0, 34, 0, 12),
+                                    0, 34, 0, 0),
+                                child: FFButtonWidget(
+                                  onPressed: () async {
+                                    String email = '';
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Reset Password'),
+                                          content: const Text(
+                                              'Please enter your email address to reset your password.'),
+                                          actions: <Widget>[
+                                            TextFormField(
+                                              autofocus: true,
+                                              obscureText: false,
+                                              decoration: InputDecoration(
+                                                labelText: 'Email',
+                                                labelStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium,
+                                                hintStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium,
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .alternate,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                errorBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .error,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                focusedErrorBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .error,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  email = value;
+                                                });
+                                              },
+                                            ),
+                                            Align(
+                                              alignment:
+                                                  const AlignmentDirectional(
+                                                      0.00, 0.00),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(0, 34, 0, 12),
+                                                child: FFButtonWidget(
+                                                  onPressed: () async {
+                                                    if (email ==
+                                                        widget.patient.email) {
+                                                      await auth
+                                                          .sendPasswordResetEmail(
+                                                              email: email);
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                              const SnackBar(
+                                                        content: Text(
+                                                            'Password reset email sent successfully.'),
+                                                        duration: Duration(
+                                                            seconds: 3),
+                                                      ));
+                                                    } else {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                              const SnackBar(
+                                                        content: Text(
+                                                            'Email does not match.'),
+                                                        duration: Duration(
+                                                            seconds: 3),
+                                                      ));
+                                                    }
+                                                  },
+                                                  text: 'SEND',
+                                                  options: FFButtonOptions(
+                                                    width: 150,
+                                                    height: 48,
+                                                    padding:
+                                                        const EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                            0, 0, 0, 0),
+                                                    iconPadding:
+                                                        const EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                            0, 0, 0, 0),
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                    textStyle: FlutterFlowTheme
+                                                            .of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                        ),
+                                                    elevation: 4,
+                                                    borderSide:
+                                                        const BorderSide(
+                                                      color: Colors.transparent,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            60),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  text: 'RESET PASSWORD',
+                                  options: FFButtonOptions(
+                                    width: 600,
+                                    height: 48,
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 0),
+                                    iconPadding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 0),
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Colors.white,
+                                        ),
+                                    elevation: 4,
+                                    borderSide: const BorderSide(
+                                      color: Colors.transparent,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(60),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                      widget.visibility
+                          ? Align(
+                              alignment: const AlignmentDirectional(0.00, 0.00),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 20, 0, 12),
                                 child: FFButtonWidget(
                                   onPressed: () async {
                                     if (!widget.modifying) {
@@ -1088,67 +1280,6 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
         ),
       ),
     );
-  }
-
-  void _showPasswordDialog() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Change password"),
-            content: Form(
-              key: _formKey,
-              child: Column(
-                children: <Widget>[
-                  TextFormField(
-                    controller: _passwordController1,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'New Password',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter password';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _passwordController2,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm New Password',
-                    ),
-                    validator: (value) {
-                      if (value != _passwordController1.text) {
-                        return 'Passwords do not match';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                child: const Text("Cancel"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: const Text("Change"),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    print('modify password');
-                    auth.currentUser!.updatePassword(_passwordController1.text);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-            ],
-          );
-        });
   }
 
   List<ValueItem<String>> caretakerListToValueItemList(

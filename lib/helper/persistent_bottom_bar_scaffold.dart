@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'flutter_flow/flutter_flow_theme.dart';
+
 class PersistentBottomBarScaffold extends StatefulWidget {
   /// pass the required items for the tabs and BottomNavigationBar
   final List<PersistentTabItem> items;
@@ -52,6 +54,7 @@ class _PersistentBottomBarScaffoldState
         /// Define the persistent bottom bar
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedTab,
+          selectedItemColor: FlutterFlowTheme.of(context).primary,
           onTap: (index) {
             /// Check if the tab that the user is pressing is currently selected
             if (index == _selectedTab) {

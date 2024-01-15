@@ -15,12 +15,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool visibility;
   final Patient? patient;
   final List<Caretaker>? caretakers;
+  final bool isRelative;
 
   CustomAppBar({
     super.key,
     required this.title,
     required this.onBackPressed,
     required this.visibility,
+    required this.isRelative,
     this.caretakers,
     this.caller = Caller.backOfficePatient,
     this.patient,
@@ -217,7 +219,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                                 Caller.patient,
                                                 "${patient!.name}'s event logs",
                                                 visibility ? null : patient,
-                                                visibility ? [] : caretakers)));
+                                                visibility ? [] : caretakers,
+                                                isRelative)));
                                       },
                                     ),
                                   ),
