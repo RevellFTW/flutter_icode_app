@@ -6,6 +6,7 @@ class Relative {
   String phoneNumber = '';
   String patientId = '';
   bool wantsToBeNotified = true;
+  String token = '';
 
   Relative({
     required this.id,
@@ -15,6 +16,7 @@ class Relative {
     required this.phoneNumber,
     required this.wantsToBeNotified,
     required this.patientId,
+    required this.token,
   });
   //initialize without values
   Relative.justID(int idParam) {

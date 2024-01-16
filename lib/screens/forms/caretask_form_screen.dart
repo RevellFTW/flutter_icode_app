@@ -573,7 +573,7 @@ class _CareTasksFormState extends State<CareTasksForm> {
                       child: widget.visibility
                           ? FFButtonWidget(
                               onPressed: () {
-                                setState(() async {
+                                setState(() {
                                   if (!widget.modifying) {
                                     if (_nameController.text.isEmpty) {
                                       ScaffoldMessenger.of(context)
@@ -596,9 +596,6 @@ class _CareTasksFormState extends State<CareTasksForm> {
                                         .removeAt(widget.caretaskIndex);
                                     saveToDb();
                                   }
-                                  List<EventLog> tasks =
-                                      await loadEventLogsFromFirestore(
-                                          widget.patient.id, Caller.patient);
                                   // ignore: use_build_context_synchronously
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => CareTasksPage(

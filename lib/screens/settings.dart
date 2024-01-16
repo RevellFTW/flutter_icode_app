@@ -323,43 +323,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
-                widget.isRelative
-                    ? Theme(
-                        data: ThemeData(
-                          checkboxTheme: const CheckboxThemeData(
-                            visualDensity: VisualDensity.compact,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          unselectedWidgetColor:
-                              FlutterFlowTheme.of(context).secondaryText,
-                        ),
-                        child: CheckboxListTile(
-                          enabled: true,
-                          value: relative!.wantsToBeNotified,
-                          onChanged: (newValue) async {
-                            setState(
-                                () => relative!.wantsToBeNotified = newValue!);
-
-                            modifyRelativeInDb(relative!);
-                          },
-                          title: Text(
-                            'Notifications',
-                            style: FlutterFlowTheme.of(context).titleLarge,
-                          ),
-                          subtitle: Text(
-                            'wants to be notified about patient updates',
-                            style: FlutterFlowTheme.of(context).labelMedium,
-                          ),
-                          tileColor:
-                              FlutterFlowTheme.of(context).secondaryBackground,
-                          activeColor: FlutterFlowTheme.of(context).primary,
-                          checkColor: FlutterFlowTheme.of(context).info,
-                          dense: false,
-                          controlAffinity: ListTileControlAffinity.trailing,
-                        ),
-                      )
-                    : Container(),
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 1),
                   child: InkWell(
@@ -508,6 +471,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
+                widget.isRelative
+                    ? Theme(
+                        data: ThemeData(
+                          checkboxTheme: const CheckboxThemeData(
+                            visualDensity: VisualDensity.compact,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          unselectedWidgetColor:
+                              FlutterFlowTheme.of(context).secondaryText,
+                        ),
+                        child: CheckboxListTile(
+                          enabled: true,
+                          value: relative!.wantsToBeNotified,
+                          onChanged: (newValue) async {
+                            setState(
+                                () => relative!.wantsToBeNotified = newValue!);
+
+                            modifyRelativeInDb(relative!);
+                          },
+                          title: Text(
+                            'Notifications',
+                            style: FlutterFlowTheme.of(context).titleLarge,
+                          ),
+                          subtitle: Text(
+                            'want to be notified about patient updates',
+                            style: FlutterFlowTheme.of(context).labelMedium,
+                          ),
+                          tileColor:
+                              FlutterFlowTheme.of(context).secondaryBackground,
+                          activeColor: FlutterFlowTheme.of(context).primary,
+                          checkColor: FlutterFlowTheme.of(context).info,
+                          dense: false,
+                          controlAffinity: ListTileControlAffinity.trailing,
+                        ),
+                      )
+                    : Container(),
               ],
             ),
           ),

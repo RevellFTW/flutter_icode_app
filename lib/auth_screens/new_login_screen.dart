@@ -1198,6 +1198,8 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
       }
       if (isRelative) {
         relative = await getRelativeFromDb(data!['roleId'].toString());
+        relative!.token = applicationToken;
+        print('relative token: ${relative!.token}');
         List<Patient> patients = [];
         _loadPatientData().then((value) {
           if (mounted) {
