@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -310,7 +311,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsetsDirectional
-                                                              .fromSTEB(
+                                                          .fromSTEB(
                                                           0, 4, 0, 24),
                                                   child: Text(
                                                     'Enter your details below.',
@@ -323,7 +324,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsetsDirectional
-                                                              .fromSTEB(
+                                                          .fromSTEB(
                                                           8, 0, 8, 16),
                                                   child: TextFormField(
                                                     controller: _model
@@ -474,7 +475,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsetsDirectional
-                                                              .fromSTEB(
+                                                          .fromSTEB(
                                                           8, 0, 8, 16),
                                                   child: TextFormField(
                                                     onChanged: (value) {
@@ -650,7 +651,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsetsDirectional
-                                                                .fromSTEB(
+                                                            .fromSTEB(
                                                             0, 0, 0, 16),
                                                     child: FFButtonWidget(
                                                       onPressed: () async {
@@ -711,11 +712,11 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                         height: 52,
                                                         padding:
                                                             const EdgeInsetsDirectional
-                                                                    .fromSTEB(
+                                                                .fromSTEB(
                                                                 0, 0, 0, 0),
                                                         iconPadding:
                                                             const EdgeInsetsDirectional
-                                                                    .fromSTEB(
+                                                                .fromSTEB(
                                                                 0, 0, 0, 0),
                                                         color:
                                                             FlutterFlowTheme.of(
@@ -785,7 +786,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsetsDirectional
-                                                              .fromSTEB(
+                                                          .fromSTEB(
                                                           0, 4, 0, 24),
                                                   child: Text(
                                                     'Let\'s get started by filling out the form below.',
@@ -798,7 +799,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsetsDirectional
-                                                              .fromSTEB(
+                                                          .fromSTEB(
                                                           8, 0, 8, 16),
                                                   child: TextFormField(
                                                     controller: _model
@@ -884,7 +885,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsetsDirectional
-                                                              .fromSTEB(
+                                                          .fromSTEB(
                                                           8, 0, 8, 16),
                                                   child: TextFormField(
                                                     controller: _model
@@ -970,7 +971,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsetsDirectional
-                                                              .fromSTEB(
+                                                          .fromSTEB(
                                                           8, 0, 8, 16),
                                                   child: TextFormField(
                                                     controller: _model
@@ -1083,7 +1084,7 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsetsDirectional
-                                                                .fromSTEB(
+                                                            .fromSTEB(
                                                             0, 0, 0, 16),
                                                     child: FFButtonWidget(
                                                       onPressed: () async {
@@ -1095,11 +1096,11 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                                                         height: 52,
                                                         padding:
                                                             const EdgeInsetsDirectional
-                                                                    .fromSTEB(
+                                                                .fromSTEB(
                                                                 0, 0, 0, 0),
                                                         iconPadding:
                                                             const EdgeInsetsDirectional
-                                                                    .fromSTEB(
+                                                                .fromSTEB(
                                                                 0, 0, 0, 0),
                                                         color:
                                                             FlutterFlowTheme.of(
@@ -1198,35 +1199,18 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
       }
       if (isRelative) {
         relative = await getRelativeFromDb(data!['roleId'].toString());
-        relative!.token = applicationToken;
-        print('relative token: ${relative!.token}');
-        List<Patient> patients = [];
-        _loadPatientData().then((value) {
-          if (mounted) {
-            setState(() {
-              patients = value;
-            });
-          }
-        });
-        Patient patient =
-            patients.where((i) => i.relatives.contains(relative)).first;
-        List<EventLog> eventLogs =
-            await loadEventLogsFromFirestore(patient.id, Caller.patient);
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => EventLogScreen(
-                    eventLogs: eventLogs,
-                    patient: patient,
-                    eventLogName: "${patient.name} Patient's Log ",
-                    caller: Caller.patient,
-                    isRelative: isRelative,
-                  )),
+        const vapidKey =
+            "BAtT0PRD3_LdaR9i1eIt-MHS8IsHs97Ib_Uva8mS9uQshRAWk_1txhuRdNTa4eLqheq218J__iIjeWHsZAq0sE8";
+        String? token = await FirebaseMessaging.instance.getToken(
+          vapidKey: vapidKey,
         );
+        relative!.token = token!;
+        print('relative token: ${relative!.token}');
       }
-      if (isPatient) {
-        Patient patient = await getPatientFromDb(data!['roleId'].toString());
+      if (isPatient || isRelative) {
+        Patient patient = isRelative
+            ? await getPatientFromDb(data!['patientId'].toString())
+            : await getPatientFromDb(data!['roleId'].toString());
         List<EventLog> eventLogs =
             await loadEventLogsFromFirestore(patient.id, Caller.patient);
         // ignore: use_build_context_synchronously

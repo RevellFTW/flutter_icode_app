@@ -13,7 +13,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 final log = Logger('MainLogger');
 
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -33,7 +33,6 @@ void main() async {
 
   final settings = await FirebaseMessaging.instance.requestPermission();
   final token = await FirebaseMessaging.instance.getToken();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(const MyApp());
 }
 

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:todoapp/auth_screens/new_login_screen.dart';
@@ -111,7 +112,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       }
       if (isRelative) {
         relative = await getRelativeFromDb(data!['roleId'].toString());
-        relative!.token = applicationToken;
+        const vapidKey =
+            "BAtT0PRD3_LdaR9i1eIt-MHS8IsHs97Ib_Uva8mS9uQshRAWk_1txhuRdNTa4eLqheq218J__iIjeWHsZAq0sE8";
+        String? token = await FirebaseMessaging.instance.getToken(
+          vapidKey: vapidKey,
+        );
+        relative!.token = token!;
         print('relative token: ${relative!.token}');
       }
       if (isPatient || isRelative) {
