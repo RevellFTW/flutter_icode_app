@@ -234,7 +234,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                               eventLogName:
                                                                   "${widget.patient.name} Patient's Log",
                                                               caller: Caller
-                                                                  .patient,
+                                                                  .backOfficePatient,
                                                               patient: widget
                                                                   .patient,
                                                               isRelative: widget

@@ -585,6 +585,19 @@ class _CareTasksFormState extends State<CareTasksForm> {
                                       );
                                       return;
                                     }
+                                    if (widget.patient.careTasks
+                                        .map((e) => e.taskName)
+                                        .toList()
+                                        .contains(_nameController.text)) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'This care task already exists'),
+                                        ),
+                                      );
+                                      return;
+                                    }
                                     widget.patient.careTasks.add(CareTask(
                                         taskName: currentNameTextFormFieldValue,
                                         taskFrequency: Frequency.values

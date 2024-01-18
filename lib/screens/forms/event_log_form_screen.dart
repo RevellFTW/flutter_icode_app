@@ -81,7 +81,8 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
       });
     }
     _dateController.text = widget.eventLog.date.toString();
-    taskNames = widget.caller == Caller.patient
+    taskNames = (widget.caller == Caller.patient ||
+            widget.caller == Caller.backOfficePatient)
         ? getTaskNameDropdownEntries()
         : getTaskNameDropdownEntries(index: widget.patient!.id.toString());
     people = getPersonTypeDropdownEntries();
@@ -155,7 +156,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                   builder: (context) => EventLogScreen(
                         eventLogs: eventLogs,
                         eventLogName: eventLogTitle,
-                        caller: Caller.patient,
+                        caller: widget.caller,
                         patient: widget.patient,
                         caretaker: widget.caretaker,
                         isRelative: widget.isRelative,
@@ -258,7 +259,8 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                         DropdownButtonFormField(
                           autofocus: true,
                           decoration: InputDecoration(
-                            labelText: widget.caller == Caller.patient
+                            labelText: (widget.caller == Caller.patient ||
+                                    widget.caller == Caller.backOfficePatient)
                                 ? 'Caretaker'
                                 : 'Patient',
                             labelStyle:
@@ -299,7 +301,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           onChanged: widget.visible
                               ? (value) {
                                   setState(() {
-                                    if (widget.caller == Caller.patient) {
+                                    if (widget.caller == Caller.patient ||
+                                        widget.caller ==
+                                            Caller.backOfficePatient) {
                                       widget.eventLog.caretaker = widget
                                           .caretakerList
                                           .firstWhere((element) =>
@@ -449,8 +453,17 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                           const EdgeInsetsDirectional.fromSTEB(0, 34, 0, 12),
                       child: widget.visible
                           ? FFButtonWidget(
-                              onPressed: () {
-                                setState(() async {
+                              onPressed: () async {
+                                List<EventLog> tasks = (widget.caller ==
+                                            Caller.patient ||
+                                        widget.caller ==
+                                            Caller.backOfficePatient)
+                                    ? await loadEventLogsFromFirestore(
+                                        widget.patient!.id, widget.caller)
+                                    : await loadEventLogsFromFirestore(
+                                        widget.caretaker!.id, widget.caller);
+
+                                setState(() {
                                   if (!widget.modifying) {
                                     widget.caller == Caller.caretaker
                                         ? widget.eventLog.caretaker =
@@ -473,12 +486,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                                     deleteEventLogFromFireStore(
                                         widget.eventLog);
                                   }
-                                  List<EventLog> tasks = widget.caller ==
-                                          Caller.patient
-                                      ? await loadEventLogsFromFirestore(
-                                          widget.patient!.id, widget.caller)
-                                      : await loadEventLogsFromFirestore(
-                                          widget.caretaker!.id, widget.caller);
+
                                   // ignore: use_build_context_synchronously
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => EventLogScreen(
@@ -668,7 +676,8 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
   }
 
   List<DropdownMenuItem<String>> getTaskNameDropdownEntries({String? index}) {
-    return widget.caller == Caller.patient
+    return (widget.caller == Caller.patient ||
+            widget.caller == Caller.backOfficePatient)
         ? widget.careTaskList.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(value: value, child: Text(value));
           }).toList()
@@ -679,7 +688,8 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
   }
 
   List<DropdownMenuItem<String>> getPersonTypeDropdownEntries() {
-    return widget.caller == Caller.patient
+    return (widget.caller == Caller.patient ||
+            widget.caller == Caller.backOfficePatient)
         ? widget.caretakerList.map<DropdownMenuItem<String>>((Caretaker value) {
             return DropdownMenuItem<String>(
                 value: value.id.toString(), child: Text(value.name));
