@@ -257,8 +257,8 @@ Future<List<String>> getPatientNamesFromCaretakerId(String id) async {
   return patientNames;
 }
 
-Future<Patient> getPatientFromDb(String id) async {
-  String docID = await getDocumentID(int.parse(id), 'patients');
+Future<Patient> getPatientFromDb(int id) async {
+  String docID = await getDocumentID(id, 'patients');
   return getPatientBydocID(docID);
 }
 
@@ -316,8 +316,9 @@ void addCaretakerToDb(Caretaker caretaker) {
   addDocumentToCollection('caretakers', caretakerData);
 }
 
-Future<Caretaker> getCaretakerFromDb(String id) async {
-  String docID = await getDocumentID(int.parse(id), 'caretakers');
+Future<Caretaker> getCaretakerFromDb(int id) async {
+  print('id: $id');
+  String docID = await getDocumentID(id, 'caretakers');
   var snapshot = await db.collection('caretakers').doc(docID).get();
   Caretaker caretaker = Caretaker(
     id: snapshot['id'],
@@ -482,15 +483,16 @@ void modifyEventLogInDb(EventLog eventLog) async {
 
 Future<List<EventLog>> loadEventLogsFromFirestore(int id, Caller caller) async {
   List<EventLog> tasks = [];
-  QuerySnapshot querySnapshot = caller == Caller.patient
-      ? await db
-          .collection('patientTasks')
-          .where('patientId', isEqualTo: id.toString())
-          .get()
-      : await db
-          .collection('patientTasks')
-          .where('caretakerId', isEqualTo: id.toString())
-          .get();
+  QuerySnapshot querySnapshot =
+      (caller == Caller.patient || caller == Caller.backOfficePatient)
+          ? await db
+              .collection('patientTasks')
+              .where('patientId', isEqualTo: id)
+              .get()
+          : await db
+              .collection('patientTasks')
+              .where('caretakerId', isEqualTo: id)
+              .get();
 
   for (var doc in querySnapshot.docs) {
     tasks.add(EventLog(
@@ -498,8 +500,8 @@ Future<List<EventLog>> loadEventLogsFromFirestore(int id, Caller caller) async {
         name: doc['name'],
         description: doc['description'],
         date: doc['date'],
-        caretaker: await getCaretakerFromDb(doc['caretakerId'].toString()),
-        patient: await getPatientFromDb(doc['patientId'].toString())));
+        caretaker: await getCaretakerFromDb(doc['caretakerId']),
+        patient: await getPatientFromDb(doc['patientId'])));
   }
 
   return tasks;
@@ -508,6 +510,14 @@ Future<List<EventLog>> loadEventLogsFromFirestore(int id, Caller caller) async {
 void deleteEventLogFromFireStore(EventLog eventLog) async {
   var eventLogId = await getDocumentID(eventLog.id, 'patientTasks');
   db.collection('patientTasks').doc(eventLogId).delete();
+}
+
+int getEventLogCountFromFirestore() {
+  int count = 0;
+  db.collection('patientTasks').get().then((value) {
+    count = value.docs.length;
+  });
+  return count;
 }
 //#endregion
 

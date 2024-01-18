@@ -65,6 +65,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   Map<String, Map<String, String>> careTasks = {};
   late DateTime updatedDateTime;
   late PatientFormModel _model;
+  bool passwordFieldVisibility = false;
 
   List<ValueItem<String>> selectedCaretakerValueItems = [];
 
@@ -221,16 +222,25 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                 .fromSTEB(0, 0, 0, 12),
                                             child: FFButtonWidget(
                                               onPressed: () async {
-                                                List<EventLog> tasks =
-                                                    await loadEventLogsFromFirestore(
+                                                List<EventLog> eventLogs = [];
+
+                                                loadEventLogsFromFirestore(
                                                         widget.patient.id,
-                                                        Caller.patient);
+                                                        Caller.patient)
+                                                    .then((value) {
+                                                  setState(() {
+                                                    eventLogs = value;
+                                                  });
+                                                });
+
                                                 // ignore: use_build_context_synchronously
+
                                                 Navigator.of(context).push(
                                                     MaterialPageRoute(
                                                         builder: (context) =>
                                                             EventLogScreen(
-                                                              eventLogs: tasks,
+                                                              eventLogs:
+                                                                  eventLogs,
                                                               eventLogName:
                                                                   "${widget.patient.name} Patient's Log",
                                                               caller: Caller
@@ -426,6 +436,78 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         },
                         style: FlutterFlowTheme.of(context).bodyMedium,
                       ),
+                      !widget.modifying
+                          ? TextFormField(
+                              controller: _passwordController,
+                              focusNode: _model.textFieldFocusNode7,
+                              readOnly: !widget.visibility,
+                              obscureText: !passwordFieldVisibility,
+                              autofocus: true,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle:
+                                    FlutterFlowTheme.of(context).labelMedium,
+                                hintStyle:
+                                    FlutterFlowTheme.of(context).labelMedium,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).error,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).error,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                suffixIcon: InkWell(
+                                  onTap: () => setState(
+                                    () => passwordFieldVisibility =
+                                        !passwordFieldVisibility,
+                                  ),
+                                  focusNode: FocusNode(skipTraversal: true),
+                                  child: Icon(
+                                    passwordFieldVisibility
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  currentPasswordTextFormFieldValue = newValue;
+                                });
+                              },
+                              onTapOutside: (newValue) {
+                                _model.textFieldFocusNode6!.unfocus();
+                              },
+                              onFieldSubmitted: (String newValue) {
+                                setState(() {
+                                  currentPasswordTextFormFieldValue = newValue;
+                                });
+                              },
+                              style: FlutterFlowTheme.of(context).bodyMedium,
+                            )
+                          : Container(),
                       TextFormField(
                         onTap: widget.visibility
                             ? () => updateStartDate(widget.patient.dateOfBirth)
@@ -914,7 +996,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsetsDirectional
-                                                                .fromSTEB(
+                                                            .fromSTEB(
                                                             12, 0, 0, 0),
                                                     child: Text(
                                                       relatives[i].name,
@@ -999,7 +1081,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               ],
                             )
                           : Container(),
-                      widget.visibility
+                      (widget.visibility && widget.modifying)
                           ? Align(
                               alignment: const AlignmentDirectional(0.00, 0.00),
                               child: Padding(
@@ -1124,11 +1206,11 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                     height: 48,
                                                     padding:
                                                         const EdgeInsetsDirectional
-                                                                .fromSTEB(
+                                                            .fromSTEB(
                                                             0, 0, 0, 0),
                                                     iconPadding:
                                                         const EdgeInsetsDirectional
-                                                                .fromSTEB(
+                                                            .fromSTEB(
                                                             0, 0, 0, 0),
                                                     color: FlutterFlowTheme.of(
                                                             context)

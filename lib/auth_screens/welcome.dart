@@ -122,8 +122,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       }
       if (isPatient || isRelative) {
         Patient patient = isRelative
-            ? await getPatientFromDb(data!['patientId'].toString())
-            : await getPatientFromDb(data!['roleId'].toString());
+            ? await getPatientFromDb(data!['patientId'])
+            : await getPatientFromDb(data!['roleId']);
         List<EventLog> eventLogs =
             await loadEventLogsFromFirestore(patient.id, Caller.patient);
         // ignore: use_build_context_synchronously

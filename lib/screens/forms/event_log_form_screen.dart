@@ -454,15 +454,6 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                       child: widget.visible
                           ? FFButtonWidget(
                               onPressed: () async {
-                                List<EventLog> tasks = (widget.caller ==
-                                            Caller.patient ||
-                                        widget.caller ==
-                                            Caller.backOfficePatient)
-                                    ? await loadEventLogsFromFirestore(
-                                        widget.patient!.id, widget.caller)
-                                    : await loadEventLogsFromFirestore(
-                                        widget.caretaker!.id, widget.caller);
-
                                 setState(() {
                                   if (!widget.modifying) {
                                     widget.caller == Caller.caretaker
@@ -486,21 +477,30 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                                     deleteEventLogFromFireStore(
                                         widget.eventLog);
                                   }
-
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => EventLogScreen(
-                                            eventLogs: tasks,
-                                            eventLogName: widget.caller ==
-                                                    Caller.patient
-                                                ? "${widget.patient!.name} Patient's Log"
-                                                : "${widget.caretaker!.name} Caretaker's Log",
-                                            caller: Caller.patient,
-                                            patient: widget.patient,
-                                            caretaker: widget.caretaker,
-                                            isRelative: widget.isRelative,
-                                          )));
                                 });
+                                List<EventLog> tasks = (widget.caller ==
+                                            Caller.patient ||
+                                        widget.caller ==
+                                            Caller.backOfficePatient)
+                                    ? await loadEventLogsFromFirestore(
+                                        widget.patient!.id, widget.caller)
+                                    : await loadEventLogsFromFirestore(
+                                        widget.caretaker!.id, widget.caller);
+                                // ignore: use_build_context_synchronously
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => EventLogScreen(
+                                          eventLogs: tasks,
+                                          eventLogName: (widget.caller ==
+                                                      Caller.patient ||
+                                                  widget.caller ==
+                                                      Caller.backOfficePatient)
+                                              ? "${widget.patient!.name} Patient's Log"
+                                              : "${widget.caretaker!.name} Caretaker's Log",
+                                          caller: widget.caller,
+                                          patient: widget.patient,
+                                          caretaker: widget.caretaker,
+                                          isRelative: widget.isRelative,
+                                        )));
                               },
                               text: widget.modifying ? 'DELETE' : 'ADD',
                               options: FFButtonOptions(
