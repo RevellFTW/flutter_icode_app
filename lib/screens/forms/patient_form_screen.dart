@@ -73,6 +73,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
 
   MultiSelectController<String> multiSelectDropdownController =
       MultiSelectController<String>();
+  List<EventLog> eventLogs = [];
 
   @override
   void initState() {
@@ -222,34 +223,35 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                 .fromSTEB(0, 0, 0, 12),
                                             child: FFButtonWidget(
                                               onPressed: () async {
-                                                List<EventLog> eventLogs = [];
-
-                                                loadEventLogsFromFirestore(
-                                                        widget.patient.id,
-                                                        Caller.patient)
-                                                    .then((value) {
-                                                  setState(() {
-                                                    eventLogs = value;
-                                                  });
+                                                try {
+                                                  // Wait for the data to be loaded before continuing
+                                                  eventLogs =
+                                                      await loadEventLogsFromFirestore(
+                                                          widget.patient.id,
+                                                          Caller.patient);
+                                                } catch (e) {
+                                                  // Handle any errors that might occur during data loading
+                                                  print(
+                                                      "Error loading event logs: $e");
+                                                }
+                                                setState(() {
+                                                  // ignore: use_build_context_synchronously
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              EventLogScreen(
+                                                                eventLogs:
+                                                                    eventLogs,
+                                                                eventLogName:
+                                                                    "${widget.patient.name} Patient's Log",
+                                                                caller: Caller
+                                                                    .backOfficePatient,
+                                                                patient: widget
+                                                                    .patient,
+                                                                isRelative: widget
+                                                                    .isRelative,
+                                                              )));
                                                 });
-
-                                                // ignore: use_build_context_synchronously
-
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            EventLogScreen(
-                                                              eventLogs:
-                                                                  eventLogs,
-                                                              eventLogName:
-                                                                  "${widget.patient.name} Patient's Log",
-                                                              caller: Caller
-                                                                  .backOfficePatient,
-                                                              patient: widget
-                                                                  .patient,
-                                                              isRelative: widget
-                                                                  .isRelative,
-                                                            )));
                                               },
                                               text: 'Event Logs',
                                               options: FFButtonOptions(
