@@ -1,8 +1,10 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:todoapp/firebase_options.dart';
 import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/datetime_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
@@ -74,6 +76,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
   @override
   void initState() {
     super.initState();
+    requestPermission();
     if (widget.caller == Caller.patient) visible = false;
     if (widget.caller == Caller.backOfficePatient ||
         widget.caller == Caller.patient) {
@@ -628,5 +631,28 @@ class _EventLogScreenState extends State<EventLogScreen> {
             return DropdownMenuEntry<String>(
                 value: value.id.toString(), label: value.name);
           }).toList();
+  }
+
+  void requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    const vapidKey =
+        "BAtT0PRD3_LdaR9i1eIt-MHS8IsHs97Ib_Uva8mS9uQshRAWk_1txhuRdNTa4eLqheq218J__iIjeWHsZAq0sE8";
+    await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    if (DefaultFirebaseOptions.currentPlatform == DefaultFirebaseOptions.web) {
+      await messaging.getToken(
+        vapidKey: vapidKey,
+      );
+    } else {
+      await messaging.getToken();
+    }
   }
 }

@@ -381,6 +381,7 @@ void addRelativeToDb(Relative relative) {
     'email': relative.email,
     'phoneNumber': relative.phoneNumber,
     'wantsToBeNotified': relative.wantsToBeNotified,
+    'patientId': relative.patientId,
     'token': relative.token,
   };
   addDocumentToCollection('relatives', relativeData);

@@ -119,10 +119,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         );
         relative!.token = token!;
         print('relative token: ${relative!.token}');
+        modifyRelativeInDb(relative!);
       }
       if (isPatient || isRelative) {
         Patient patient = isRelative
-            ? await getPatientFromDb(data!['patientId'])
+            ? await getPatientFromDb(int.parse(data!['patientId']))
             : await getPatientFromDb(data!['roleId']);
         List<EventLog> eventLogs =
             await loadEventLogsFromFirestore(patient.id, Caller.patient);

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/datetime_helper.dart';
@@ -8,6 +9,7 @@ import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
 import 'package:todoapp/models/caretaker.dart';
 import 'package:todoapp/models/event_log.dart';
 import 'package:todoapp/models/patient.dart';
+import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/screens/home_page.dart';
 import 'package:todoapp/screens/tasks_and_logs/event_log_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
@@ -473,6 +475,8 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                                       return;
                                     }
                                     addEventLogInDb(widget.eventLog);
+                                    sendNotification(widget.eventLog.name,
+                                        widget.eventLog.description);
                                   } else {
                                     deleteEventLogFromFireStore(
                                         widget.eventLog);
@@ -544,12 +548,11 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
 
 //todo make this work
   void sendNotification(String taskName, String? taskDescription) async {
-    var dbUser = await db
-        .collection('users')
-        .where('clientName', isEqualTo: 'todo')
-        .get()
-        .then((value) => value.docs.first);
-    var token = dbUser.data()['token'];
+    //only load relatives if the patientId is equal to widget.patient.id
+    List<Relative> relatives = await loadRelativesFromFirestore();
+    List<Relative> filteredRelatives = relatives
+        .where((element) => element.patientId == widget.patient!.id.toString())
+        .toList();
     String serverKey =
         'AAAAXj5_Moc:APA91bEAt0jcbmGF9EGhpwAufWuKqr3bHqtdZ_xm_UQi5KGSog586k0Md_2soKYBJKJ9Ov2W9MewDjLj9R1S-2AKL8wZSVcWTQhaPPu-QfJRbtco6qsLXAbiwE1H0s25osBNvhbYbmm2';
     Map<String, dynamic> notification = {
@@ -563,24 +566,36 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
       'Authorization': 'key=$serverKey',
     };
 
-    Map<String, dynamic> payload = {
-      'to': token,
-      'notification': notification,
-      'android': {
-        'priority': 'high',
-        'notification': {
-          'sound': 'default',
-          'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-        },
-      },
-    };
+    for (var relative in filteredRelatives) {
+      if (relative.token != '') {
+        Map<String, dynamic> payload = {
+          'to': relative.token,
+          'notification': notification,
+          'android': {
+            'priority': 'high',
+            'notification': {
+              'sound': 'default',
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            },
+          },
+          'webpush': {
+            'headers': {'Urgency': 'high'},
+            'notification': {
+              'body': taskDescription,
+              'requireInteraction': 'true',
+              'badge': '/badge-icon.png'
+            }
+          }
+        };
 
-    // Send the POST request to FCM REST API
-    await http.post(
-      Uri.parse('https://fcm.googleapis.com/fcm/send'),
-      headers: headers,
-      body: json.encode(payload),
-    );
+        // Send the POST request to FCM REST API
+        await http.post(
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: headers,
+          body: json.encode(payload),
+        );
+      }
+    }
   }
 
   void saveTextValue(String currentFieldValue, TextEditingController controller,
