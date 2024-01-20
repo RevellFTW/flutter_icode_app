@@ -116,9 +116,6 @@ class _EventLogScreenState extends State<EventLogScreen> {
         return DateUtils.dateOnly(yMHTAStringToDateTime(eventLog.date)) ==
             justDate;
       }).toList();
-      for (var eventLog in widget.eventLogs) {
-        print(eventLog.date);
-      }
     });
   }
 
@@ -541,8 +538,8 @@ class _EventLogScreenState extends State<EventLogScreen> {
       floatingActionButton: visible
           ? FloatingActionButton(
               heroTag: null,
-              onPressed: () {
-                int eventLogLength = getEventLogCountFromFirestore();
+              onPressed: () async {
+                int eventLogLength = await getEventLogCountFromFirestore();
                 widget.caller == Caller.backOfficePatient
                     ? Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => EventLogFormScreen(
@@ -562,7 +559,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
                             caretakerList: caretakerList,
                             patient: widget.patient,
                             isRelative: widget.isRelative,
-                            caretaker: widget.caretaker)))
+                            caretaker: selectedCaretaker)))
                     : Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => EventLogFormScreen(
                             eventLog: EventLog(

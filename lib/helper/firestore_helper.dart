@@ -317,7 +317,6 @@ void addCaretakerToDb(Caretaker caretaker) {
 }
 
 Future<Caretaker> getCaretakerFromDb(int id) async {
-  print('id: $id');
   String docID = await getDocumentID(id, 'caretakers');
   var snapshot = await db.collection('caretakers').doc(docID).get();
   Caretaker caretaker = Caretaker(
@@ -512,12 +511,8 @@ void deleteEventLogFromFireStore(EventLog eventLog) async {
   db.collection('patientTasks').doc(eventLogId).delete();
 }
 
-int getEventLogCountFromFirestore() {
-  int count = 0;
-  db.collection('patientTasks').get().then((value) {
-    count = value.docs.length;
-  });
-  return count;
+Future<int> getEventLogCountFromFirestore() {
+  return db.collection('patientTasks').get().then((value) => value.docs.length);
 }
 //#endregion
 
