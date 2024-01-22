@@ -231,7 +231,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     MaterialPageRoute(
                       builder: (context) => const MyApp(),
                     ),
-                    (route) => false);
+                    (route) => route.isFirst);
               },
               text: 'Log Out',
               options: FFButtonOptions(

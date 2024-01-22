@@ -8,7 +8,6 @@ import 'package:todoapp/models/event_log.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/screens/tasks_and_logs/event_log_screen.dart';
 import '../global/variables.dart';
-import '../main.dart';
 import '../screens/home_page.dart';
 
 bool back_office = false;
@@ -100,6 +99,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           }
         }
       } else {
+        // ignore: use_build_context_synchronously
         Navigator.pushNamed(context, AuthWidget.id);
       }
       if (isBackOffice) {
@@ -119,7 +119,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         );
         relative!.token = token!;
         print('relative token: ${relative!.token}');
-        modifyRelativeInDb(relative!);
+        if (relative!.token != '') {
+          modifyRelativeInDb(relative!);
+        }
       }
       if (isPatient || isRelative) {
         Patient patient = isRelative

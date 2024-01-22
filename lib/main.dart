@@ -4,11 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
 import 'package:todoapp/auth_screens/new_login_screen.dart';
 import 'package:todoapp/screens/home_page.dart';
-import 'package:todoapp/screens/patient_screen.dart';
 import 'auth_screens/welcome.dart';
 import 'firebase_options.dart';
 import 'global/variables.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 final log = Logger('MainLogger');
 
@@ -31,8 +29,8 @@ void main() async {
     // token is generated.
   });
 
-  final settings = await FirebaseMessaging.instance.requestPermission();
-  final token = await FirebaseMessaging.instance.getToken();
+  // final settings = await FirebaseMessaging.instance.requestPermission();
+//  final token = await FirebaseMessaging.instance.getToken();
   runApp(const MyApp());
 }
 
@@ -69,17 +67,6 @@ class _MyAppState extends State<MyApp> {
         AuthWidget.id: (context) => const AuthWidget(),
         WelcomeScreen.id: (context) => const WelcomeScreen(),
         HomePage.id: (context) => HomePage(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == PatientScreen.id) {
-          return MaterialPageRoute(
-            builder: (context) => const PatientScreen(),
-          );
-        }
-
-        return MaterialPageRoute(
-          builder: (context) => const AuthWidget(),
-        );
       },
     );
   }

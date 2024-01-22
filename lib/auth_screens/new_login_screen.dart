@@ -1206,7 +1206,9 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
         );
         relative!.token = token!;
         print('relative token: ${relative!.token}');
-        modifyRelativeInDb(relative!);
+        if (relative!.token != '') {
+          modifyRelativeInDb(relative!);
+        }
       }
       if (isPatient || isRelative) {
         Patient patient = isRelative
