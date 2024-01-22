@@ -556,7 +556,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
     String serverKey =
         'AAAAXj5_Moc:APA91bEAt0jcbmGF9EGhpwAufWuKqr3bHqtdZ_xm_UQi5KGSog586k0Md_2soKYBJKJ9Ov2W9MewDjLj9R1S-2AKL8wZSVcWTQhaPPu-QfJRbtco6qsLXAbiwE1H0s25osBNvhbYbmm2';
     Map<String, dynamic> notification = {
-      'title': taskName,
+      'title': 'the following task has been performed: $taskName',
       'body': taskDescription,
     };
 

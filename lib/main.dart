@@ -23,12 +23,6 @@ void main() async {
     log.severe('Could not initialize app: $e');
   }
 
-  FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-    applicationToken = fcmToken;
-    // Note: This callback is fired at each app startup and whenever a new
-    // token is generated.
-  });
-
   // final settings = await FirebaseMessaging.instance.requestPermission();
 //  final token = await FirebaseMessaging.instance.getToken();
   runApp(const MyApp());
