@@ -13,8 +13,9 @@ import 'forms/patient_form_screen.dart';
 import 'settings.dart';
 
 class PatientScreen extends StatefulWidget {
-  const PatientScreen({super.key});
+  const PatientScreen({super.key, required this.caller});
   static const String id = 'patient_screen';
+  final Caller caller;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -157,7 +158,9 @@ class _PatientScreenState extends State<PatientScreen> {
                         mainAxisSize: MainAxisSize.max,
                         children: [
                           Text(
-                            'Curamus Back-Office',
+                            widget.caller == Caller.backOfficePatient
+                                ? 'Curamus Back-Office'
+                                : 'Curamus Caretaker',
                             style: FlutterFlowTheme.of(context)
                                 .headlineMedium
                                 .override(
@@ -186,9 +189,12 @@ class _PatientScreenState extends State<PatientScreen> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const SettingsScreen(
-                                                    Caller.backOfficePatient,
-                                                    'Curamus Back-Office',
+                                                SettingsScreen(
+                                                    widget.caller,
+                                                    widget.caller ==
+                                                            Caller.caretaker
+                                                        ? 'Caretaker'
+                                                        : 'Back-Office',
                                                     null,
                                                     [],
                                                     false)));

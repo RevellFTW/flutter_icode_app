@@ -121,7 +121,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Back to Curamus Back-Office',
+        title: loggedInUserType == Caller.backOfficePatient
+            ? 'Back to Curamus Back-Office'
+            : 'Back to Curamus Caretaker',
         visibility: widget.visibility,
         onBackPressed: () async {
           Navigator.of(context).pop();
@@ -1311,17 +1313,20 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    const PatientScreen()));
+                                                    PatientScreen(
+                                                        caller:
+                                                            loggedInUserType)));
                                       });
                                     } else {
                                       print(
                                           'todo remove patient from auth users');
                                       removePatientFromDb(widget.patient.id);
                                     }
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const PatientScreen()));
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => PatientScreen(
+                                                  caller: loggedInUserType,
+                                                )));
                                   },
                                   text: widget.modifying ? 'DELETE' : 'ADD',
                                   options: FFButtonOptions(

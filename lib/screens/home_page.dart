@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
         ? PersistentBottomBarScaffold(
             items: [
               PersistentTabItem(
-                tab: const PatientScreen(),
+                tab: const PatientScreen(caller: Caller.backOfficePatient),
                 icon: Icons.accessible,
                 title: 'Patients',
                 navigatorkey: _tab1navigatorKey,
@@ -30,7 +30,9 @@ class HomePage extends StatelessWidget {
               ),
             ],
           )
-        : const PatientScreen();
+        : const PatientScreen(
+            caller: Caller.caretaker,
+          );
   }
 }
 

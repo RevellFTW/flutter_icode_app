@@ -16,7 +16,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
 
   final List tabs = [
-    const PatientScreen(),
+    const PatientScreen(
+      caller: Caller.backOfficePatient,
+    ),
     const CaretakerScreen(),
   ];
 
