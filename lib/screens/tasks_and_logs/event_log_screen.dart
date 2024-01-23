@@ -173,8 +173,7 @@ class _EventLogScreenState extends State<EventLogScreen> {
               : Navigator.of(context).pop(
                   MaterialPageRoute(
                       builder: (context) => CaretakerFormScreen(
-                            caretaker: widget.caretaker!,
-                          )),
+                          caretaker: widget.caretaker!, caller: widget.caller)),
                 );
         },
         caller: widget.caller,

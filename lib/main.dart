@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logging/logging.dart';
@@ -43,10 +42,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    appName = 'Caretaker App';
-    // if (currentUser.role == 'back-office') {
-    appName = 'Back-Office Caretaker App';
-    // }
   }
 
   @override
@@ -60,7 +55,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         AuthWidget.id: (context) => const AuthWidget(),
         WelcomeScreen.id: (context) => const WelcomeScreen(),
-        HomePage.id: (context) => HomePage(),
+        HomePage.id: (context) => HomePage(caller: Caller.backOfficePatient),
       },
     );
   }

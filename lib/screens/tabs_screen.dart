@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:todoapp/screens/patient_screen.dart';
 import '../providers/user_provider.dart';
 import 'caretaker_screen.dart';
+import 'home_page.dart';
 
 class Tabs extends StatefulWidget {
   const Tabs({super.key});
@@ -16,7 +17,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   final List tabs = [
     const PatientScreen(),
-    const CaretakerScreen(),
+    const CaretakerScreen(caller: Caller.backOfficePatient),
   ];
 
   late AnimationController _animationController;

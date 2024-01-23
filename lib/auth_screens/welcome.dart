@@ -73,6 +73,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     bool isBackOffice = false;
     bool isPatient = false;
     bool isRelative = false;
+    bool isCaretaker = false;
     final user = auth.currentUser;
     DocumentSnapshot<Map<String, dynamic>>? userData;
     Map<String, dynamic>? data;
@@ -83,7 +84,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         data = userData.data() as Map<String, dynamic>;
         if (data['approved'] == true) {
           switch (data['role']) {
-            case 'back-office':
+            case 'backoffice':
               {
                 isBackOffice = true;
                 break;
@@ -91,15 +92,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             case 'patient':
               {
                 isPatient = true;
+                break;
               }
             case 'relative':
               {
                 isRelative = true;
+                break;
+              }
+            case 'caretaker':
+              {
+                isCaretaker = true;
+                break;
               }
           }
         }
       } else {
-        // ignore: use_build_context_synchronously
         Navigator.pushNamed(context, AuthWidget.id);
       }
       if (isBackOffice) {
@@ -107,7 +114,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         // ignore: use_build_context_synchronously
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(
+              builder: (context) => HomePage(caller: Caller.backOfficePatient)),
+        );
+      }
+      if (isCaretaker) {
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(caller: Caller.caretaker)),
         );
       }
       if (isRelative) {

@@ -12,7 +12,8 @@ import 'forms/caretaker_form_screen.dart';
 import 'settings.dart';
 
 class CaretakerScreen extends StatefulWidget {
-  const CaretakerScreen({super.key});
+  const CaretakerScreen({super.key, required this.caller});
+  final Caller caller;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -175,9 +176,12 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const SettingsScreen(
-                                                    Caller.backOfficeCaretaker,
-                                                    'Curamus Back-Office',
+                                                SettingsScreen(
+                                                    widget.caller,
+                                                    widget.caller ==
+                                                            Caller.caretaker
+                                                        ? 'Caretaker'
+                                                        : 'Back-Office',
                                                     null,
                                                     [],
                                                     false)));
@@ -358,6 +362,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                             CaretakerFormScreen(
                                           caretaker: _filteredCaretakers[i],
                                           modifying: true,
+                                          caller: widget.caller,
                                         ),
                                       ),
                                     );
@@ -384,10 +389,11 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   CaretakerFormScreen(
-                                                caretaker:
-                                                    _filteredCaretakers[i],
-                                                modifying: true,
-                                              ),
+                                                      caretaker:
+                                                          _filteredCaretakers[
+                                                              i],
+                                                      modifying: true,
+                                                      caller: widget.caller),
                                             ),
                                           );
                                         },
@@ -421,6 +427,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
               builder: (context) => CaretakerFormScreen(
                     caretaker: Caretaker.empty(caretakers.length + 1),
                     modifying: false,
+                    caller: widget.caller,
                   )));
         },
         child: const Icon(Icons.add),

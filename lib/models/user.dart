@@ -16,4 +16,4 @@ class User {
   });
 }
 
-enum Role { patient, caretaker }
+enum Role { patient, caretaker, backoffice, relative }
