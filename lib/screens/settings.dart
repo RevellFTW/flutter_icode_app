@@ -48,6 +48,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       case Caller.caretaker:
         appName = 'Caretaker Application';
         break;
+      case Caller.relative:
+        appName = 'Relative Application';
+        break;
     }
   }
 

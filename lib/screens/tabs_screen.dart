@@ -17,7 +17,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   final List tabs = [
     const PatientScreen(),
-    const CaretakerScreen(caller: Caller.backOfficePatient),
+    const CaretakerScreen(),
   ];
 
   late AnimationController _animationController;

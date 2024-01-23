@@ -18,12 +18,8 @@ import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 class CaretakerFormScreen extends StatefulWidget {
   final Caretaker caretaker;
   final bool modifying;
-  final Caller caller;
   const CaretakerFormScreen(
-      {super.key,
-      required this.caretaker,
-      required this.caller,
-      this.modifying = true});
+      {super.key, required this.caretaker, this.modifying = true});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -68,8 +64,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
         visibility: true,
         title: 'Back to Curamus Back-Office',
         onBackPressed: () async {
-          Navigator.of(context).pop(MaterialPageRoute(
-              builder: (context) => CaretakerScreen(caller: widget.caller)));
+          Navigator.of(context).pop(
+              MaterialPageRoute(builder: (context) => const CaretakerScreen()));
         },
         isRelative: false,
       ),
@@ -805,15 +801,15 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                       widget.caretaker, user.uid);
                                   addCaretakerToDb(widget.caretaker);
                                   Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => CaretakerScreen(
-                                          caller: widget.caller)));
+                                      builder: (context) =>
+                                          const CaretakerScreen()));
                                 });
                               } else {
                                 removeCaretakerFromDb(widget.caretaker.id);
                               }
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                      CaretakerScreen(caller: widget.caller)));
+                                      const CaretakerScreen()));
                             },
                             text: widget.modifying ? 'DELETE' : 'ADD',
                             options: FFButtonOptions(

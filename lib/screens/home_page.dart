@@ -23,17 +23,21 @@ class HomePage extends StatelessWidget {
                 navigatorkey: _tab1navigatorKey,
               ),
               PersistentTabItem(
-                tab: const CaretakerScreen(caller: Caller.backOfficeCaretaker),
+                tab: const CaretakerScreen(),
                 icon: Icons.account_circle_sharp,
                 title: 'Caretakers',
                 navigatorkey: _tab2navigatorKey,
               ),
             ],
           )
-        : CaretakerScreen(
-            caller: caller,
-          );
+        : const PatientScreen();
   }
 }
 
-enum Caller { backOfficePatient, backOfficeCaretaker, patient, caretaker }
+enum Caller {
+  backOfficePatient,
+  backOfficeCaretaker,
+  patient,
+  caretaker,
+  relative
+}

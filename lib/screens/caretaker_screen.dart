@@ -12,8 +12,7 @@ import 'forms/caretaker_form_screen.dart';
 import 'settings.dart';
 
 class CaretakerScreen extends StatefulWidget {
-  const CaretakerScreen({super.key, required this.caller});
-  final Caller caller;
+  const CaretakerScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -176,12 +175,9 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                SettingsScreen(
-                                                    widget.caller,
-                                                    widget.caller ==
-                                                            Caller.caretaker
-                                                        ? 'Caretaker'
-                                                        : 'Back-Office',
+                                                const SettingsScreen(
+                                                    Caller.backOfficeCaretaker,
+                                                    'Back-Office',
                                                     null,
                                                     [],
                                                     false)));
@@ -362,7 +358,6 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                             CaretakerFormScreen(
                                           caretaker: _filteredCaretakers[i],
                                           modifying: true,
-                                          caller: widget.caller,
                                         ),
                                       ),
                                     );
@@ -392,8 +387,7 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
                                                       caretaker:
                                                           _filteredCaretakers[
                                                               i],
-                                                      modifying: true,
-                                                      caller: widget.caller),
+                                                      modifying: true),
                                             ),
                                           );
                                         },
@@ -427,7 +421,6 @@ class _CaretakerScreenState extends State<CaretakerScreen> {
               builder: (context) => CaretakerFormScreen(
                     caretaker: Caretaker.empty(caretakers.length + 1),
                     modifying: false,
-                    caller: widget.caller,
                   )));
         },
         child: const Icon(Icons.add),
