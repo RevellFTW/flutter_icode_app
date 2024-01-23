@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
@@ -33,13 +35,16 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
   late TextEditingController _workTypesController;
   late TextEditingController _availabilityController;
   late TextEditingController _emailController;
+  late TextEditingController _passwordController;
   final _dateController = MaskedTextController(mask: '00/00/0000');
   String currentNameTextFormFieldValue = '';
   String currentWorkTypesTextFormFieldValue = '';
   String currentAvailabilityTextFormFieldValue = '';
   String currentEmailTextFormFieldValue = '';
+  String currentPasswordTextFormFieldValue = '';
   Map<String, Map<String, String>> careTasks = {};
   late DateTime updatedDateTime;
+  bool passwordFieldVisibility = false;
 
   @override
   void initState() {
@@ -53,6 +58,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
     _availabilityController =
         TextEditingController(text: widget.caretaker.availability);
     _emailController = TextEditingController(text: widget.caretaker.email);
+    _passwordController = TextEditingController(text: '');
   }
 
   @override
@@ -360,6 +366,73 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                           });
                         },
                       ),
+                      !widget.modifying
+                          ? TextFormField(
+                              controller: _passwordController,
+                              obscureText: !passwordFieldVisibility,
+                              autofocus: true,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle:
+                                    FlutterFlowTheme.of(context).labelMedium,
+                                hintStyle:
+                                    FlutterFlowTheme.of(context).labelMedium,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).error,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).error,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                suffixIcon: InkWell(
+                                  onTap: () => setState(
+                                    () => passwordFieldVisibility =
+                                        !passwordFieldVisibility,
+                                  ),
+                                  focusNode: FocusNode(skipTraversal: true),
+                                  child: Icon(
+                                    passwordFieldVisibility
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  currentPasswordTextFormFieldValue = newValue;
+                                });
+                              },
+                              onFieldSubmitted: (String newValue) {
+                                setState(() {
+                                  currentPasswordTextFormFieldValue = newValue;
+                                });
+                              },
+                              style: FlutterFlowTheme.of(context).bodyMedium,
+                            )
+                          : Container(),
                       TextFormField(
                         controller: _workTypesController,
                         autofocus: true,
@@ -510,15 +583,204 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                           });
                         },
                       ),
+                      widget.modifying
+                          ? Align(
+                              alignment: const AlignmentDirectional(0.00, 0.00),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 34, 0, 0),
+                                child: FFButtonWidget(
+                                  onPressed: () async {
+                                    String email = '';
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Reset Password'),
+                                          content: const Text(
+                                              'Please enter your email address to reset your password.'),
+                                          actions: <Widget>[
+                                            TextFormField(
+                                              autofocus: true,
+                                              obscureText: false,
+                                              decoration: InputDecoration(
+                                                labelText: 'Email',
+                                                labelStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium,
+                                                hintStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium,
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .alternate,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                errorBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .error,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                focusedErrorBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .error,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  email = value;
+                                                });
+                                              },
+                                            ),
+                                            Align(
+                                              alignment:
+                                                  const AlignmentDirectional(
+                                                      0.00, 0.00),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(0, 34, 0, 12),
+                                                child: FFButtonWidget(
+                                                  onPressed: () async {
+                                                    if (email ==
+                                                        widget
+                                                            .caretaker.email) {
+                                                      await auth
+                                                          .sendPasswordResetEmail(
+                                                              email: email);
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                              const SnackBar(
+                                                        content: Text(
+                                                            'Password reset email sent successfully.'),
+                                                        duration: Duration(
+                                                            seconds: 3),
+                                                      ));
+                                                    } else {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                              const SnackBar(
+                                                        content: Text(
+                                                            'Email does not match.'),
+                                                        duration: Duration(
+                                                            seconds: 3),
+                                                      ));
+                                                    }
+                                                  },
+                                                  text: 'SEND',
+                                                  options: FFButtonOptions(
+                                                    width: 150,
+                                                    height: 48,
+                                                    padding:
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                            0, 0, 0, 0),
+                                                    iconPadding:
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                            0, 0, 0, 0),
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                    textStyle: FlutterFlowTheme
+                                                            .of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                        ),
+                                                    elevation: 4,
+                                                    borderSide:
+                                                        const BorderSide(
+                                                      color: Colors.transparent,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            60),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  text: 'RESET PASSWORD',
+                                  options: FFButtonOptions(
+                                    width: 600,
+                                    height: 48,
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 0),
+                                    iconPadding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 0, 0),
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Colors.white,
+                                        ),
+                                    elevation: 4,
+                                    borderSide: const BorderSide(
+                                      color: Colors.transparent,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(60),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
                       Align(
                         alignment: const AlignmentDirectional(0.00, 0.00),
                         child: Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               0, 34, 0, 12),
                           child: FFButtonWidget(
-                            onPressed: () {
-                              setState(() {
-                                if (!widget.modifying) {
+                            onPressed: () async {
+                              if (!widget.modifying) {
+                                setState(() {
                                   if (widget.caretaker.name.isEmpty ||
                                       widget.caretaker.email.isEmpty ||
                                       widget.caretaker.workTypes.isEmpty ||
@@ -532,14 +794,26 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                     );
                                     return;
                                   }
+                                });
+
+                                UserCredential result = await register(
+                                    widget.caretaker.email,
+                                    currentPasswordTextFormFieldValue);
+                                setState(() {
+                                  User user = result.user!;
+                                  addCaretakerUserInDb(
+                                      widget.caretaker, user.uid);
                                   addCaretakerToDb(widget.caretaker);
-                                } else {
-                                  removeCaretakerFromDb(widget.caretaker.id);
-                                }
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => CaretakerScreen(
-                                        caller: widget.caller)));
-                              });
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => CaretakerScreen(
+                                          caller: widget.caller)));
+                                });
+                              } else {
+                                removeCaretakerFromDb(widget.caretaker.id);
+                              }
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      CaretakerScreen(caller: widget.caller)));
                             },
                             text: widget.modifying ? 'DELETE' : 'ADD',
                             options: FFButtonOptions(

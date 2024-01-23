@@ -33,7 +33,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return PreferredSize(
       preferredSize: const Size.fromHeight(100),
       child: caller == Caller.backOfficeCaretaker ||
-              caller == Caller.backOfficePatient
+              caller == Caller.backOfficePatient ||
+              caller == Caller.caretaker
           ? AppBar(
               backgroundColor: appBackgroundColor,
               foregroundColor: appForegroundColor,
