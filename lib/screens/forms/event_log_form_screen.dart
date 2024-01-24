@@ -96,7 +96,8 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
       backToText = "Back to ${widget.patient!.name} Patient's Log";
       eventLogTitle = "${widget.patient!.name} Patient's Log";
       widget.eventLog.patient = widget.patient!;
-    } else if (widget.caller == Caller.caretaker) {
+      widget.eventLog.caretaker = caretakerList.first;
+    } else {
       backToText = "Back to ${widget.caretaker!.name} Caretaker's Log";
       eventLogTitle = "${widget.caretaker!.name} Caretaker's Log";
       widget.eventLog.caretaker = widget.caretaker!;
@@ -458,7 +459,9 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
                               onPressed: () async {
                                 setState(() {
                                   if (!widget.modifying) {
-                                    widget.caller == Caller.caretaker
+                                    widget.caller == Caller.caretaker ||
+                                            widget.caller ==
+                                                Caller.backOfficeCaretaker
                                         ? widget.eventLog.caretaker =
                                             widget.caretaker!
                                         : widget.eventLog.patient =
