@@ -293,7 +293,7 @@ void removeCaretakerFromDb(int id) async {
 
 void addCaretakerUserInDb(Caretaker caretaker, String uid) {
   Map<String, dynamic> userData = {
-    'approved': 'false',
+    'approved': false,
     'email': caretaker.email,
     'id': uid,
     'role': 'caretaker',
