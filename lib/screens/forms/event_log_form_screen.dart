@@ -570,7 +570,7 @@ class _EventLogFormScreenState extends State<EventLogFormScreen> {
     };
 
     for (var relative in filteredRelatives) {
-      if (relative.token != '') {
+      if (relative.token != '' && relative.wantsToBeNotified == true) {
         Map<String, dynamic> payload = {
           'to': relative.token,
           'notification': notification,
