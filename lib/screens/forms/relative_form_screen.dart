@@ -181,84 +181,92 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                             });
                           },
                         ),
-                        TextFormField(
-                          controller: _passwordController,
-                          autofocus: true,
-                          readOnly: !widget.visibility,
-                          obscureText: !passwordFieldVisibility,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            labelStyle:
-                                FlutterFlowTheme.of(context).labelMedium,
-                            hintStyle: FlutterFlowTheme.of(context).labelMedium,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).primary,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).error,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).error,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            suffixIcon: InkWell(
-                              onTap: () => setState(
-                                () => passwordFieldVisibility =
-                                    !passwordFieldVisibility,
-                              ),
-                              focusNode: FocusNode(skipTraversal: true),
-                              child: Icon(
-                                passwordFieldVisibility
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                          style: FlutterFlowTheme.of(context).bodyMedium,
-                          onChanged: (String newValue) {
-                            setState(() {
-                              currentPasswordTextFormFieldValue = newValue;
-                            });
-                          },
-                          onTapOutside: (newValue) {
-                            saveTextValue(currentPasswordTextFormFieldValue,
-                                _passwordController, (value) {
-                              widget.relative.password = value;
-                            }, () {
-                              _passwordController.text =
-                                  widget.relative.password;
-                            });
-                            FocusScope.of(context).unfocus();
-                          },
-                          onFieldSubmitted: (String newValue) {
-                            saveTextValue(currentPasswordTextFormFieldValue,
-                                _passwordController, (value) {
-                              widget.relative.password = value;
-                            }, () {
-                              _passwordController.text =
-                                  widget.relative.password;
-                            });
-                          },
-                        ),
+                        !widget.modifying
+                            ? TextFormField(
+                                controller: _passwordController,
+                                autofocus: true,
+                                readOnly: !widget.visibility,
+                                obscureText: !passwordFieldVisibility,
+                                decoration: InputDecoration(
+                                  labelText: 'Password',
+                                  labelStyle:
+                                      FlutterFlowTheme.of(context).labelMedium,
+                                  hintStyle:
+                                      FlutterFlowTheme.of(context).labelMedium,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context).error,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context).error,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  suffixIcon: InkWell(
+                                    onTap: () => setState(
+                                      () => passwordFieldVisibility =
+                                          !passwordFieldVisibility,
+                                    ),
+                                    focusNode: FocusNode(skipTraversal: true),
+                                    child: Icon(
+                                      passwordFieldVisibility
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                                style: FlutterFlowTheme.of(context).bodyMedium,
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    currentPasswordTextFormFieldValue =
+                                        newValue;
+                                  });
+                                },
+                                onTapOutside: (newValue) {
+                                  saveTextValue(
+                                      currentPasswordTextFormFieldValue,
+                                      _passwordController, (value) {
+                                    widget.relative.password = value;
+                                  }, () {
+                                    _passwordController.text =
+                                        widget.relative.password;
+                                  });
+                                  FocusScope.of(context).unfocus();
+                                },
+                                onFieldSubmitted: (String newValue) {
+                                  saveTextValue(
+                                      currentPasswordTextFormFieldValue,
+                                      _passwordController, (value) {
+                                    widget.relative.password = value;
+                                  }, () {
+                                    _passwordController.text =
+                                        widget.relative.password;
+                                  });
+                                },
+                              )
+                            : Container(),
                         TextFormField(
                           controller: _emailController,
                           autofocus: true,
@@ -426,6 +434,181 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                       ].divide(const SizedBox(height: 12)),
                     ),
                   ),
+                  (widget.visibility && widget.modifying)
+                      ? Align(
+                          alignment: const AlignmentDirectional(0.00, 0.00),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 34, 0, 0),
+                            child: FFButtonWidget(
+                              onPressed: () async {
+                                String email = '';
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Reset Password'),
+                                      content: const Text(
+                                          'Please enter your email address to reset your password.'),
+                                      actions: <Widget>[
+                                        TextFormField(
+                                          autofocus: true,
+                                          obscureText: false,
+                                          decoration: InputDecoration(
+                                            labelText: 'Email',
+                                            labelStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelMedium,
+                                            hintStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelMedium,
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate,
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .error,
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            focusedErrorBorder:
+                                                OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .error,
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              email = value;
+                                            });
+                                          },
+                                        ),
+                                        Align(
+                                          alignment: const AlignmentDirectional(
+                                              0.00, 0.00),
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(0, 34, 0, 12),
+                                            child: FFButtonWidget(
+                                              onPressed: () async {
+                                                if (email ==
+                                                    widget.relative.email) {
+                                                  await auth
+                                                      .sendPasswordResetEmail(
+                                                          email: email);
+                                                  Navigator.of(context).pop();
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                          const SnackBar(
+                                                    content: Text(
+                                                        'Password reset email sent successfully.'),
+                                                    duration:
+                                                        Duration(seconds: 3),
+                                                  ));
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                          const SnackBar(
+                                                    content: Text(
+                                                        'Email does not match.'),
+                                                    duration:
+                                                        Duration(seconds: 3),
+                                                  ));
+                                                }
+                                              },
+                                              text: 'SEND',
+                                              options: FFButtonOptions(
+                                                width: 150,
+                                                height: 48,
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(0, 0, 0, 0),
+                                                iconPadding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(0, 0, 0, 0),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                textStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                        ),
+                                                elevation: 4,
+                                                borderSide: const BorderSide(
+                                                  color: Colors.transparent,
+                                                  width: 1,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(60),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              text: 'RESET PASSWORD',
+                              options: FFButtonOptions(
+                                width: 600,
+                                height: 48,
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 0, 0, 0),
+                                iconPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        0, 0, 0, 0),
+                                color: FlutterFlowTheme.of(context).primary,
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleSmall
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      color: Colors.white,
+                                    ),
+                                elevation: 4,
+                                borderSide: const BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(60),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(),
                   widget.visibility
                       ? Align(
                           alignment: const AlignmentDirectional(0.00, 0.00),
