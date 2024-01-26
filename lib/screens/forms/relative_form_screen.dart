@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/global/variables.dart';
-import 'package:todoapp/helper/firestore_helper.dart';
+import 'package:todoapp/helper/firebase_helper.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_theme.dart';
 import 'package:todoapp/helper/flutter_flow/flutter_flow_util.dart';
@@ -321,13 +321,30 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                             });
                             FocusScope.of(context).unfocus();
                           },
-                          onFieldSubmitted: (String newValue) {
+                          onFieldSubmitted: (String newValue) async {
                             saveTextValue(currentEmailTextFormFieldValue,
                                 _emailController, (value) {
-                              widget.relative.email = value;
+                              if (!widget.modifying) {
+                                widget.relative.email = value;
+                              }
                             }, () {
                               _emailController.text = widget.relative.email;
                             });
+                            if (widget.modifying) {
+                              String uid = await getUserUID(
+                                  'relative', widget.relative.id.toString());
+                              bool result = await changeEmail(
+                                  uid, newValue, widget.relative.token);
+                              if (result) {
+                                widget.relative.email = newValue;
+                                modifyRelativeInDb(widget.relative);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Email change failed. Please try again later.')));
+                              }
+                            }
                           },
                         ),
                         TextFormField(

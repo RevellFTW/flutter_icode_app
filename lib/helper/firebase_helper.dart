@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:http/http.dart' as http;
 import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/screens/home_page.dart';
 import '../global/variables.dart';
@@ -448,6 +451,19 @@ Future<Relative> getRelativeFromDb(String id) async {
   return relative;
 }
 
+Future<String> getUserUID(String role, String roleId) async {
+  var snapshot = await db
+      .collection('users')
+      .where('role', isEqualTo: role)
+      .where('roleId', isEqualTo: int.parse(roleId))
+      .get();
+  if (snapshot.docs.isEmpty) {
+    return '';
+  } else {
+    return snapshot.docs[0].id;
+  }
+}
+
 //#region eventlogs
 
 void updateEventLog(EventLog eventLog, String documentID) {
@@ -532,3 +548,41 @@ Future<List<String>> getCareTaskNamesFromPatientId(String id) async {
 
 //#endregion
 
+Future<bool> changeEmail(String uid, String newEmail, String fcmToken) async {
+  const String serverKey =
+      'AAAAXj5_Moc:APA91bEAt0jcbmGF9EGhpwAufWuKqr3bHqtdZ_xm_UQi5KGSog586k0Md_2soKYBJKJ9Ov2W9MewDjLj9R1S-2AKL8wZSVcWTQhaPPu-QfJRbtco6qsLXAbiwE1H0s25osBNvhbYbmm2';
+  final Uri fcmEndpoint = Uri(
+    scheme: 'https',
+    host: 'fcm.googleapis.com',
+    path: '/v1/projects/flutterproject-22248/messages:send',
+  );
+
+  final Map<String, dynamic> message = {
+    'message': {
+      'token': fcmToken, // FCM registration token of the target user
+      'data': {
+        'action': 'change_email',
+        'uid': uid,
+        'newEmail': newEmail,
+      },
+    },
+  };
+
+  final http.Response response = await http.post(
+    fcmEndpoint,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $serverKey',
+    },
+    body: json.encode(message),
+  );
+
+  if (response.statusCode == 200) {
+    print('Email change request sent successfully');
+    return true;
+  } else {
+    print(
+        'Failed to send email change request. Status code: ${response.statusCode}');
+  }
+  return false;
+}

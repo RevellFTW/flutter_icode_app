@@ -3,7 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:todoapp/auth_screens/new_login_screen.dart';
-import 'package:todoapp/helper/firestore_helper.dart';
+import 'package:todoapp/helper/firebase_helper.dart';
 import 'package:todoapp/models/event_log.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/screens/tasks_and_logs/event_log_screen.dart';

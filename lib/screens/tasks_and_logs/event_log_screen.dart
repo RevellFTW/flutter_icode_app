@@ -15,7 +15,7 @@ import 'package:todoapp/screens/forms/event_log_form_screen.dart';
 import 'package:todoapp/screens/forms/patient_form_screen.dart';
 import 'package:todoapp/screens/settings.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
-import '../../helper/firestore_helper.dart';
+import '../../helper/firebase_helper.dart';
 import '../../models/event_log.dart';
 import '../../models/patient.dart';
 import '../home_page.dart';

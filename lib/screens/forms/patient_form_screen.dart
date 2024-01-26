@@ -14,7 +14,7 @@ import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/screens/patient_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 import '../../global/variables.dart';
-import '../../helper/firestore_helper.dart';
+import '../../helper/firebase_helper.dart';
 import '../../models/patient.dart';
 import '../../models/event_log.dart';
 import '../home_page.dart';
