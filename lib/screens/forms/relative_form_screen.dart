@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/global/variables.dart';
 import 'package:todoapp/helper/firebase_helper.dart';
@@ -10,6 +11,7 @@ import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/screens/forms/patient_form_screen.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class RelativeFormScreen extends StatefulWidget {
   final Relative relative;
@@ -333,16 +335,30 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                             if (widget.modifying) {
                               String uid = await getUserUID(
                                   'relative', widget.relative.id.toString());
-                              bool result = await changeEmail(
-                                  uid, newValue, widget.relative.token);
-                              if (result) {
-                                widget.relative.email = newValue;
-                                modifyRelativeInDb(widget.relative);
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Email change failed. Please try again later.')));
+
+                              final HttpsCallable callable = FirebaseFunctions
+                                  .instance
+                                  .httpsCallable('updateUserEmail');
+                              try {
+                                final HttpsCallableResult result =
+                                    await callable.call(<String, dynamic>{
+                                  'uid': uid,
+                                  'email': newValue,
+                                });
+                                if (result.data['success']) {
+                                  widget.relative.email = newValue;
+                                  modifyRelativeInDb(widget.relative);
+                                  print('Email updated successfully');
+                                } else {
+                                  print('Email update failed');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Email change failed. Please try again later.')));
+                                }
+                              } on FirebaseFunctionsException catch (e) {
+                                print(
+                                    'Failed to update email: ${e.code}\n${e.message}');
                               }
                             }
                           },
