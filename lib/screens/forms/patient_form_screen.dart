@@ -299,7 +299,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         focusNode: _model.textFieldFocusNode1,
                         autofocus: true,
                         obscureText: false,
-                        readOnly: !widget.visibility,
+                        //make readonly if caller is caretaker
+                        readOnly: !widget.visibility &&
+                            loggedInUserType == Caller.caretaker,
                         decoration: InputDecoration(
                           labelText: 'Name',
                           labelStyle: FlutterFlowTheme.of(context).labelMedium,
@@ -370,7 +372,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       TextFormField(
                         controller: _emailController,
                         focusNode: _model.textFieldFocusNode6,
-                        readOnly: !widget.visibility,
+                        readOnly: !widget.visibility &&
+                            loggedInUserType == Caller.caretaker,
                         autofocus: true,
                         obscureText: false,
                         decoration: InputDecoration(
@@ -517,7 +520,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             ? () => updateStartDate(widget.patient.dateOfBirth)
                             : null,
                         keyboardType: TextInputType.datetime,
-                        readOnly: !widget.visibility,
+                        readOnly: !widget.visibility &&
+                            loggedInUserType == Caller.caretaker,
                         controller: _dateController,
                         focusNode: _model.textFieldFocusNode2,
                         autofocus: true,
@@ -884,10 +888,12 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       Align(
                         alignment: const AlignmentDirectional(0.00, 0.00),
                         child: IgnorePointer(
-                          ignoring: !widget.visibility,
+                          ignoring: !widget.visibility &&
+                              loggedInUserType == Caller.caretaker,
                           child: MultiSelectDropDown<String>(
                             controller: multiSelectDropdownController,
-                            onOptionSelected: widget.visibility
+                            onOptionSelected: widget.visibility &&
+                                    loggedInUserType != Caller.caretaker
                                 ? (List<ValueItem> selectedOptions) {
                                     var selectedItems = selectedOptions
                                         .map((option) => option.value)
@@ -959,7 +965,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                           //goto edit relative
                                           //if not a relative and not a patient => edit relative
                                           if (!widget.isRelative &&
-                                              widget.visibility) {
+                                              widget.visibility &&
+                                              loggedInUserType !=
+                                                  Caller.caretaker) {
                                             Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) =>
@@ -1019,7 +1027,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     );
                                   },
                                 ),
-                                widget.visibility
+                                widget.visibility &&
+                                        loggedInUserType != Caller.caretaker
                                     ? Align(
                                         alignment: const AlignmentDirectional(
                                             -1.00, 0.00),

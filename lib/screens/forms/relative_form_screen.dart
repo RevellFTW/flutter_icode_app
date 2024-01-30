@@ -10,6 +10,7 @@ import 'package:todoapp/helper/flutter_flow/flutter_flow_widgets.dart';
 import 'package:todoapp/models/patient.dart';
 import 'package:todoapp/models/relative.dart';
 import 'package:todoapp/screens/forms/patient_form_screen.dart';
+import 'package:todoapp/screens/home_page.dart';
 import 'package:todoapp/widget/custom_app_bar.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
@@ -183,7 +184,10 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                             });
                           },
                         ),
-                        !widget.modifying
+                        !widget.modifying ||
+                                loggedInUserType ==
+                                    Caller.backOfficeCaretaker ||
+                                loggedInUserType == Caller.backOfficePatient
                             ? TextFormField(
                                 controller: _passwordController,
                                 autofocus: true,
@@ -257,15 +261,45 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                   });
                                   FocusScope.of(context).unfocus();
                                 },
-                                onFieldSubmitted: (String newValue) {
+                                onFieldSubmitted: (String newPassword) async {
                                   saveTextValue(
                                       currentPasswordTextFormFieldValue,
                                       _passwordController, (value) {
-                                    widget.relative.password = value;
+                                    if (!widget.modifying) {
+                                      widget.relative.password = value;
+                                    }
                                   }, () {
                                     _passwordController.text =
                                         widget.relative.password;
                                   });
+                                  if (widget.modifying) {
+                                    String uid = await getUserUID('relative',
+                                        widget.relative.id.toString());
+
+                                    final HttpsCallable callable =
+                                        FirebaseFunctions.instance
+                                            .httpsCallable(
+                                                'updateUserPassword');
+                                    try {
+                                      final HttpsCallableResult result =
+                                          await callable.call(<String, dynamic>{
+                                        'uid': uid,
+                                        'newPassword': newPassword,
+                                      });
+                                      if (result.data['success']) {
+                                        print('Password updated successfully');
+                                      } else {
+                                        print('Password update failed');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                                content: Text(
+                                                    'Password change failed. Please try again later.')));
+                                      }
+                                    } on FirebaseFunctionsException catch (e) {
+                                      print(
+                                          'Failed to update Password: ${e.code}\n${e.message}');
+                                    }
+                                  }
                                 },
                               )
                             : Container(),
@@ -323,7 +357,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                             });
                             FocusScope.of(context).unfocus();
                           },
-                          onFieldSubmitted: (String newValue) async {
+                          onFieldSubmitted: (String newEmail) async {
                             saveTextValue(currentEmailTextFormFieldValue,
                                 _emailController, (value) {
                               if (!widget.modifying) {
@@ -343,14 +377,13 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                 final HttpsCallableResult result =
                                     await callable.call(<String, dynamic>{
                                   'uid': uid,
-                                  'email': newValue,
+                                  'newEmail': newEmail,
                                 });
                                 if (result.data['success']) {
-                                  widget.relative.email = newValue;
+                                  widget.relative.email = newEmail;
+                                  updateUserEmail(newEmail, uid);
                                   modifyRelativeInDb(widget.relative);
-                                  print('Email updated successfully');
                                 } else {
-                                  print('Email update failed');
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: Text(

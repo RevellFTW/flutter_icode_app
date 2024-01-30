@@ -415,6 +415,10 @@ Future<List<Relative>> loadRelativesFromFirestore() async {
   return relatives;
 }
 
+void updateUserEmail(String email, String uid) {
+  db.collection('users').doc(uid).update({'email': email});
+}
+
 void addRelativeUserInDb(Relative relative, String uid) {
   Map<String, dynamic> userData = {
     'approved': false,
