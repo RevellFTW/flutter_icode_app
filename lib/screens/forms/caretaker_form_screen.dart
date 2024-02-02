@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/global/variables.dart';
@@ -334,13 +335,41 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                             currentEmailTextFormFieldValue = newValue;
                           });
                         },
-                        onTapOutside: (newValue) {
+                        onTapOutside: (newValue) async {
                           if (currentEmailTextFormFieldValue.isNotEmpty) {
-                            setState(() {
+                            setState(() async {
                               widget.caretaker.email =
                                   currentEmailTextFormFieldValue;
-                              if (widget.modifying)
-                                modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying) {
+                                String uid = await getUserUID(
+                                    'relative', widget.caretaker.id.toString());
+
+                                final HttpsCallable callable = FirebaseFunctions
+                                    .instance
+                                    .httpsCallable('updateUserEmail');
+                                try {
+                                  final HttpsCallableResult result =
+                                      await callable.call(<String, dynamic>{
+                                    'uid': uid,
+                                    'newEmail': currentEmailTextFormFieldValue,
+                                  });
+                                  if (result.data['success']) {
+                                    widget.caretaker.email =
+                                        currentEmailTextFormFieldValue;
+                                    updateUserEmail(
+                                        currentEmailTextFormFieldValue, uid);
+                                    modifyCaretakerInDb(widget.caretaker);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Email change failed. Please try again later.')));
+                                  }
+                                } on FirebaseFunctionsException catch (e) {
+                                  print(
+                                      'Failed to update email: ${e.code}\n${e.message}');
+                                }
+                              }
                             });
                           } else {
                             setState(() {
@@ -349,13 +378,41 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                           }
                           FocusScope.of(context).unfocus();
                         },
-                        onFieldSubmitted: (String newValue) {
-                          setState(() {
+                        onFieldSubmitted: (String newValue) async {
+                          setState(() async {
                             if (currentEmailTextFormFieldValue.isNotEmpty) {
                               widget.caretaker.email =
                                   currentEmailTextFormFieldValue;
-                              if (widget.modifying)
-                                modifyCaretakerInDb(widget.caretaker);
+                              if (widget.modifying) {
+                                String uid = await getUserUID(
+                                    'relative', widget.caretaker.id.toString());
+
+                                final HttpsCallable callable = FirebaseFunctions
+                                    .instance
+                                    .httpsCallable('updateUserEmail');
+                                try {
+                                  final HttpsCallableResult result =
+                                      await callable.call(<String, dynamic>{
+                                    'uid': uid,
+                                    'newEmail': currentEmailTextFormFieldValue,
+                                  });
+                                  if (result.data['success']) {
+                                    widget.caretaker.email =
+                                        currentEmailTextFormFieldValue;
+                                    updateUserEmail(
+                                        currentEmailTextFormFieldValue, uid);
+                                    modifyCaretakerInDb(widget.caretaker);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Email change failed. Please try again later.')));
+                                  }
+                                } on FirebaseFunctionsException catch (e) {
+                                  print(
+                                      'Failed to update email: ${e.code}\n${e.message}');
+                                }
+                              }
                             } else {
                               _emailController.text = widget.caretaker.email;
                             }
@@ -421,7 +478,10 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                   currentPasswordTextFormFieldValue = newValue;
                                 });
                               },
-                              onFieldSubmitted: (String newValue) {
+                              onTapOutside: (newValue) async {
+                                FocusScope.of(context).unfocus();
+                              },
+                              onFieldSubmitted: (String newValue) async {
                                 setState(() {
                                   currentPasswordTextFormFieldValue = newValue;
                                 });
@@ -587,20 +647,18 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                     0, 34, 0, 0),
                                 child: FFButtonWidget(
                                   onPressed: () async {
-                                    String email = '';
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: const Text('Reset Password'),
+                                          title: const Text('Change Password'),
                                           content: const Text(
-                                              'Please enter your email address to reset your password.'),
+                                              'Please enter your new password.'),
                                           actions: <Widget>[
                                             TextFormField(
                                               autofocus: true,
                                               obscureText: false,
                                               decoration: InputDecoration(
-                                                labelText: 'Email',
                                                 labelStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .labelMedium,
@@ -656,7 +714,8 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                                       .bodyMedium,
                                               onChanged: (value) {
                                                 setState(() {
-                                                  email = value;
+                                                  currentPasswordTextFormFieldValue =
+                                                      value;
                                                 });
                                               },
                                             ),
@@ -670,36 +729,48 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                                         .fromSTEB(0, 34, 0, 12),
                                                 child: FFButtonWidget(
                                                   onPressed: () async {
-                                                    if (email ==
-                                                        widget
-                                                            .caretaker.email) {
-                                                      await auth
-                                                          .sendPasswordResetEmail(
-                                                              email: email);
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              const SnackBar(
-                                                        content: Text(
-                                                            'Password reset email sent successfully.'),
-                                                        duration: Duration(
-                                                            seconds: 3),
-                                                      ));
-                                                    } else {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              const SnackBar(
-                                                        content: Text(
-                                                            'Email does not match.'),
-                                                        duration: Duration(
-                                                            seconds: 3),
-                                                      ));
+                                                    String uid =
+                                                        await getUserUID(
+                                                            'caretaker',
+                                                            widget.caretaker.id
+                                                                .toString());
+
+                                                    final HttpsCallable
+                                                        callable =
+                                                        FirebaseFunctions
+                                                            .instance
+                                                            .httpsCallable(
+                                                                'updateUserPassword');
+                                                    try {
+                                                      final HttpsCallableResult
+                                                          result =
+                                                          await callable
+                                                              .call(<String,
+                                                                  dynamic>{
+                                                        'uid': uid,
+                                                        'newPassword':
+                                                            currentPasswordTextFormFieldValue,
+                                                      });
+                                                      if (result
+                                                          .data['success']) {
+                                                        print(
+                                                            'Password updated successfully');
+                                                      } else {
+                                                        print(
+                                                            'Password update failed');
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                                const SnackBar(
+                                                                    content: Text(
+                                                                        'Password change failed. Please try again later.')));
+                                                      }
+                                                    } on FirebaseFunctionsException catch (e) {
+                                                      print(
+                                                          'Failed to update Password: ${e.code}\n${e.message}');
                                                     }
                                                   },
-                                                  text: 'SEND',
+                                                  text: 'CONFIRM',
                                                   options: FFButtonOptions(
                                                     width: 150,
                                                     height: 48,
@@ -740,7 +811,7 @@ class _CaretakerFormScreenState extends State<CaretakerFormScreen> {
                                       },
                                     );
                                   },
-                                  text: 'RESET PASSWORD',
+                                  text: 'CHANGE PASSWORD',
                                   options: FFButtonOptions(
                                     width: 600,
                                     height: 48,

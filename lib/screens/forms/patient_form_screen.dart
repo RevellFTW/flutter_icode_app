@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -414,13 +415,41 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             currentEmailTextFormFieldValue = newValue;
                           });
                         },
-                        onTapOutside: (newValue) {
+                        onTapOutside: (newValue) async {
                           if (currentEmailTextFormFieldValue.isNotEmpty) {
-                            setState(() {
+                            setState(() async {
                               widget.patient.email =
                                   currentEmailTextFormFieldValue;
-                              if (widget.modifying)
-                                modifyPatientInDb(widget.patient);
+                              if (widget.modifying) {
+                                String uid = await getUserUID(
+                                    'relative', widget.patient.id.toString());
+
+                                final HttpsCallable callable = FirebaseFunctions
+                                    .instance
+                                    .httpsCallable('updateUserEmail');
+                                try {
+                                  final HttpsCallableResult result =
+                                      await callable.call(<String, dynamic>{
+                                    'uid': uid,
+                                    'newEmail': currentEmailTextFormFieldValue,
+                                  });
+                                  if (result.data['success']) {
+                                    widget.patient.email =
+                                        currentEmailTextFormFieldValue;
+                                    updateUserEmail(
+                                        currentEmailTextFormFieldValue, uid);
+                                    modifyPatientInDb(widget.patient);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Email change failed. Please try again later.')));
+                                  }
+                                } on FirebaseFunctionsException catch (e) {
+                                  print(
+                                      'Failed to update email: ${e.code}\n${e.message}');
+                                }
+                              }
                             });
                           } else {
                             setState(() {
@@ -429,13 +458,41 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                           }
                           _model.textFieldFocusNode6!.unfocus();
                         },
-                        onFieldSubmitted: (String newValue) {
-                          setState(() {
+                        onFieldSubmitted: (String newValue) async {
+                          setState(() async {
                             if (currentEmailTextFormFieldValue.isNotEmpty) {
                               widget.patient.email =
                                   currentEmailTextFormFieldValue;
-                              if (widget.modifying)
-                                modifyPatientInDb(widget.patient);
+                              if (widget.modifying) {
+                                String uid = await getUserUID(
+                                    'relative', widget.patient.id.toString());
+
+                                final HttpsCallable callable = FirebaseFunctions
+                                    .instance
+                                    .httpsCallable('updateUserEmail');
+                                try {
+                                  final HttpsCallableResult result =
+                                      await callable.call(<String, dynamic>{
+                                    'uid': uid,
+                                    'newEmail': currentEmailTextFormFieldValue,
+                                  });
+                                  if (result.data['success']) {
+                                    widget.patient.email =
+                                        currentEmailTextFormFieldValue;
+                                    updateUserEmail(
+                                        currentEmailTextFormFieldValue, uid);
+                                    modifyPatientInDb(widget.patient);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Email change failed. Please try again later.')));
+                                  }
+                                } on FirebaseFunctionsException catch (e) {
+                                  print(
+                                      'Failed to update email: ${e.code}\n${e.message}');
+                                }
+                              }
                             } else {
                               _emailController.text = widget.patient.email;
                             }
@@ -504,13 +561,73 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                   currentPasswordTextFormFieldValue = newValue;
                                 });
                               },
-                              onTapOutside: (newValue) {
+                              onTapOutside: (newValue) async {
+                                if (currentPasswordTextFormFieldValue
+                                    .isNotEmpty) {
+                                  if (widget.modifying) {
+                                    String uid = await getUserUID('patient',
+                                        widget.patient.id.toString());
+
+                                    final HttpsCallable callable =
+                                        FirebaseFunctions.instance
+                                            .httpsCallable(
+                                                'updateUserPassword');
+                                    try {
+                                      final HttpsCallableResult result =
+                                          await callable.call(<String, dynamic>{
+                                        'uid': uid,
+                                        'newPassword':
+                                            currentPasswordTextFormFieldValue,
+                                      });
+                                      if (result.data['success']) {
+                                        print('Password updated successfully');
+                                      } else {
+                                        print('Password update failed');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                                content: Text(
+                                                    'Password change failed. Please try again later.')));
+                                      }
+                                    } on FirebaseFunctionsException catch (e) {
+                                      print(
+                                          'Failed to update Password: ${e.code}\n${e.message}');
+                                    }
+                                  }
+                                }
                                 _model.textFieldFocusNode6!.unfocus();
                               },
-                              onFieldSubmitted: (String newValue) {
+                              onFieldSubmitted: (String newValue) async {
                                 setState(() {
                                   currentPasswordTextFormFieldValue = newValue;
                                 });
+                                if (widget.modifying) {
+                                  String uid = await getUserUID(
+                                      'patient', widget.patient.id.toString());
+
+                                  final HttpsCallable callable =
+                                      FirebaseFunctions.instance
+                                          .httpsCallable('updateUserPassword');
+                                  try {
+                                    final HttpsCallableResult result =
+                                        await callable.call(<String, dynamic>{
+                                      'uid': uid,
+                                      'newPassword':
+                                          currentPasswordTextFormFieldValue,
+                                    });
+                                    if (result.data['success']) {
+                                      print('Password updated successfully');
+                                    } else {
+                                      print('Password update failed');
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Password change failed. Please try again later.')));
+                                    }
+                                  } on FirebaseFunctionsException catch (e) {
+                                    print(
+                                        'Failed to update Password: ${e.code}\n${e.message}');
+                                  }
+                                }
                               },
                               style: FlutterFlowTheme.of(context).bodyMedium,
                             )
@@ -1102,20 +1219,18 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                     0, 34, 0, 0),
                                 child: FFButtonWidget(
                                   onPressed: () async {
-                                    String email = '';
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: const Text('Reset Password'),
+                                          title: const Text('Change Password'),
                                           content: const Text(
-                                              'Please enter your email address to reset your password.'),
+                                              'Please enter your new password.'),
                                           actions: <Widget>[
                                             TextFormField(
                                               autofocus: true,
                                               obscureText: false,
                                               decoration: InputDecoration(
-                                                labelText: 'Email',
                                                 labelStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .labelMedium,
@@ -1171,7 +1286,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                       .bodyMedium,
                                               onChanged: (value) {
                                                 setState(() {
-                                                  email = value;
+                                                  currentPasswordTextFormFieldValue =
+                                                      value;
                                                 });
                                               },
                                             ),
@@ -1185,35 +1301,48 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                                         .fromSTEB(0, 34, 0, 12),
                                                 child: FFButtonWidget(
                                                   onPressed: () async {
-                                                    if (email ==
-                                                        widget.patient.email) {
-                                                      await auth
-                                                          .sendPasswordResetEmail(
-                                                              email: email);
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              const SnackBar(
-                                                        content: Text(
-                                                            'Password reset email sent successfully.'),
-                                                        duration: Duration(
-                                                            seconds: 3),
-                                                      ));
-                                                    } else {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              const SnackBar(
-                                                        content: Text(
-                                                            'Email does not match.'),
-                                                        duration: Duration(
-                                                            seconds: 3),
-                                                      ));
+                                                    String uid =
+                                                        await getUserUID(
+                                                            'patient',
+                                                            widget.patient.id
+                                                                .toString());
+
+                                                    final HttpsCallable
+                                                        callable =
+                                                        FirebaseFunctions
+                                                            .instance
+                                                            .httpsCallable(
+                                                                'updateUserPassword');
+                                                    try {
+                                                      final HttpsCallableResult
+                                                          result =
+                                                          await callable
+                                                              .call(<String,
+                                                                  dynamic>{
+                                                        'uid': uid,
+                                                        'newPassword':
+                                                            currentPasswordTextFormFieldValue,
+                                                      });
+                                                      if (result
+                                                          .data['success']) {
+                                                        print(
+                                                            'Password updated successfully');
+                                                      } else {
+                                                        print(
+                                                            'Password update failed');
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                                const SnackBar(
+                                                                    content: Text(
+                                                                        'Password change failed. Please try again later.')));
+                                                      }
+                                                    } on FirebaseFunctionsException catch (e) {
+                                                      print(
+                                                          'Failed to update Password: ${e.code}\n${e.message}');
                                                     }
                                                   },
-                                                  text: 'SEND',
+                                                  text: 'CONFIRM',
                                                   options: FFButtonOptions(
                                                     width: 150,
                                                     height: 48,
@@ -1254,7 +1383,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                                       },
                                     );
                                   },
-                                  text: 'RESET PASSWORD',
+                                  text: 'CHANGE PASSWORD',
                                   options: FFButtonOptions(
                                     width: 600,
                                     height: 48,

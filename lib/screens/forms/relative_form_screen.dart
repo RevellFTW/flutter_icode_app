@@ -184,10 +184,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                             });
                           },
                         ),
-                        !widget.modifying ||
-                                loggedInUserType ==
-                                    Caller.backOfficeCaretaker ||
-                                loggedInUserType == Caller.backOfficePatient
+                        !widget.modifying
                             ? TextFormField(
                                 controller: _passwordController,
                                 autofocus: true,
@@ -250,7 +247,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                         newValue;
                                   });
                                 },
-                                onTapOutside: (newValue) {
+                                onTapOutside: (newValue) async {
                                   saveTextValue(
                                       currentPasswordTextFormFieldValue,
                                       _passwordController, (value) {
@@ -259,6 +256,35 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                     _passwordController.text =
                                         widget.relative.password;
                                   });
+                                  if (widget.modifying) {
+                                    String uid = await getUserUID('relative',
+                                        widget.relative.id.toString());
+
+                                    final HttpsCallable callable =
+                                        FirebaseFunctions.instance
+                                            .httpsCallable(
+                                                'updateUserPassword');
+                                    try {
+                                      final HttpsCallableResult result =
+                                          await callable.call(<String, dynamic>{
+                                        'uid': uid,
+                                        'newPassword':
+                                            currentPasswordTextFormFieldValue,
+                                      });
+                                      if (result.data['success']) {
+                                        print('Password updated successfully');
+                                      } else {
+                                        print('Password update failed');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                                content: Text(
+                                                    'Password change failed. Please try again later.')));
+                                      }
+                                    } on FirebaseFunctionsException catch (e) {
+                                      print(
+                                          'Failed to update Password: ${e.code}\n${e.message}');
+                                    }
+                                  }
                                   FocusScope.of(context).unfocus();
                                 },
                                 onFieldSubmitted: (String newPassword) async {
@@ -348,13 +374,44 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                               currentEmailTextFormFieldValue = newValue;
                             });
                           },
-                          onTapOutside: (newValue) {
+                          onTapOutside: (newValue) async {
                             saveTextValue(currentEmailTextFormFieldValue,
                                 _emailController, (value) {
                               widget.relative.email = value;
                             }, () {
                               _emailController.text = widget.relative.email;
                             });
+
+                            if (widget.modifying) {
+                              String uid = await getUserUID(
+                                  'relative', widget.relative.id.toString());
+
+                              final HttpsCallable callable = FirebaseFunctions
+                                  .instance
+                                  .httpsCallable('updateUserEmail');
+                              try {
+                                final HttpsCallableResult result =
+                                    await callable.call(<String, dynamic>{
+                                  'uid': uid,
+                                  'newEmail': currentEmailTextFormFieldValue,
+                                });
+                                if (result.data['success']) {
+                                  widget.relative.email =
+                                      currentEmailTextFormFieldValue;
+                                  updateUserEmail(
+                                      currentEmailTextFormFieldValue, uid);
+                                  modifyRelativeInDb(widget.relative);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Email change failed. Please try again later.')));
+                                }
+                              } on FirebaseFunctionsException catch (e) {
+                                print(
+                                    'Failed to update email: ${e.code}\n${e.message}');
+                              }
+                            }
                             FocusScope.of(context).unfocus();
                           },
                           onFieldSubmitted: (String newEmail) async {
@@ -508,20 +565,18 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                 0, 34, 0, 0),
                             child: FFButtonWidget(
                               onPressed: () async {
-                                String email = '';
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      title: const Text('Reset Password'),
+                                      title: const Text('Change Password'),
                                       content: const Text(
-                                          'Please enter your email address to reset your password.'),
+                                          'Please enter your new password.'),
                                       actions: <Widget>[
                                         TextFormField(
                                           autofocus: true,
-                                          obscureText: false,
+                                          obscureText: !passwordFieldVisibility,
                                           decoration: InputDecoration(
-                                            labelText: 'Email',
                                             labelStyle:
                                                 FlutterFlowTheme.of(context)
                                                     .labelMedium,
@@ -569,12 +624,28 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                               borderRadius:
                                                   BorderRadius.circular(8),
                                             ),
+                                            suffixIcon: InkWell(
+                                              onTap: () => setState(
+                                                () => passwordFieldVisibility =
+                                                    !passwordFieldVisibility,
+                                              ),
+                                              focusNode: FocusNode(
+                                                  skipTraversal: true),
+                                              child: Icon(
+                                                passwordFieldVisibility
+                                                    ? Icons.visibility_outlined
+                                                    : Icons
+                                                        .visibility_off_outlined,
+                                                size: 20,
+                                              ),
+                                            ),
                                           ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium,
                                           onChanged: (value) {
                                             setState(() {
-                                              email = value;
+                                              currentPasswordTextFormFieldValue =
+                                                  value;
                                             });
                                           },
                                         ),
@@ -586,29 +657,41 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                                 .fromSTEB(0, 34, 0, 12),
                                             child: FFButtonWidget(
                                               onPressed: () async {
-                                                if (email ==
-                                                    widget.relative.email) {
-                                                  await auth
-                                                      .sendPasswordResetEmail(
-                                                          email: email);
-                                                  Navigator.of(context).pop();
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                          const SnackBar(
-                                                    content: Text(
-                                                        'Password reset email sent successfully.'),
-                                                    duration:
-                                                        Duration(seconds: 3),
-                                                  ));
-                                                } else {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                          const SnackBar(
-                                                    content: Text(
-                                                        'Email does not match.'),
-                                                    duration:
-                                                        Duration(seconds: 3),
-                                                  ));
+                                                String uid = await getUserUID(
+                                                    'relative',
+                                                    widget.relative.id
+                                                        .toString());
+
+                                                final HttpsCallable callable =
+                                                    FirebaseFunctions.instance
+                                                        .httpsCallable(
+                                                            'updateUserPassword');
+                                                try {
+                                                  final HttpsCallableResult
+                                                      result = await callable
+                                                          .call(<String,
+                                                              dynamic>{
+                                                    'uid': uid,
+                                                    'newPassword':
+                                                        currentPasswordTextFormFieldValue,
+                                                  });
+                                                  if (result.data['success']) {
+                                                    print(
+                                                        'Password updated successfully');
+                                                  } else {
+                                                    print(
+                                                        'Password update failed');
+                                                    // ignore: use_build_context_synchronously
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                            const SnackBar(
+                                                                content: Text(
+                                                                    'Password change failed. Please try again later.')));
+                                                  }
+                                                } on FirebaseFunctionsException catch (e) {
+                                                  print(
+                                                      'Failed to update Password: ${e.code}\n${e.message}');
                                                 }
                                               },
                                               text: 'SEND',
@@ -648,7 +731,7 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                   },
                                 );
                               },
-                              text: 'RESET PASSWORD',
+                              text: 'CHANGE PASSWORD',
                               options: FFButtonOptions(
                                 width: 600,
                                 height: 48,
@@ -701,6 +784,30 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                           widget.relative, user.uid);
                                     });
                                   } else {
+                                    String uid = await getUserUID('relative',
+                                        widget.relative.id.toString());
+                                    final HttpsCallable callable =
+                                        FirebaseFunctions.instance
+                                            .httpsCallable('deleteUser');
+                                    try {
+                                      final HttpsCallableResult result =
+                                          await callable.call(<String, dynamic>{
+                                        'uid': uid,
+                                      });
+                                      if (result.data['success']) {
+                                        print('user deleted successfully');
+                                      } else {
+                                        print('User delete failed');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                                content: Text(
+                                                    'User delete failed. Please try again later.')));
+                                      }
+                                    } on FirebaseFunctionsException catch (e) {
+                                      print(
+                                          'Failed to delete user: ${e.code}\n${e.message}');
+                                    }
+
                                     removeRelativeFromDb(widget.relative.id);
                                     widget.patient!.relatives
                                         .remove(widget.relative);
