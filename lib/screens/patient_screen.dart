@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
@@ -297,11 +298,35 @@ class _PatientScreenState extends State<PatientScreen> {
                         motion: const ScrollMotion(),
                         children: <Widget>[
                           SlidableAction(
-                            onPressed: (context) => {
-                              removePatient(_filteredPatients[i].id),
+                            onPressed: (context) async {
+                              String uid = await getUserUID('patient',
+                                  _filteredPatients[i].id.toString());
+                              final HttpsCallable callable = FirebaseFunctions
+                                  .instance
+                                  .httpsCallable('deleteUser');
+                              try {
+                                final HttpsCallableResult result =
+                                    await callable.call(<String, dynamic>{
+                                  'uid': uid,
+                                });
+                                if (result.data['success']) {
+                                  print('user deleted successfully');
+                                } else {
+                                  print('User delete failed');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'User delete failed. Please try again later.')));
+                                }
+                              } on FirebaseFunctionsException catch (e) {
+                                print(
+                                    'Failed to delete user: ${e.code}\n${e.message}');
+                              }
+
+                              removePatient(_filteredPatients[i].id);
                               setState(() {
                                 filterPatients();
-                              })
+                              });
                             },
                             backgroundColor: Colors.red,
                             icon: Icons.delete,
