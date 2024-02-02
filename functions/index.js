@@ -21,12 +21,34 @@ admin.initializeApp();
 exports.updateUserEmail = functions.https.onCall((data, context) => {
   const uid = data.uid;
   const newEmail = data.newEmail;
-  return admin.auth().updateUser(uid, {
-    email: newEmail,
-  })
+  console.log("Receive request to update email for UID: ${uid} to ${newEmail}");
+  return admin.auth().getUser(uid)
       .then((userRecord) => {
-        console.log(userRecord.newEmail);
-        return {success: true};
+        return admin.auth().updateUser(userRecord.uid, {
+          email: newEmail,
+        })
+            .then((updatedUserRecord) => {
+              console.log(updatedUserRecord.email);
+              return {success: true};
+            });
+      })
+      .catch((error) => {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      });
+});
+exports.updateUserPassword = functions.https.onCall((data, context) => {
+  const uid = data.uid;
+  const newPassword = data.newPassword;
+  console.log("Receive request to update pw for UID: ${uid} to ${newPassword}");
+  return admin.auth().getUser(uid)
+      .then((userRecord) => {
+        return admin.auth().updateUser(userRecord.uid, {
+          password: newPassword,
+        })
+            .then((updatedUserRecord) => {
+              console.log(updatedUserRecord.password);
+              return {success: true};
+            });
       })
       .catch((error) => {
         throw new functions.https.HttpsError("unknown", error.message, error);
