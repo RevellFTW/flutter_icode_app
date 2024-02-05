@@ -329,129 +329,160 @@ class _RelativeFormScreenState extends State<RelativeFormScreen> {
                                 },
                               )
                             : Container(),
-                        TextFormField(
-                          controller: _emailController,
-                          autofocus: true,
-                          obscureText: false,
-                          readOnly: !widget.visibility,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle:
-                                FlutterFlowTheme.of(context).labelMedium,
-                            hintStyle: FlutterFlowTheme.of(context).labelMedium,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                width: 2,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _emailController,
+                                autofocus: true,
+                                obscureText: false,
+                                readOnly: !widget.visibility,
+                                decoration: InputDecoration(
+                                  labelText: 'Email',
+                                  labelStyle:
+                                      FlutterFlowTheme.of(context).labelMedium,
+                                  hintStyle:
+                                      FlutterFlowTheme.of(context).labelMedium,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context).error,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context).error,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                style: FlutterFlowTheme.of(context).bodyMedium,
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    currentEmailTextFormFieldValue = newValue;
+                                  });
+                                },
+                                onTapOutside: (newValue) async {
+                                  if (!widget.modifying) {
+                                    saveTextValue(
+                                        currentEmailTextFormFieldValue,
+                                        _emailController, (value) {
+                                      widget.relative.email = value;
+                                    }, () {
+                                      _emailController.text =
+                                          widget.relative.email;
+                                    });
+                                  }
+                                },
+                                onFieldSubmitted: (String newEmail) async {
+                                  if (!widget.modifying) {
+                                    saveTextValue(
+                                        currentEmailTextFormFieldValue,
+                                        _emailController, (value) {
+                                      widget.relative.email = value;
+                                    }, () {
+                                      _emailController.text =
+                                          widget.relative.email;
+                                    });
+                                  }
+                                },
                               ),
-                              borderRadius: BorderRadius.circular(8),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).primary,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).error,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).error,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          style: FlutterFlowTheme.of(context).bodyMedium,
-                          onChanged: (String newValue) {
-                            setState(() {
-                              currentEmailTextFormFieldValue = newValue;
-                            });
-                          },
-                          onTapOutside: (newValue) async {
-                            saveTextValue(currentEmailTextFormFieldValue,
-                                _emailController, (value) {
-                              widget.relative.email = value;
-                            }, () {
-                              _emailController.text = widget.relative.email;
-                            });
+                            widget.modifying
+                                ? Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12, 0, 0, 0),
+                                    child: SizedBox(
+                                      width:
+                                          100, // Adjust the width as needed to match the original length of the TextFormField
+                                      child: FFButtonWidget(
+                                        onPressed: () async {
+                                          String uid = await getUserUID(
+                                              'relative',
+                                              widget.relative.id.toString());
 
-                            if (widget.modifying) {
-                              String uid = await getUserUID(
-                                  'relative', widget.relative.id.toString());
-
-                              final HttpsCallable callable = FirebaseFunctions
-                                  .instance
-                                  .httpsCallable('updateUserEmail');
-                              try {
-                                final HttpsCallableResult result =
-                                    await callable.call(<String, dynamic>{
-                                  'uid': uid,
-                                  'newEmail': currentEmailTextFormFieldValue,
-                                });
-                                if (result.data['success']) {
-                                  widget.relative.email =
-                                      currentEmailTextFormFieldValue;
-                                  updateUserEmail(
-                                      currentEmailTextFormFieldValue, uid);
-                                  modifyRelativeInDb(widget.relative);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Email change failed. Please try again later.')));
-                                }
-                              } on FirebaseFunctionsException catch (e) {
-                                print(
-                                    'Failed to update email: ${e.code}\n${e.message}');
-                              }
-                            }
-                            FocusScope.of(context).unfocus();
-                          },
-                          onFieldSubmitted: (String newEmail) async {
-                            saveTextValue(currentEmailTextFormFieldValue,
-                                _emailController, (value) {
-                              if (!widget.modifying) {
-                                widget.relative.email = value;
-                              }
-                            }, () {
-                              _emailController.text = widget.relative.email;
-                            });
-                            if (widget.modifying) {
-                              String uid = await getUserUID(
-                                  'relative', widget.relative.id.toString());
-
-                              final HttpsCallable callable = FirebaseFunctions
-                                  .instance
-                                  .httpsCallable('updateUserEmail');
-                              try {
-                                final HttpsCallableResult result =
-                                    await callable.call(<String, dynamic>{
-                                  'uid': uid,
-                                  'newEmail': newEmail,
-                                });
-                                if (result.data['success']) {
-                                  widget.relative.email = newEmail;
-                                  updateUserEmail(newEmail, uid);
-                                  modifyRelativeInDb(widget.relative);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Email change failed. Please try again later.')));
-                                }
-                              } on FirebaseFunctionsException catch (e) {
-                                print(
-                                    'Failed to update email: ${e.code}\n${e.message}');
-                              }
-                            }
-                          },
+                                          final HttpsCallable callable =
+                                              FirebaseFunctions.instance
+                                                  .httpsCallable(
+                                                      'updateUserEmail');
+                                          try {
+                                            final HttpsCallableResult result =
+                                                await callable
+                                                    .call(<String, dynamic>{
+                                              'uid': uid,
+                                              'newEmail':
+                                                  currentEmailTextFormFieldValue,
+                                            });
+                                            if (result.data['success']) {
+                                              widget.relative.email =
+                                                  currentEmailTextFormFieldValue;
+                                              updateUserEmail(
+                                                  currentEmailTextFormFieldValue,
+                                                  uid);
+                                              modifyRelativeInDb(
+                                                  widget.relative);
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                      content: Text(
+                                                          'Email change failed. Please try again later.')));
+                                            }
+                                          } on FirebaseFunctionsException catch (e) {
+                                            print(
+                                                'Failed to update email: ${e.code}\n${e.message}');
+                                          }
+                                        },
+                                        text: 'Change',
+                                        options: FFButtonOptions(
+                                          width: 150,
+                                          height: 48,
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(0, 0, 0, 0),
+                                          iconPadding:
+                                              const EdgeInsetsDirectional
+                                                  .fromSTEB(0, 0, 0, 0),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          textStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleSmall
+                                                  .override(
+                                                    fontFamily: 'Readex Pro',
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                          elevation: 4,
+                                          borderSide: const BorderSide(
+                                            color: Colors.transparent,
+                                            width: 1,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(60),
+                                        ),
+                                      ),
+                                    ))
+                                : Container(),
+                          ],
                         ),
                         TextFormField(
                           controller: _phoneNumberController,
