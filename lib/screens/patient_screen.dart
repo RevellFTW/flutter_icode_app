@@ -456,22 +456,24 @@ class _PatientScreenState extends State<PatientScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        backgroundColor: appBackgroundColor,
-        foregroundColor: appForegroundColor,
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => PatientFormScreen(
-                    patient: Patient.empty(patients.length + 1),
-                    caretakerList: caretakerList,
-                    modifying: false,
-                    visibility: true,
-                    isRelative: false,
-                  )));
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: loggedInUserType != Caller.caretaker
+          ? FloatingActionButton(
+              heroTag: null,
+              backgroundColor: appBackgroundColor,
+              foregroundColor: appForegroundColor,
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => PatientFormScreen(
+                          patient: Patient.empty(patients.length + 1),
+                          caretakerList: caretakerList,
+                          modifying: false,
+                          visibility: true,
+                          isRelative: false,
+                        )));
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 

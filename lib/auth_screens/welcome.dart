@@ -87,21 +87,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             case 'backoffice':
               {
                 isBackOffice = true;
+                loggedInUserType = Caller.backOfficePatient;
                 break;
               }
             case 'patient':
               {
                 isPatient = true;
+                loggedInUserType = Caller.patient;
                 break;
               }
             case 'relative':
               {
                 isRelative = true;
+                loggedInUserType = Caller.relative;
                 break;
               }
             case 'caretaker':
               {
                 isCaretaker = true;
+                loggedInUserType = Caller.caretaker;
                 break;
               }
           }

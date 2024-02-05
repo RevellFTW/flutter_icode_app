@@ -300,8 +300,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                         focusNode: _model.textFieldFocusNode1,
                         autofocus: true,
                         obscureText: false,
-                        //make readonly if caller is caretaker
-                        readOnly: !widget.visibility &&
+                        readOnly: !widget.visibility ||
                             loggedInUserType == Caller.caretaker,
                         decoration: InputDecoration(
                           labelText: 'Name',
@@ -373,7 +372,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       TextFormField(
                         controller: _emailController,
                         focusNode: _model.textFieldFocusNode6,
-                        readOnly: !widget.visibility &&
+                        readOnly: !widget.visibility ||
                             loggedInUserType == Caller.caretaker,
                         autofocus: true,
                         obscureText: false,
@@ -637,7 +636,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             ? () => updateStartDate(widget.patient.dateOfBirth)
                             : null,
                         keyboardType: TextInputType.datetime,
-                        readOnly: !widget.visibility &&
+                        readOnly: !widget.visibility ||
                             loggedInUserType == Caller.caretaker,
                         controller: _dateController,
                         focusNode: _model.textFieldFocusNode2,
@@ -1005,7 +1004,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                       Align(
                         alignment: const AlignmentDirectional(0.00, 0.00),
                         child: IgnorePointer(
-                          ignoring: !widget.visibility &&
+                          ignoring: !widget.visibility ||
                               loggedInUserType == Caller.caretaker,
                           child: MultiSelectDropDown<String>(
                             controller: multiSelectDropdownController,
@@ -1211,7 +1210,9 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               ],
                             )
                           : Container(),
-                      (widget.visibility && widget.modifying)
+                      (widget.visibility &&
+                              widget.modifying &&
+                              loggedInUserType != Caller.caretaker)
                           ? Align(
                               alignment: const AlignmentDirectional(0.00, 0.00),
                               child: Padding(
@@ -1411,7 +1412,7 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                               ),
                             )
                           : Container(),
-                      widget.visibility
+                      widget.visibility && loggedInUserType != Caller.caretaker
                           ? Align(
                               alignment: const AlignmentDirectional(0.00, 0.00),
                               child: Padding(
