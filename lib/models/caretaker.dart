@@ -26,7 +26,7 @@ class Caretaker {
         id: idParam,
         name: '',
         startDate: DateTime.now(),
-        dateOfBirth: DateTime.now(),
+        dateOfBirth: DateTime.now().subtract(const Duration(days: 365 * 20)),
         email: '',
         workTypes: '',
         availability: '',

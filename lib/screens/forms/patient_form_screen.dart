@@ -632,7 +632,8 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
                             )
                           : Container(),
                       TextFormField(
-                        onTap: widget.visibility
+                        onTap: widget.visibility &&
+                                loggedInUserType != Caller.caretaker
                             ? () => updateStartDate(widget.patient.dateOfBirth)
                             : null,
                         keyboardType: TextInputType.datetime,

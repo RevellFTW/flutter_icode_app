@@ -37,7 +37,8 @@ class Patient {
         name: '',
         email: '',
         startDate: DateTime.now(),
-        dateOfBirth: DateTime.now(),
+        //make birth date older
+        dateOfBirth: DateTime.now().subtract(const Duration(days: 365 * 20)),
         medicalState: '',
         dailyHours: 0,
         takenMedicines: '',
